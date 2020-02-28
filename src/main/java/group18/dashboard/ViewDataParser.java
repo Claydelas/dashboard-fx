@@ -120,16 +120,40 @@ public class ViewDataParser {
         return cost;
     }
 
+    public static XYChart.Series<Date, Double> getCTRTimeSeries(int timeResolution, List<Impression> impressions, List<Click> clicks) {
+        final Map<Date, Integer> totalImpressions = new HashMap<>();
+        final Map<Date, Integer> totalClicks = new HashMap<>();
+
+        for (Impression impression : impressions) {
+            final Date roundedTime = DateUtils.round(impression.getDate(), timeResolution);
+            totalImpressions.putIfAbsent(roundedTime, 0);
+            totalImpressions.computeIfPresent(roundedTime, (key, val) -> val + 1);
+        }
+
+        for (Click click : clicks) {
+            final Date roundedTime = DateUtils.round(click.getDate(), timeResolution);
+            totalClicks.putIfAbsent(roundedTime, 0);
+            totalClicks.computeIfPresent(roundedTime, (key, val) -> val + 1);
+        }
+
+        final Map<Date, Double> ctrs = new HashMap<>();
+        for (Map.Entry<Date, Integer> entry : totalImpressions.entrySet()) {
+            ctrs.put(entry.getKey(), (double) totalClicks.get(entry.getKey()) / entry.getValue());
+        }
+
+        return mapToSeries("Click-through-rate", ctrs);
+    }
+
+    public static double getCTR(List<Impression> impressions, List<Click> clicks) {
+        return (double) clicks.size() / impressions.size();
+    }
+
     public static double getCPA(List<Impression> impressions, List<Click> clicks, List<Interaction> interactions) {
         return getTotalCost(impressions, clicks) / getConversions(interactions);
     }
 
     public static double getCPC(List<Impression> impressions, List<Click> clicks) {
         return getTotalCost(impressions, clicks) / clicks.size();
-    }
-
-    public static double getCTR(List<Impression> impressions, List<Click> clicks) {
-        return (double) clicks.size() / impressions.size();
     }
 
     public static double getBounceRate(List<Click> clicks, List<Interaction> interactions) {
