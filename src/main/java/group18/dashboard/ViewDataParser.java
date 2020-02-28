@@ -148,12 +148,27 @@ public class ViewDataParser {
         return (double) clicks.size() / impressions.size();
     }
 
+    // TODO
+    public static XYChart.Series<Date, Double> getCPATimeSeries(int timeResolution, List<Impression> impressions, List<Click> clicks, List<Interaction> interactions) {
+        return null;
+    }
+
     public static double getCPA(List<Impression> impressions, List<Click> clicks, List<Interaction> interactions) {
         return getTotalCost(impressions, clicks) / getConversions(interactions);
     }
 
+    // TODO
+    public static XYChart.Series<Date, Double> getCPCTimeSeries(int timeResolution, List<Impression> impressions, List<Click> clicks) {
+        return null;
+    }
+
     public static double getCPC(List<Impression> impressions, List<Click> clicks) {
         return getTotalCost(impressions, clicks) / clicks.size();
+    }
+
+    // TODO
+    public static XYChart.Series<Date, Double> getBounceRateTimeSeries(int timeResolution, List<Click> clicks, List<Interaction> interactions) {
+        return null;
     }
 
     public static double getBounceRate(List<Click> clicks, List<Interaction> interactions) {
