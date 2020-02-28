@@ -128,6 +128,14 @@ public class ViewDataParser {
         return getTotalCost(impressions, clicks) / clicks.size();
     }
 
+    public static double getCTR(List<Impression> impressions, List<Click> clicks) {
+        return (double) clicks.size() / impressions.size();
+    }
+
+    public static double getBounceRate(List<Click> clicks, List<Interaction> interactions) {
+        return (double) getBounces(interactions) / clicks.size();
+    }
+
     private static <T, U> XYChart.Series<T, U> mapToSeries(String seriesName, Map<T, U> map) {
         final XYChart.Series<T, U> series = new XYChart.Series<>();
         series.setName(seriesName);
