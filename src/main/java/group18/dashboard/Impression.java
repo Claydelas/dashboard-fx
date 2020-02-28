@@ -12,6 +12,15 @@ public class Impression {
     private Income income;
     private double cost;
 
+    public Impression(Date date, String id, Gender gender, int age, Income income, double cost) {
+        this.date = date;
+        this.id = id;
+        this.gender = gender;
+        this.age = age;
+        this.income = income;
+        this.cost = cost;
+    }
+
     public Date getDate() {
         return date;
     }

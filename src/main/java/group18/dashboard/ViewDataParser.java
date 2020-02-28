@@ -23,8 +23,8 @@ public class ViewDataParser {
     }
 
     // Every 1000 impressions calculate the cost sum and plot them
-    public static XYChart.Series<Date, Double> getCPMTimeSeries(List<Impression> impressions) {
-        final Map<Date, Double> cpms = new HashMap<>();
+    public static XYChart.Series<String, Double> getCPMTimeSeries(List<Impression> impressions) {
+        final Map<String, Double> cpms = new HashMap<>();
 
         final List<Impression> sortedImpressions = impressions
                 .stream()
@@ -38,7 +38,7 @@ public class ViewDataParser {
                     .limit(1000)
                     .mapToDouble(Impression::getCost)
                     .sum();
-            cpms.put(sortedImpressions.get(i + 999).getDate(), cpm);
+            cpms.put(sortedImpressions.get(i + 999).getDate().toString(), cpm);
         }
 
         return mapToSeries("Cost-per-thousand impressions", cpms);

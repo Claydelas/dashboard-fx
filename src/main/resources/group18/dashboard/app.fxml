@@ -11,21 +11,20 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.VBox?>
 
-
-<BorderPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<BorderPane fx:id="appView" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="group18.dashboard.controllers.AppController">
    <top>
       <MenuBar prefHeight="25.0" prefWidth="914.0" BorderPane.alignment="CENTER">
         <menus>
           <Menu mnemonicParsing="false" text="File">
             <items>
-              <MenuItem mnemonicParsing="false" text="Import Campaign" />
-                  <MenuItem mnemonicParsing="false" text="Save as PNG" />
+              <MenuItem fx:id="importCampaignButton" mnemonicParsing="false" onAction="#importCampaignButtonAction" text="Import Campaign" />
+                  <MenuItem fx:id="exportPNGButton" mnemonicParsing="false" text="Save as PNG" />
             </items>
           </Menu>
           <Menu mnemonicParsing="false" text="Accessibility">
             <items>
-              <MenuItem mnemonicParsing="false" text="UI Scaling" />
-                  <MenuItem mnemonicParsing="false" text="Colour Palette" />
+              <MenuItem fx:id="uiScalingButton" mnemonicParsing="false" text="UI Scaling" />
+                  <MenuItem fx:id="themeButton" mnemonicParsing="false" onAction="#themeButtonAction" text="Colour Palette" />
             </items>
           </Menu>
         </menus>
@@ -34,17 +33,17 @@
    <center>
       <BorderPane BorderPane.alignment="CENTER">
          <center>
-            <LineChart prefHeight="507.0" prefWidth="685.0">
+            <LineChart fx:id="mainChart" prefHeight="507.0" prefWidth="685.0">
               <xAxis>
-                <CategoryAxis side="BOTTOM" />
+                <CategoryAxis side="BOTTOM" fx:id="xAxis" />
               </xAxis>
               <yAxis>
-                <NumberAxis side="LEFT" />
+                <NumberAxis fx:id="yAxis" side="LEFT" />
               </yAxis>
             </LineChart>
          </center>
          <bottom>
-            <JFXSlider showTickLabels="true" showTickMarks="true" BorderPane.alignment="CENTER">
+            <JFXSlider fx:id="granularitySlider" showTickLabels="true" showTickMarks="true" BorderPane.alignment="CENTER">
                <padding>
                   <Insets left="10.0" right="10.0" />
                </padding>

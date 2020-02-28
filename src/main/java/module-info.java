@@ -4,6 +4,6 @@ module group18.dashboard {
     requires commons.lang;
     requires com.jfoenix;
 
-    opens group18.dashboard to javafx.fxml;
+    opens group18.dashboard.controllers to javafx.fxml;
     exports group18.dashboard;
 }
