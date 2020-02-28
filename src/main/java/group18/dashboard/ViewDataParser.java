@@ -22,26 +22,69 @@ public class ViewDataParser {
         return mapToSeries(dataName, quantities);
     }
 
-    // Every 1000 impressions calculate the cost sum and plot them
-    public static XYChart.Series<Date, Double> getCPMTimeSeries(List<Impression> impressions) {
+    public static long getUniques(List<Click> clicks) {
+        return clicks
+                .parallelStream()
+                .map(Click::getID)
+                .distinct()
+                .count();
+    }
+
+    public static long getBounces(List<Interaction> interactions) {
+        return interactions
+                .parallelStream()
+                .filter(interaction -> !interaction.isConversion())
+                .count();
+    }
+
+    public static long getConversions(List<Interaction> interactions) {
+        return interactions
+                .parallelStream()
+                .filter(Interaction::isConversion)
+                .count();
+    }
+
+    // Every 1000 impressions calculate the (impressions + click) cost sum and plot them
+    public static XYChart.Series<Date, Double> getCPMTimeSeries(List<Impression> impressions, List<Click> clicks) {
         final Map<Date, Double> cpms = new HashMap<>();
 
         final List<Impression> sortedImpressions = impressions
                 .stream()
                 .sorted(Comparator.comparing(Impression::getDate))
                 .collect(Collectors.toList());
+        // Maybe use this if searching through all clicks in the loop is too slow
+//        final List<Click> sortedClicks = clicks
+//                .stream()
+//                .sorted(Comparator.comparing(Click::getDate))
+//                .collect(Collectors.toList());
 
         for (int i = 0, length = sortedImpressions.size(); i < length; i += 1000) {
-            final double cpm = sortedImpressions
+            double cpm = sortedImpressions
                     .stream()
                     .skip(i * 1000)
                     .limit(1000)
                     .mapToDouble(Impression::getCost)
                     .sum();
+
+            final Impression firstImpression = sortedImpressions.get(i * 1000);
+            final Impression lastImpression = sortedImpressions.get(i * 1000 + 999);
+
+            cpm += clicks
+                    .parallelStream()
+                    .filter(click ->
+                            click.getDate().after(firstImpression.getDate()) &&
+                            click.getDate().before(lastImpression.getDate()))
+                    .mapToDouble(Click::getCost)
+                    .sum();
+
             cpms.put(sortedImpressions.get(i + 999).getDate(), cpm);
         }
 
         return mapToSeries("Cost-per-thousand impressions", cpms);
+    }
+
+    public static double getCPM(List<Impression> impressions, List<Click> clicks) {
+        return getTotalCost(impressions, clicks) / (impressions.size() * 1000);
     }
 
     public static XYChart.Series<Date, Double> getTotalCostSeries(int timeResolution, List<Impression> impressions, List<Click> clicks) {
@@ -60,6 +103,29 @@ public class ViewDataParser {
         }
 
         return mapToSeries("Total cost", totalCosts);
+    }
+
+    public static double getTotalCost(List<Impression> impressions, List<Click> clicks) {
+        double cost = 0;
+
+        cost += impressions
+                .parallelStream()
+                .mapToDouble(Impression::getCost)
+                .sum();
+        cost += clicks
+                .parallelStream()
+                .mapToDouble(Click::getCost)
+                .sum();
+
+        return cost;
+    }
+
+    public static double getCPA(List<Impression> impressions, List<Click> clicks, List<Interaction> interactions) {
+        return getTotalCost(impressions, clicks) / getConversions(interactions);
+    }
+
+    public static double getCPC(List<Impression> impressions, List<Click> clicks) {
+        return getTotalCost(impressions, clicks) / clicks.size();
     }
 
     private static <T, U> XYChart.Series<T, U> mapToSeries(String seriesName, Map<T, U> map) {
