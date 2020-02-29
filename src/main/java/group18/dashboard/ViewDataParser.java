@@ -1,5 +1,6 @@
 package group18.dashboard;
 
+import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.commons.lang.time.DateUtils;
 
 import javafx.scene.chart.XYChart;
@@ -10,16 +11,20 @@ import java.util.stream.Collectors;
 public class ViewDataParser {
     // timeResolution parameter filled by Calendar.MONTH, Calendar.MINUTE, etc.
     // Fills all 'Number of X' metrics charts
-    public static XYChart.Series<Date, Integer> getCumulativeTimeSeries(String dataName, int timeResolution, List<Date> times) {
-        final Map<Date, Integer> quantities = new HashMap<>();
+    public static XYChart.Series<String, Integer> getCumulativeTimeSeries(String dataName, int timeResolution, List<Date> times) {
+        final Map<String, Integer> quantities = new HashMap<>();
 
         for (Date time : times) {
-            final Date roundedTime = DateUtils.round(time, timeResolution);
+            final String roundedTime = dateToString(DateUtils.round(time, timeResolution));
             quantities.putIfAbsent(roundedTime, 0);
             quantities.computeIfPresent(roundedTime, (key, value) -> value + 1);
         }
 
         return mapToSeries(dataName, quantities);
+    }
+
+    private static String dateToString(Date date) {
+        return DateFormatUtils.format(date, "yyy-MM-dd HH:mm:ss");
     }
 
     public static long getUniques(List<Click> clicks) {
@@ -45,8 +50,8 @@ public class ViewDataParser {
     }
 
     // Every 1000 impressions calculate the (impressions + click) cost sum and plot them
-    public static XYChart.Series<Date, Double> getCPMTimeSeries(List<Impression> impressions, List<Click> clicks) {
-        final Map<Date, Double> cpms = new HashMap<>();
+    public static XYChart.Series<String, Double> getCPMTimeSeries(List<Impression> impressions, List<Click> clicks) {
+        final Map<String, Double> cpms = new HashMap<>();
 
         final List<Impression> sortedImpressions = impressions
                 .stream()
@@ -77,7 +82,7 @@ public class ViewDataParser {
                     .mapToDouble(Click::getCost)
                     .sum();
 
-            cpms.put(sortedImpressions.get(i + 999).getDate(), cpm);
+            cpms.put(dateToString(sortedImpressions.get(i + 999).getDate()), cpm);
         }
 
         return mapToSeries("Cost-per-thousand impressions", cpms);
@@ -87,17 +92,17 @@ public class ViewDataParser {
         return getTotalCost(impressions, clicks) / (impressions.size() * 1000);
     }
 
-    public static XYChart.Series<Date, Double> getTotalCostSeries(int timeResolution, List<Impression> impressions, List<Click> clicks) {
-        final Map<Date, Double> totalCosts = new HashMap<>();
+    public static XYChart.Series<String, Double> getTotalCostSeries(int timeResolution, List<Impression> impressions, List<Click> clicks) {
+        final Map<String, Double> totalCosts = new HashMap<>();
 
         for (Impression impression : impressions) {
-            final Date roundedTime = DateUtils.round(impression.getDate(), timeResolution);
+            final String roundedTime = dateToString(DateUtils.round(impression.getDate(), timeResolution));
             totalCosts.putIfAbsent(roundedTime, 0.0);
             totalCosts.computeIfPresent(roundedTime, (key, val) -> val + impression.getCost());
         }
 
         for (Click click : clicks) {
-            final Date roundedTime = DateUtils.round(click.getDate(), timeResolution);
+            final String roundedTime = dateToString(DateUtils.round(click.getDate(), timeResolution));
             totalCosts.putIfAbsent(roundedTime, 0.0);
             totalCosts.computeIfPresent(roundedTime, (key, val) -> val + click.getCost());
         }
@@ -120,24 +125,24 @@ public class ViewDataParser {
         return cost;
     }
 
-    public static XYChart.Series<Date, Double> getCTRTimeSeries(int timeResolution, List<Impression> impressions, List<Click> clicks) {
-        final Map<Date, Integer> totalImpressions = new HashMap<>();
-        final Map<Date, Integer> totalClicks = new HashMap<>();
+    public static XYChart.Series<String, Double> getCTRTimeSeries(int timeResolution, List<Impression> impressions, List<Click> clicks) {
+        final Map<String, Integer> totalImpressions = new HashMap<>();
+        final Map<String, Integer> totalClicks = new HashMap<>();
 
         for (Impression impression : impressions) {
-            final Date roundedTime = DateUtils.round(impression.getDate(), timeResolution);
+            final String roundedTime = dateToString(DateUtils.round(impression.getDate(), timeResolution));
             totalImpressions.putIfAbsent(roundedTime, 0);
             totalImpressions.computeIfPresent(roundedTime, (key, val) -> val + 1);
         }
 
         for (Click click : clicks) {
-            final Date roundedTime = DateUtils.round(click.getDate(), timeResolution);
+            final String roundedTime = dateToString(DateUtils.round(click.getDate(), timeResolution));
             totalClicks.putIfAbsent(roundedTime, 0);
             totalClicks.computeIfPresent(roundedTime, (key, val) -> val + 1);
         }
 
-        final Map<Date, Double> ctrs = new HashMap<>();
-        for (Map.Entry<Date, Integer> entry : totalImpressions.entrySet()) {
+        final Map<String, Double> ctrs = new HashMap<>();
+        for (Map.Entry<String, Integer> entry : totalImpressions.entrySet()) {
             ctrs.put(entry.getKey(), (double) totalClicks.get(entry.getKey()) / entry.getValue());
         }
 
@@ -149,7 +154,7 @@ public class ViewDataParser {
     }
 
     // TODO
-    public static XYChart.Series<Date, Double> getCPATimeSeries(int timeResolution, List<Impression> impressions, List<Click> clicks, List<Interaction> interactions) {
+    public static XYChart.Series<String, Double> getCPATimeSeries(int timeResolution, List<Impression> impressions, List<Click> clicks, List<Interaction> interactions) {
         return null;
     }
 
@@ -158,7 +163,7 @@ public class ViewDataParser {
     }
 
     // TODO
-    public static XYChart.Series<Date, Double> getCPCTimeSeries(int timeResolution, List<Impression> impressions, List<Click> clicks) {
+    public static XYChart.Series<String, Double> getCPCTimeSeries(int timeResolution, List<Impression> impressions, List<Click> clicks) {
         return null;
     }
 
@@ -167,7 +172,7 @@ public class ViewDataParser {
     }
 
     // TODO
-    public static XYChart.Series<Date, Double> getBounceRateTimeSeries(int timeResolution, List<Click> clicks, List<Interaction> interactions) {
+    public static XYChart.Series<String, Double> getBounceRateTimeSeries(int timeResolution, List<Click> clicks, List<Interaction> interactions) {
         return null;
     }
 
