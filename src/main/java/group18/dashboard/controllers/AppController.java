@@ -1,16 +1,14 @@
 package group18.dashboard.controllers;
 
 import com.jfoenix.controls.JFXSlider;
-import group18.dashboard.Gender;
-import group18.dashboard.Impression;
-import group18.dashboard.Income;
-import group18.dashboard.ViewDataParser;
+import group18.dashboard.*;
 import javafx.fxml.FXML;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.control.MenuItem;
 import javafx.scene.layout.BorderPane;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 
 import java.io.File;
@@ -38,7 +36,7 @@ public class AppController {
         /*for (int i = 0; i < 1000; i++) {
             impressions.add(new Impression(Date.from(Instant.now()),"2", Gender.MALE,20, Income.HIGH,20));
         }*/
-        mainChart.getData().add(ViewDataParser.getCPMTimeSeries(impressions));
+        //mainChart.getData().add(ViewDataParser.getCPMTimeSeries(impressions));
     }
 
     @FXML
@@ -47,9 +45,19 @@ public class AppController {
 
     @FXML
     public void importCampaignButtonAction() {
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Import Campaign Files");
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Log Files", "*.csv"));
-        List<File> campaignFiles = fileChooser.showOpenMultipleDialog(appView.getScene().getWindow());
+        //FileChooser fileChooser = new FileChooser();
+        //fileChooser.setTitle("Import Campaign Files");
+        //fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Log Files", "*.csv"));
+        //List<File> campaignFiles = fileChooser.showOpenMultipleDialog(appView.getScene().getWindow());
+        DirectoryChooser directoryChooser = new DirectoryChooser();
+        File dir = directoryChooser.showDialog(appView.getScene().getWindow());
+        try {
+            CSVReader c = new CSVReader(dir.getAbsolutePath());
+            System.out.println(c.getClicks().size());
+            System.out.println(c.getImpressions().size());
+            System.out.println(c.getServers().size());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

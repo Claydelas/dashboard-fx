@@ -46,10 +46,6 @@ public class CSVReader {
             servers.add(new Server((line)));
         }
     }
-    public static void main(String[] args) throws Exception{
-        //Example for getting all objects from a given campaign directory
-        CSVReader c = new CSVReader("C:\\Users\\Jeremy\\Documents\\year2\\Semester2\\COMP2211\\2_week_campaign_2");
-    }
 
     public ArrayList<Impression> getImpressions() {
         return impressions;
