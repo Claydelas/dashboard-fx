@@ -35,9 +35,9 @@ public class AppController {
     @FXML
     public void initialize() {
         List<Impression> impressions = new ArrayList<>();
-        for (int i = 0; i < 1000; i++) {
+        /*for (int i = 0; i < 1000; i++) {
             impressions.add(new Impression(Date.from(Instant.now()),"2", Gender.MALE,20, Income.HIGH,20));
-        }
+        }*/
         mainChart.getData().add(ViewDataParser.getCPMTimeSeries(impressions));
     }
 

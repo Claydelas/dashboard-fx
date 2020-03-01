@@ -1,3 +1,5 @@
+package group18.dashboard;
+
 import java.text.ParseException;
 import java.util.Date;
 import java.text.SimpleDateFormat;
