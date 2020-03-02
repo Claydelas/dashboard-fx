@@ -1,3 +1,5 @@
+package group18.dashboard;
+
 public class ParsingException extends Exception {
     private String message;
     public ParsingException(String m){
