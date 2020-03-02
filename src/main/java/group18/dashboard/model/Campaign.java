@@ -4,6 +4,7 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleLongProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.chart.XYChart;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -25,6 +26,26 @@ public class Campaign {
     private SimpleDoubleProperty cpc = new SimpleDoubleProperty();
     private SimpleDoubleProperty cpm = new SimpleDoubleProperty();
     private SimpleDoubleProperty bounceRate = new SimpleDoubleProperty();
+    private XYChart.Series<String, Number> ctrSeries;
+
+    public XYChart.Series<String, Number> getCtrSeries() {
+        return ctrSeries;
+    }
+
+    public void setCtrSeries(XYChart.Series<String, Number> ctrSeries) {
+        this.ctrSeries = ctrSeries;
+    }
+
+    public XYChart.Series<String, Number> getTotalCostSeries() {
+        return totalCostSeries;
+    }
+
+    public void setTotalCostSeries(XYChart.Series<String, Number> totalCostSeries) {
+        this.totalCostSeries = totalCostSeries;
+    }
+
+    private XYChart.Series<String, Number> totalCostSeries;
+
 
     public SimpleLongProperty impressionCountProperty() {
         return impressionCount;

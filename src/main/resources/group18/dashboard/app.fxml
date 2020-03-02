@@ -97,17 +97,17 @@
                             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                           </rowConstraints>
                            <children>
-                              <JFXToggleButton fx:id="impressionsButton" text="Impressions" />
-                              <JFXToggleButton fx:id="clicksButton" text="Clicks" GridPane.rowIndex="1" />
-                              <JFXToggleButton fx:id="uniquesButton" text="Uniques" GridPane.rowIndex="2" />
-                              <JFXToggleButton fx:id="bouncesButton" text="Bounces" GridPane.rowIndex="3" />
-                              <JFXToggleButton fx:id="conversionsButton" text="Conversions" GridPane.rowIndex="4" />
-                              <JFXToggleButton fx:id="totalCostButton" text="Total Cost" GridPane.rowIndex="5" />
-                              <JFXToggleButton fx:id="ctrButton" text="CTR" GridPane.rowIndex="6" />
-                              <JFXToggleButton fx:id="cpaButton" text="CPA" GridPane.rowIndex="7" />
-                              <JFXToggleButton fx:id="cpcButton" text="CPC" GridPane.rowIndex="8" />
-                              <JFXToggleButton fx:id="cpmButton" text="CPM" GridPane.rowIndex="9" />
-                              <JFXToggleButton fx:id="bounceRateButton" text="Bounce Rate" GridPane.rowIndex="10" />
+                              <JFXToggleButton fx:id="impressionsButton" disable="true" text="Impressions" />
+                              <JFXToggleButton fx:id="clicksButton" disable="true" text="Clicks" GridPane.rowIndex="1" />
+                              <JFXToggleButton fx:id="uniquesButton" disable="true" text="Uniques" GridPane.rowIndex="2" />
+                              <JFXToggleButton fx:id="bouncesButton" disable="true" text="Bounces" GridPane.rowIndex="3" />
+                              <JFXToggleButton fx:id="conversionsButton" disable="true" text="Conversions" GridPane.rowIndex="4" />
+                              <JFXToggleButton fx:id="totalCostButton" disable="true" text="Total Cost" GridPane.rowIndex="5" />
+                              <JFXToggleButton fx:id="ctrButton" disable="true" text="CTR" GridPane.rowIndex="6" />
+                              <JFXToggleButton fx:id="cpaButton" disable="true" text="CPA" GridPane.rowIndex="7" />
+                              <JFXToggleButton fx:id="cpcButton" disable="true" text="CPC" GridPane.rowIndex="8" />
+                              <JFXToggleButton fx:id="cpmButton" disable="true" text="CPM" GridPane.rowIndex="9" />
+                              <JFXToggleButton fx:id="bounceRateButton" disable="true" text="Bounce Rate" GridPane.rowIndex="10" />
                               <Label fx:id="impressions" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.valignment="CENTER" />
                               <Label fx:id="clicks" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.rowIndex="1" GridPane.valignment="CENTER" />
                               <Label fx:id="uniques" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.rowIndex="2" GridPane.valignment="CENTER" />

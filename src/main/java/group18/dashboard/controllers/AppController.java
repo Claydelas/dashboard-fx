@@ -5,7 +5,8 @@ import com.jfoenix.controls.JFXToggleButton;
 import group18.dashboard.ViewDataParser;
 import group18.dashboard.model.Campaign;
 import javafx.application.Platform;
-import javafx.beans.value.ObservableValue;
+import javafx.beans.property.Property;
+import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -63,6 +64,9 @@ public class AppController {
     public JFXToggleButton bounceRateButton;
     public TabPane tabs;
 
+    ObservableList<XYChart.Series<String, Number>> seriesList = FXCollections.observableArrayList();
+    Property<ObservableList<XYChart.Series<String, Number>>> series = new SimpleListProperty<>(seriesList);
+
     Campaign in;
 
     @FXML
@@ -88,7 +92,16 @@ public class AppController {
     }
 
     private void bindChartMetrics(Campaign campaign) {
-        //impressionsButton.selectedProperty().
+        mainChart.dataProperty().bind(series);
+
+        totalCostButton.selectedProperty().addListener((o, old, selected) -> {
+            if (selected) seriesList.add(campaign.getTotalCostSeries());
+            else seriesList.remove(campaign.getTotalCostSeries());
+        });
+        ctrButton.selectedProperty().addListener((o, old, selected) -> {
+            if (selected) seriesList.add(campaign.getCtrSeries());
+            else seriesList.remove(campaign.getCtrSeries());
+        });
     }
 
     @FXML
@@ -177,11 +190,10 @@ public class AppController {
     }
 
     private void updateChartMetrics(int resolution) {
-        ObservableList<XYChart.Series<String, Number>> series = FXCollections.observableArrayList();
-        Platform.runLater(() -> {
-            mainChart.getData().addAll(ViewDataParser.getTotalCostSeries(resolution, in.getImpressions(), in.getClicks()),
-                    ViewDataParser.getCTRTimeSeries(resolution, in.getImpressions(), in.getClicks()));
-        });
+        in.setTotalCostSeries(ViewDataParser.getCTRTimeSeries(resolution, in.getImpressions(), in.getClicks()));
+        ctrButton.setDisable(false);
+        in.setCtrSeries(ViewDataParser.getTotalCostSeries(resolution, in.getImpressions(), in.getClicks()));
+        totalCostButton.setDisable(false);
         //ViewDataParser.getCPATimeSeries(resolution, in.getImpressions(), in.getClicks(), in.getInteractions())
         //ViewDataParser.getCPCTimeSeries(resolution, in.getImpressions(), in.getClicks()),
         //ViewDataParser.getBounceRateTimeSeries(resolution, in.getClicks(), in.getInteractions())
