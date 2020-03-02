@@ -4,6 +4,7 @@ import com.jfoenix.controls.JFXSlider;
 import com.jfoenix.controls.JFXToggleButton;
 import group18.dashboard.ViewDataParser;
 import group18.dashboard.model.Campaign;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.LineChart;
@@ -16,6 +17,7 @@ import javafx.scene.layout.StackPane;
 import javafx.stage.DirectoryChooser;
 
 import java.io.File;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -61,6 +63,18 @@ public class AppController {
     @FXML
     public void initialize() {
         in = new Campaign();
+        impressions.textProperty().bind(in.impressionCountProperty().asString());
+        clicks.textProperty().bind(in.clickCountProperty().asString());
+        uniques.textProperty().bind(in.uniquesProperty().asString());
+        bounces.textProperty().bind(in.bouncesProperty().asString());
+        conversions.textProperty().bind(in.conversionsProperty().asString());
+        totalCost.textProperty().bind(in.totalCostProperty().asString());
+        ctr.textProperty().bind(in.ctrProperty().asString());
+        cpa.textProperty().bind(in.cpaProperty().asString());
+        cpc.textProperty().bind(in.cpcProperty().asString());
+        cpm.textProperty().bind(in.cpmProperty().asString());
+        bounceRate.textProperty().bind(in.bounceRateProperty().asString());
+
     }
 
     @FXML
@@ -74,12 +88,15 @@ public class AppController {
         File dir = directoryChooser.showDialog(appView.getScene().getWindow());
         if (dir == null) return;
 
+        System.out.println("--Parsing Campaign--");
         ExecutorService executor = Executors.newWorkStealingPool();
+        CountDownLatch latch = new CountDownLatch(3);
 
         executor.execute(() -> {
             try {
                 in.readClicks(dir.getAbsolutePath());
-                System.out.println("clicks");
+                System.out.println("Clicks parsed: " + in.getClicks().size());
+                latch.countDown();
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -88,7 +105,8 @@ public class AppController {
         {
             try {
                 in.readImpressions(dir.getAbsolutePath());
-                System.out.println("impressions");
+                System.out.println("Impressions parsed: " + in.getImpressions().size());
+                latch.countDown();
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -96,10 +114,30 @@ public class AppController {
         executor.execute(() -> {
             try {
                 in.readInteractions(dir.getAbsolutePath());
-                System.out.println("interactions");
+                System.out.println("Interactions parsed: " + in.getInteractions().size());
+                latch.countDown();
             } catch (Exception e) {
                 e.printStackTrace();
             }
+        });
+        executor.execute(() -> {
+            try {
+                latch.await();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            Platform.runLater(() -> in.setBounceRate(ViewDataParser.getBounceRate(in.getClicks(), in.getInteractions())));
+            Platform.runLater(() -> in.setBounces(ViewDataParser.getBounces(in.getInteractions())));
+            Platform.runLater(() -> in.setClickCount(in.getClicks().size()));
+            Platform.runLater(() -> in.setConversions(ViewDataParser.getConversions(in.getInteractions())));
+            Platform.runLater(() -> in.setCpa(ViewDataParser.getCPA(in.getImpressions(), in.getClicks(), in.getInteractions())));
+            Platform.runLater(() -> in.setCpc(ViewDataParser.getCPC(in.getImpressions(), in.getClicks())));
+            Platform.runLater(() -> in.setCpm(ViewDataParser.getCPM(in.getImpressions(), in.getClicks())));
+            Platform.runLater(() -> in.setCtr(ViewDataParser.getCTR(in.getImpressions(), in.getClicks())));
+            Platform.runLater(() -> in.setImpressionCount(in.getImpressions().size()));
+            Platform.runLater(() -> in.setTotalCost(ViewDataParser.getTotalCost(in.getImpressions(), in.getClicks())));
+            Platform.runLater(() -> in.setUniques(ViewDataParser.getUniques(in.getClicks())));
+            System.out.println("--Finished Parsing Campaign--");
         });
         executor.shutdown();
         chartPane.getChildren().remove(importNotification);
