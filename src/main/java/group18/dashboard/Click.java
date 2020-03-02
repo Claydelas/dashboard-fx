@@ -3,6 +3,7 @@ package group18.dashboard;
 import java.text.ParseException;
 import java.util.Date;
 import java.text.SimpleDateFormat;
+import java.util.Objects;
 
 public class Click {
     private Date date;
@@ -43,6 +44,20 @@ public class Click {
     }
     public Date getDate() {
         return date;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Click click = (Click) o;
+        return getID() == click.getID() &&
+                Objects.equals(getDate(), click.getDate());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getDate(), getID());
     }
 
     public long getID() {
