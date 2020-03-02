@@ -52,8 +52,8 @@ public class ViewDataParser {
     }
 
     // Every 1000 impressions calculate the (impressions + click) cost sum and plot them
-    public static XYChart.Series<String, Double> getCPMTimeSeries(List<Impression> impressions, List<Click> clicks) {
-        final Map<String, Double> cpms = new HashMap<>();
+    public static XYChart.Series<String, Number> getCPMTimeSeries(List<Impression> impressions, List<Click> clicks) {
+        final Map<String, Number> cpms = new HashMap<>();
 
         final List<Impression> sortedImpressions = impressions
                 .stream()
@@ -94,19 +94,19 @@ public class ViewDataParser {
         return getTotalCost(impressions, clicks) / (impressions.size() * 1000);
     }
 
-    public static XYChart.Series<String, Double> getTotalCostSeries(int timeResolution, List<Impression> impressions, List<Click> clicks) {
-        final Map<String, Double> totalCosts = new HashMap<>();
+    public static XYChart.Series<String, Number> getTotalCostSeries(int timeResolution, List<Impression> impressions, List<Click> clicks) {
+        final Map<String, Number> totalCosts = new HashMap<>();
 
         for (Impression impression : impressions) {
             final String roundedTime = dateToString(DateUtils.round(impression.getDate(), timeResolution));
             totalCosts.putIfAbsent(roundedTime, 0.0);
-            totalCosts.computeIfPresent(roundedTime, (key, val) -> val + impression.getCost());
+            totalCosts.computeIfPresent(roundedTime, (key, val) -> val.doubleValue() + impression.getCost());
         }
 
         for (Click click : clicks) {
             final String roundedTime = dateToString(DateUtils.round(click.getDate(), timeResolution));
             totalCosts.putIfAbsent(roundedTime, 0.0);
-            totalCosts.computeIfPresent(roundedTime, (key, val) -> val + click.getCost());
+            totalCosts.computeIfPresent(roundedTime, (key, val) -> val.doubleValue() + click.getCost());
         }
 
         return mapToSeries("Total cost", totalCosts);
@@ -127,7 +127,7 @@ public class ViewDataParser {
         return cost;
     }
 
-    public static XYChart.Series<String, Double> getCTRTimeSeries(int timeResolution, List<Impression> impressions, List<Click> clicks) {
+    public static XYChart.Series<String, Number> getCTRTimeSeries(int timeResolution, List<Impression> impressions, List<Click> clicks) {
         final Map<String, Integer> totalImpressions = new HashMap<>();
         final Map<String, Integer> totalClicks = new HashMap<>();
 
@@ -143,7 +143,7 @@ public class ViewDataParser {
             totalClicks.computeIfPresent(roundedTime, (key, val) -> val + 1);
         }
 
-        final Map<String, Double> ctrs = new HashMap<>();
+        final Map<String, Number> ctrs = new HashMap<>();
         for (Map.Entry<String, Integer> entry : totalImpressions.entrySet()) {
             ctrs.put(entry.getKey(), (double) totalClicks.get(entry.getKey()) / entry.getValue());
         }
@@ -156,7 +156,7 @@ public class ViewDataParser {
     }
 
     // TODO
-    public static XYChart.Series<String, Double> getCPATimeSeries(int timeResolution, List<Impression> impressions, List<Click> clicks, List<Interaction> interactions) {
+    public static XYChart.Series<String, Number> getCPATimeSeries(int timeResolution, List<Impression> impressions, List<Click> clicks, List<Interaction> interactions) {
         return null;
     }
 
@@ -165,7 +165,7 @@ public class ViewDataParser {
     }
 
     // TODO
-    public static XYChart.Series<String, Double> getCPCTimeSeries(int timeResolution, List<Impression> impressions, List<Click> clicks) {
+    public static XYChart.Series<String, Number> getCPCTimeSeries(int timeResolution, List<Impression> impressions, List<Click> clicks) {
         return null;
     }
 
@@ -174,7 +174,7 @@ public class ViewDataParser {
     }
 
     // TODO
-    public static XYChart.Series<String, Double> getBounceRateTimeSeries(int timeResolution, List<Click> clicks, List<Interaction> interactions) {
+    public static XYChart.Series<String, Number> getBounceRateTimeSeries(int timeResolution, List<Click> clicks, List<Interaction> interactions) {
         return null;
     }
 
