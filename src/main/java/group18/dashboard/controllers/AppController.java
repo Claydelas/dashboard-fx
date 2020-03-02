@@ -126,17 +126,30 @@ public class AppController {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            Platform.runLater(() -> in.setBounceRate(ViewDataParser.getBounceRate(in.getClicks(), in.getInteractions())));
-            Platform.runLater(() -> in.setBounces(ViewDataParser.getBounces(in.getInteractions())));
-            Platform.runLater(() -> in.setClickCount(in.getClicks().size()));
-            Platform.runLater(() -> in.setConversions(ViewDataParser.getConversions(in.getInteractions())));
-            Platform.runLater(() -> in.setCpa(ViewDataParser.getCPA(in.getImpressions(), in.getClicks(), in.getInteractions())));
-            Platform.runLater(() -> in.setCpc(ViewDataParser.getCPC(in.getImpressions(), in.getClicks())));
-            Platform.runLater(() -> in.setCpm(ViewDataParser.getCPM(in.getImpressions(), in.getClicks())));
-            Platform.runLater(() -> in.setCtr(ViewDataParser.getCTR(in.getImpressions(), in.getClicks())));
-            Platform.runLater(() -> in.setImpressionCount(in.getImpressions().size()));
-            Platform.runLater(() -> in.setTotalCost(ViewDataParser.getTotalCost(in.getImpressions(), in.getClicks())));
-            Platform.runLater(() -> in.setUniques(ViewDataParser.getUniques(in.getClicks())));
+            var bounceRate = ViewDataParser.getBounceRate(in.getClicks(), in.getInteractions());
+            var bounces = ViewDataParser.getBounces(in.getInteractions());
+            var clicks = in.getClicks().size();
+            var conversions = ViewDataParser.getConversions(in.getInteractions());
+            var cpa = ViewDataParser.getCPA(in.getImpressions(), in.getClicks(), in.getInteractions());
+            var cpc = ViewDataParser.getCPC(in.getImpressions(), in.getClicks());
+            var cpm = ViewDataParser.getCPM(in.getImpressions(), in.getClicks());
+            var ctr = ViewDataParser.getCTR(in.getImpressions(), in.getClicks());
+            var impressions = in.getImpressions().size();
+            var totalCost = ViewDataParser.getTotalCost(in.getImpressions(), in.getClicks());
+            var uniques = ViewDataParser.getUniques(in.getClicks());
+            Platform.runLater(() -> {
+                in.setBounceRate(bounceRate);
+                in.setBounces(bounces);
+                in.setClickCount(clicks);
+                in.setConversions(conversions);
+                in.setCpc(cpc);
+                in.setCpa(cpa);
+                in.setCpm(cpm);
+                in.setCtr(ctr);
+                in.setImpressionCount(impressions);
+                in.setTotalCost(totalCost);
+                in.setUniques(uniques);
+            });
             System.out.println("--Finished Parsing Campaign--");
         });
         executor.shutdown();
