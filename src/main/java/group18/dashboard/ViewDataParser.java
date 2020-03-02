@@ -1,9 +1,11 @@
 package group18.dashboard;
 
+import group18.dashboard.model.Click;
+import group18.dashboard.model.Impression;
+import group18.dashboard.model.Interaction;
+import javafx.scene.chart.XYChart;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.commons.lang.time.DateUtils;
-
-import javafx.scene.chart.XYChart;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -78,7 +80,7 @@ public class ViewDataParser {
                     .parallelStream()
                     .filter(click ->
                             click.getDate().after(firstImpression.getDate()) &&
-                            click.getDate().before(lastImpression.getDate()))
+                                    click.getDate().before(lastImpression.getDate()))
                     .mapToDouble(Click::getCost)
                     .sum();
 
@@ -184,7 +186,7 @@ public class ViewDataParser {
         final XYChart.Series<T, U> series = new XYChart.Series<>();
         series.setName(seriesName);
 
-        for (Map.Entry<T, U> entry: map.entrySet()) {
+        for (Map.Entry<T, U> entry : map.entrySet()) {
             series.getData().add(new XYChart.Data<>(entry.getKey(), entry.getValue()));
         }
 

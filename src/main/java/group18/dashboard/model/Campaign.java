@@ -1,18 +1,63 @@
 package group18.dashboard.model;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+
 public class Campaign {
 
-    private final String IMPRESSION_LOG_PATH;
-    private final String SERVER_LOG_PATH;
-    private final String CLICK_LOG_PATH;
+    private ObservableList<Impression> impressions = FXCollections.observableArrayList();
+    private ObservableList<Click> clicks = FXCollections.observableArrayList();
+    private ObservableList<Interaction> interactions = FXCollections.observableArrayList();
 
-    public Campaign(String impression_path, String server_log_path, String click_log_path) {
-        IMPRESSION_LOG_PATH = impression_path;
-        SERVER_LOG_PATH = server_log_path;
-        CLICK_LOG_PATH = click_log_path;
+    public void readInteractions(String filepath) throws Exception {
+        //Servers
+        File serversFile = new File(filepath + File.separator + "server_log.csv");
+        BufferedReader brServers = new BufferedReader(new FileReader(serversFile));
+        String line = "";
+        //First line is the column headings so should be ignored
+        line = brServers.readLine();
+        while ((line = brServers.readLine()) != null) {
+            interactions.add(new Interaction((line)));
+        }
     }
 
-    String name;
+    public void readClicks(String filepath) throws Exception {
+        //Clicks
+        File clicksFile = new File(filepath + File.separator + "click_log.csv");
+        BufferedReader brClicks = new BufferedReader(new FileReader(clicksFile));
+        String line = "";
+        //First line is the column headings so should be ignored
+        line = brClicks.readLine();
+        while ((line = brClicks.readLine()) != null) {
+            clicks.add(new Click((line)));
+        }
+    }
 
-    //ObservableList<String>
+    public void readImpressions(String filepath) throws Exception {
+        //Impressions
+        File impressionsFile = new File(filepath + File.separator + "impression_log.csv");
+        BufferedReader brImpressions = new BufferedReader(new FileReader(impressionsFile));
+        String line = "";
+        //First line is the column headings so should be ignored
+        line = brImpressions.readLine();
+        while ((line = brImpressions.readLine()) != null) {
+            impressions.add(new Impression((line)));
+        }
+    }
+
+    public ObservableList<Impression> getImpressions() {
+        return impressions;
+    }
+
+    public ObservableList<Click> getClicks() {
+        return clicks;
+    }
+
+    public ObservableList<Interaction> getInteractions() {
+        return interactions;
+    }
 }

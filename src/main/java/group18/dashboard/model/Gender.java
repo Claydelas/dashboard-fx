@@ -1,4 +1,4 @@
-package group18.dashboard;
+package group18.dashboard.model;
 
 public enum Gender {
     MALE, FEMALE

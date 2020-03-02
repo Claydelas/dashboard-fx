@@ -6,4 +6,7 @@ module group18.dashboard {
 
     opens group18.dashboard.controllers to javafx.fxml;
     exports group18.dashboard;
+    exports group18.dashboard.model;
+    exports group18.dashboard.controllers;
+    exports group18.dashboard.exceptions;
 }

@@ -1,4 +1,4 @@
-package group18.dashboard;
+package group18.dashboard.exceptions;
 
 public class ParsingException extends Exception {
     private String message;

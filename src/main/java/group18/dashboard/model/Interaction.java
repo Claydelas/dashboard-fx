@@ -1,18 +1,20 @@
-package group18.dashboard;
+package group18.dashboard.model;
 
 //import java.sql.SQLIntegrityConstraintViolationException;
+import group18.dashboard.exceptions.ParsingException;
+
 import java.text.ParseException;
 import java.util.Date;
 import java.text.SimpleDateFormat;
 
-public class Server {
+public class Interaction {
     private Date entryDate;
     private Date exitDate;
     private Long ID;
     private Integer pageViews;
     private boolean conversion;
 
-    public Server(String lineIn) throws ParsingException {
+    public Interaction(String lineIn) throws ParsingException {
         //Takes in a single line of the csv and parses it
         //Checks for validity as the file is parsed, throwing an exception
         String[] columns = lineIn.split(",");
