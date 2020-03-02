@@ -6,8 +6,8 @@ import java.text.SimpleDateFormat;
 
 public class Click {
     private Date date;
-    private Long ID;
-    private Double cost;
+    private long ID;
+    private double cost;
 
     public Click(String lineIn) throws ParsingException{
         //Takes in a single line of the csv and parses it
@@ -45,11 +45,11 @@ public class Click {
         return date;
     }
 
-    public Long getID() {
+    public long getID() {
         return ID;
     }
 
-    public Double getCost() {
+    public double getCost() {
         return cost;
     }
 }

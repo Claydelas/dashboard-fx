@@ -10,7 +10,7 @@ public class CSVReader {
     //Getters are provided for each log
     private ArrayList<Impression> impressions = new ArrayList<>();
     private ArrayList<Click> clicks = new ArrayList<>();
-    private ArrayList<Server> servers = new ArrayList<>();
+    private ArrayList<Interaction> interactions = new ArrayList<>();
 
     public CSVReader(String filepath) throws Exception{
         // Takes in the filepath of the campaign folder and
@@ -43,12 +43,12 @@ public class CSVReader {
         //First line is the column headings so should be ignored
         line = brServers.readLine();
         while((line = brServers.readLine()) != null){
-            servers.add(new Server((line)));
+            interactions.add(new Interaction((line)));
         }
     }
     public static void main(String[] args) throws Exception{
         //Example for getting all objects from a given campaign directory
-        CSVReader c = new CSVReader("C:\\Users\\Jeremy\\Documents\\year2\\Semester2\\COMP2211\\2_week_campaign_2");
+        CSVReader c = new CSVReader("/home/platelminto/Documents/UG soton/Year 2/COMP2211 - Software Engineering Group Project/2_week_campaign_2");
     }
 
     public ArrayList<Impression> getImpressions() {
@@ -59,7 +59,7 @@ public class CSVReader {
         return clicks;
     }
 
-    public ArrayList<Server> getServers() {
-        return servers;
+    public ArrayList<Interaction> getInteractions() {
+        return interactions;
     }
 }

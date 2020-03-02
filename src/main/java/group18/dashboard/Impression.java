@@ -6,13 +6,13 @@ import java.text.SimpleDateFormat;
 
 public class Impression {
     private Date date;
-    private Long ID;
+    private long ID;
     private String gender;
-    private Integer lowerBound = -1;
-    private Integer upperBound = -1;
+    private int lowerBound = -1;
+    private int upperBound = -1;
     private String income;
     private String context;
-    private Double cost;
+    private double cost;
 
     public Impression(String lineIn) throws ParsingException{
         //Takes in a single line of the csv and parses it
@@ -91,7 +91,7 @@ public class Impression {
         return date;
     }
 
-    public Long getID() {
+    public long getID() {
         return ID;
     }
 
@@ -99,11 +99,11 @@ public class Impression {
         return gender;
     }
 
-    public Integer getLowerBound() {
+    public int getLowerBound() {
         return lowerBound;
     }
 
-    public Integer getUpperBound() {
+    public int getUpperBound() {
         return upperBound;
     }
 
@@ -115,7 +115,7 @@ public class Impression {
         return context;
     }
 
-    public Double getCost() {
+    public double getCost() {
         return cost;
     }
 }
