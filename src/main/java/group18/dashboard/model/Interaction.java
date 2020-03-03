@@ -1,6 +1,5 @@
 package group18.dashboard.model;
 
-//import java.sql.SQLIntegrityConstraintViolationException;
 import group18.dashboard.exceptions.ParsingException;
 
 import java.text.ParseException;
@@ -10,8 +9,8 @@ import java.text.SimpleDateFormat;
 public class Interaction {
     private Date entryDate;
     private Date exitDate;
-    private Long ID;
-    private Integer pageViews;
+    private long ID;
+    private int pageViews;
     private boolean conversion;
 
     public Interaction(String lineIn) throws ParsingException {
@@ -19,21 +18,21 @@ public class Interaction {
         //Checks for validity as the file is parsed, throwing an exception
         String[] columns = lineIn.split(",");
         if (columns.length != 5) {
-            throw new ParsingException("Incorrect number of columns were given for a server");
+            throw new ParsingException("Incorrect number of columns were given for an interaction");
         }
 
         //Getting the entry date
         try {
             entryDate = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss").parse(columns[0]);
         } catch (ParseException e) {
-            throw new ParsingException("Entry date could not be parsed for a server.");
+            throw new ParsingException("Entry date could not be parsed for an interaction.");
         }
 
         //Getting the ID
         try {
             ID = Long.parseLong(columns[1]);
         } catch (Exception e) {
-            throw new ParsingException("ID could not be parsed for a server.");
+            throw new ParsingException("ID could not be parsed for an interaction.");
         }
 
         //Getting the exit date
@@ -45,7 +44,7 @@ public class Interaction {
                 exitDate = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss").parse(columns[2]);
             }
         } catch (ParseException e) {
-            throw new ParsingException("Exit date could not be parsed for a server.");
+            throw new ParsingException("Exit date could not be parsed for an interaction.");
         }
 
         //Getting the pages viewed
@@ -62,10 +61,10 @@ public class Interaction {
             } else if (columns[4].equals("No")) {
                 conversion = false;
             } else {
-                throw new ParsingException("Conversion status could not be parsed for a server");
+                throw new ParsingException("Conversion status could not be parsed for an interaction");
             }
         } catch (Exception e) {
-            throw new ParsingException("Conversion status could not be parsed for a server");
+            throw new ParsingException("Conversion status could not be parsed for an interaction");
         }
     }
 
@@ -77,11 +76,11 @@ public class Interaction {
         return exitDate;
     }
 
-    public Long getID() {
+    public long getID() {
         return ID;
     }
 
-    public Integer getPageViews() {
+    public int getPageViews() {
         return pageViews;
     }
 
