@@ -31,7 +31,7 @@ public class AppController {
 
     public JFXSlider granularitySlider;
     public NumberAxis yAxis;
-    public LineChart mainChart;
+    public LineChart<String, Number> mainChart;
     public MenuItem themeButton;
     public CategoryAxis xAxis;
     public MenuItem uiScalingButton;
@@ -92,6 +92,7 @@ public class AppController {
 
     private void bindChartMetrics(Campaign campaign) {
         mainChart.dataProperty().bind(series);
+        mainChart.setAnimated(false);
 
         totalCostButton.selectedProperty().addListener((o, old, selected) -> {
             if (selected) seriesList.add(campaign.getTotalCostSeries());
@@ -168,8 +169,8 @@ public class AppController {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            executor.execute(this::updateMetrics);
-            executor.execute(() -> updateChartMetrics(Calendar.DAY_OF_MONTH));
+            updateMetrics(executor);
+            updateChartMetrics(executor, Calendar.DAY_OF_MONTH);
             System.out.println("--Finished Parsing Campaign--");
         });
         executor.shutdown();
@@ -177,49 +178,136 @@ public class AppController {
         mainChart.setVisible(true);
     }
 
-    private void updateMetrics() {
-        var bounceRate = ViewDataParser.getBounceRate(in.getClicks(), in.getInteractions());
-        var bounces = ViewDataParser.getBounces(in.getInteractions());
-        var clicks = in.getClicks().size();
-        var conversions = ViewDataParser.getConversions(in.getInteractions());
-        var cpa = ViewDataParser.getCPA(in.getImpressions(), in.getClicks(), in.getInteractions());
-        var cpc = ViewDataParser.getCPC(in.getImpressions(), in.getClicks());
-        var cpm = ViewDataParser.getCPM(in.getImpressions(), in.getClicks());
-        var ctr = ViewDataParser.getCTR(in.getImpressions(), in.getClicks());
-        var impressions = in.getImpressions().size();
-        var totalCost = ViewDataParser.getTotalCost(in.getImpressions(), in.getClicks());
-        var uniques = ViewDataParser.getUniques(in.getClicks());
-        Platform.runLater(() -> {
-            in.setBounceRate(bounceRate);
-            in.setBounces(bounces);
-            in.setClickCount(clicks);
-            in.setConversions(conversions);
-            in.setCpc(cpc);
-            in.setCpa(cpa);
-            in.setCpm(cpm);
-            in.setCtr(ctr);
-            in.setImpressionCount(impressions);
-            in.setTotalCost(totalCost);
-            in.setUniques(uniques);
-        });
+    private void updateMetrics(ExecutorService executor) {
+        executor.execute(this::updateBounceRate);
+        executor.execute(this::updateBounces);
+        executor.execute(this::updateClickCount);
+        executor.execute(this::updateConversions);
+        executor.execute(this::updateCPA);
+        executor.execute(this::updateCPC);
+        executor.execute(this::updateCPM);
+        executor.execute(this::updateCTR);
+        executor.execute(this::updateImpressions);
+        executor.execute(this::updateTotalCost);
+        executor.execute(this::updateUniques);
     }
 
-    private void updateChartMetrics(int resolution) {
-        in.setTotalCostSeries(ViewDataParser.getCTRTimeSeries(resolution, in.getImpressions(), in.getClicks()));
-        ctrButton.setDisable(false);
-        in.setCtrSeries(ViewDataParser.getTotalCostSeries(resolution, in.getImpressions(), in.getClicks()));
-        totalCostButton.setDisable(false);
-        in.setCPMSeries(ViewDataParser.getCPMTimeSeries(in.getImpressions(), in.getClicks()));
-        cpmButton.setDisable(false);
-        in.setCPASeries(ViewDataParser.getCPATimeSeries(in.getImpressions(), in.getClicks(), in.getInteractions()));
-        cpaButton.setDisable(false);
-        in.setCPCSeries(ViewDataParser.getCPCTimeSeries(resolution, in.getImpressions(), in.getClicks()));
-        cpcButton.setDisable(false);
+    private void updateBounceRate() {
+        var bounceRate = ViewDataParser.getBounceRate(in.getClicks(), in.getInteractions());
+        Platform.runLater(() -> in.setBounceRate(bounceRate));
+    }
+
+    private void updateBounces() {
+        var bounces = ViewDataParser.getBounces(in.getInteractions());
+        Platform.runLater(() -> in.setBounces(bounces));
+    }
+
+    private void updateClickCount() {
+        var clicks = in.getClicks().size();
+        Platform.runLater(() -> in.setClickCount(clicks));
+    }
+
+    private void updateConversions() {
+        var conversions = ViewDataParser.getConversions(in.getInteractions());
+        Platform.runLater(() -> in.setConversions(conversions));
+    }
+
+    private void updateCPA() {
+        var cpa = ViewDataParser.getCPA(in.getImpressions(), in.getClicks(), in.getInteractions());
+        Platform.runLater(() -> in.setCpa(cpa));
+    }
+
+    private void updateCPC() {
+        var cpc = ViewDataParser.getCPC(in.getImpressions(), in.getClicks());
+        Platform.runLater(() -> in.setCpc(cpc));
+    }
+
+    private void updateCPM() {
+        var cpm = ViewDataParser.getCPM(in.getImpressions(), in.getClicks());
+        Platform.runLater(() -> in.setCpm(cpm));
+    }
+
+    private void updateCTR() {
+        var ctr = ViewDataParser.getCTR(in.getImpressions(), in.getClicks());
+        Platform.runLater(() -> in.setCtr(ctr));
+    }
+
+    private void updateImpressions() {
+        var impressions = in.getImpressions().size();
+        Platform.runLater(() -> in.setImpressionCount(impressions));
+    }
+
+    private void updateTotalCost() {
+        var totalCost = ViewDataParser.getTotalCost(in.getImpressions(), in.getClicks());
+        Platform.runLater(() -> in.setTotalCost(totalCost));
+    }
+
+    private void updateUniques() {
+        var uniques = ViewDataParser.getUniques(in.getClicks());
+        Platform.runLater(() -> in.setUniques(uniques));
+    }
+
+    private void updateChartMetrics(ExecutorService executor, int resolution) {
+        executor.execute(() -> updateBounceRateSeries(resolution));
+        executor.execute(() -> updateCPASeries());
+        executor.execute(() -> updateCPCSeries(resolution));
+        executor.execute(() -> updateCPMSeries());
+        executor.execute(() -> updateCTRSeries(resolution));
+        executor.execute(() -> updateTotalCostSeries(resolution));
+
+    }
+
+    private void updateBounceRateSeries(int resolution) {
         in.setBounceRateSeries(ViewDataParser.getBounceRateTimeSeries(resolution, in.getClicks(), in.getInteractions()));
-        bounceRateButton.setDisable(false);
-        //ViewDataParser.getCPATimeSeries(resolution, in.getImpressions(), in.getClicks(), in.getInteractions())
-        //ViewDataParser.getCPCTimeSeries(resolution, in.getImpressions(), in.getClicks()),
-        //ViewDataParser.getBounceRateTimeSeries(resolution, in.getClicks(), in.getInteractions())
-        //ViewDataParser.getCPMTimeSeries(in.getImpressions(), in.getClicks())
+        Platform.runLater(() -> {
+            bounceRateButton.setDisable(false);
+            //seriesList.add(in.getBounceRateSeries());
+        });
+
+    }
+
+    private void updateBouncesSeries() {
+    }
+
+    private void updateClickCountSeries() {
+    }
+
+    private void updateConversionsSeries() {
+    }
+
+    private void updateCPASeries() {
+        in.setCPASeries(ViewDataParser.getCPATimeSeries(in.getImpressions(), in.getClicks(), in.getInteractions()));
+        //Platform.runLater(()->seriesList.add(in.getCPASeries()));
+        cpaButton.setDisable(false);
+    }
+
+    private void updateCPCSeries(int resolution) {
+        in.setCPCSeries(ViewDataParser.getCPCTimeSeries(resolution, in.getImpressions(), in.getClicks()));
+        //Platform.runLater(()->seriesList.add(in.getCPCSeries()));
+        cpcButton.setDisable(false);
+    }
+
+    private void updateCPMSeries() {
+        in.setCPMSeries(ViewDataParser.getCPMTimeSeries(in.getImpressions(), in.getClicks()));
+        //Platform.runLater(()->seriesList.add(in.getCPMSeries()));
+        cpmButton.setDisable(false);
+    }
+
+    private void updateCTRSeries(int resolution) {
+        in.setCtrSeries(ViewDataParser.getTotalCostSeries(resolution, in.getImpressions(), in.getClicks()));
+        //Platform.runLater(()->seriesList.add(in.getCtrSeries()));
+        ctrButton.setDisable(false);
+    }
+
+    private void updateImpressionsSeries() {
+    }
+
+    private void updateTotalCostSeries(int resolution) {
+        in.setTotalCostSeries(ViewDataParser.getCTRTimeSeries(resolution, in.getImpressions(), in.getClicks()));
+        //Platform.runLater(()->seriesList.add(in.getTotalCostSeries()));
+        totalCostButton.setDisable(false);
+    }
+
+    private void updateUniquesSeries() {
     }
 }
