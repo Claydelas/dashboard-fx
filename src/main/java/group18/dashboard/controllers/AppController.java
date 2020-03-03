@@ -74,7 +74,6 @@ public class AppController {
         in = new Campaign();
         bindMetrics(in);
         bindChartMetrics(in);
-
     }
 
     private void bindMetrics(Campaign campaign) {
@@ -101,6 +100,22 @@ public class AppController {
         ctrButton.selectedProperty().addListener((o, old, selected) -> {
             if (selected) seriesList.add(campaign.getCtrSeries());
             else seriesList.remove(campaign.getCtrSeries());
+        });
+        cpmButton.selectedProperty().addListener((o, old, selected) -> {
+            if (selected) seriesList.add(campaign.getCPMSeries());
+            else seriesList.remove(campaign.getCPMSeries());
+        });
+        cpaButton.selectedProperty().addListener((o, old, selected) -> {
+            if (selected) seriesList.add(campaign.getCPASeries());
+            else seriesList.remove(campaign.getCPASeries());
+        });
+        cpcButton.selectedProperty().addListener((o, old, selected) -> {
+            if (selected) seriesList.add(campaign.getCPCSeries());
+            else seriesList.remove(campaign.getCPCSeries());
+        });
+        bounceRateButton.selectedProperty().addListener((o, old, selected) -> {
+            if (selected) seriesList.add(campaign.getBounceRateSeries());
+            else seriesList.remove(campaign.getBounceRateSeries());
         });
     }
 
@@ -154,7 +169,7 @@ public class AppController {
                 e.printStackTrace();
             }
             executor.execute(this::updateMetrics);
-            executor.execute(() -> updateChartMetrics(Calendar.DATE));
+            executor.execute(() -> updateChartMetrics(Calendar.DAY_OF_MONTH));
             System.out.println("--Finished Parsing Campaign--");
         });
         executor.shutdown();
@@ -194,6 +209,14 @@ public class AppController {
         ctrButton.setDisable(false);
         in.setCtrSeries(ViewDataParser.getTotalCostSeries(resolution, in.getImpressions(), in.getClicks()));
         totalCostButton.setDisable(false);
+        in.setCPMSeries(ViewDataParser.getCPMTimeSeries(in.getImpressions(), in.getClicks()));
+        cpmButton.setDisable(false);
+        in.setCPASeries(ViewDataParser.getCPATimeSeries(in.getImpressions(), in.getClicks(), in.getInteractions()));
+        cpaButton.setDisable(false);
+        in.setCPCSeries(ViewDataParser.getCPCTimeSeries(resolution, in.getImpressions(), in.getClicks()));
+        cpcButton.setDisable(false);
+        in.setBounceRateSeries(ViewDataParser.getBounceRateTimeSeries(resolution, in.getClicks(), in.getInteractions()));
+        bounceRateButton.setDisable(false);
         //ViewDataParser.getCPATimeSeries(resolution, in.getImpressions(), in.getClicks(), in.getInteractions())
         //ViewDataParser.getCPCTimeSeries(resolution, in.getImpressions(), in.getClicks()),
         //ViewDataParser.getBounceRateTimeSeries(resolution, in.getClicks(), in.getInteractions())

@@ -34,6 +34,10 @@ public class Campaign {
     private SimpleDoubleProperty cpm = new SimpleDoubleProperty();
     private SimpleDoubleProperty bounceRate = new SimpleDoubleProperty();
     private XYChart.Series<String, Number> ctrSeries;
+    private XYChart.Series<String, Number> cpmSeries;
+    private XYChart.Series<String, Number> cpaSeries;
+    private XYChart.Series<String, Number> cpcSeries;
+    private XYChart.Series<String, Number> bounceRateSeries;
 
     public XYChart.Series<String, Number> getCtrSeries() {
         return ctrSeries;
@@ -332,4 +336,35 @@ public class Campaign {
         return t -> seen.add(keyExtractor.apply(t));
     }
 
+    public void setCPMSeries(XYChart.Series<String, Number> cpmSeries) {
+        this.cpmSeries = cpmSeries;
+    }
+
+    public XYChart.Series<String, Number> getCPMSeries() {
+        return cpmSeries;
+    }
+
+    public void setCPASeries(XYChart.Series<String, Number> cpaSeries) {
+        this.cpaSeries = cpaSeries;
+    }
+
+    public XYChart.Series<String, Number> getCPASeries() {
+        return cpaSeries;
+    }
+
+    public void setCPCSeries(XYChart.Series<String, Number> cpcSeries) {
+        this.cpcSeries = cpcSeries;
+    }
+
+    public XYChart.Series<String, Number> getCPCSeries() {
+        return cpcSeries;
+    }
+
+    public void setBounceRateSeries(XYChart.Series<String, Number> bounceRateSeries) {
+        this.bounceRateSeries = bounceRateSeries;
+    }
+
+    public XYChart.Series<String, Number> getBounceRateSeries() {
+        return bounceRateSeries;
+    }
 }
