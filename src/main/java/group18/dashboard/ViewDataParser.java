@@ -157,41 +157,61 @@ public class ViewDataParser {
         return (double) clicks.size() / impressions.size();
     }
 
-    public static XYChart.Series<String, Number> getCPATimeSeries(List<Impression> impressions, List<Click> clicks, List<Interaction> interactions) {
+    public static XYChart.Series<String, Number> getCPATimeSeries(int timeResolution, List<Impression> impressions, List<Click> clicks, List<Interaction> interactions) {
         final Map<String, Number> cpas = new HashMap<>();
+        final List<Date> clickSeenDates = new ArrayList<>();
+        final List<Date> impressionSeenDates = new ArrayList<>();
+        final List<Date> interactionSeenDates = new ArrayList<>();
+
+        final Map<Date, Number> distinctClicksCosts = new HashMap<>();
+        final Map<Date, Number> distinctImpressionCosts = new HashMap<>();
+        final Map<Date, Number> acquisitionsAtDate = new HashMap<>();
+
+        for (Click click : clicks) {
+            final Date roundedDate = DateUtils.round(click.getDate(), timeResolution);
+            if (!clickSeenDates.contains(roundedDate)) {
+                distinctClicksCosts.putIfAbsent(roundedDate, click.getCost());
+                distinctClicksCosts.computeIfPresent(roundedDate, (key, d) -> d.doubleValue() + click.getCost()); // Not sure this line ever runs
+                clickSeenDates.add(roundedDate);
+            } else {
+                distinctClicksCosts.computeIfPresent(roundedDate, (key, d) -> d.doubleValue() + click.getCost());
+            }
+        }
+
+        for (Impression impression : impressions) {
+            final Date roundedDate = DateUtils.round(impression.getDate(), timeResolution);
+            if (!impressionSeenDates.contains(roundedDate)) {
+                distinctImpressionCosts.putIfAbsent(roundedDate, impression.getCost());
+                distinctImpressionCosts.computeIfPresent(roundedDate, (key, d) -> d.doubleValue() + impression.getCost()); // Not sure this line ever runs
+                impressionSeenDates.add(roundedDate);
+            } else {
+                distinctImpressionCosts.computeIfPresent(roundedDate, (key, d) -> d.doubleValue() + impression.getCost());
+            }
+        }
 
         final List<Interaction> conversions = interactions
                 .parallelStream()
                 .filter(Interaction::isConversion)
                 .collect(Collectors.toList());
 
-        for (int i = 1, length = conversions.size(); i < length; i++) {
-            final Interaction previousConversion = conversions.get(i - 1);
-            final Interaction currentConversion = conversions.get(i);
-
-            if (currentConversion.getExitDate() == null || previousConversion.getExitDate() == null) {
-                continue;
+        for (Interaction conversion : conversions) {
+            final Date roundedDate = DateUtils.round(conversion.getEntryDate(), timeResolution);
+            if (!interactionSeenDates.contains(roundedDate)) {
+                acquisitionsAtDate.putIfAbsent(roundedDate, 0);
+                acquisitionsAtDate.computeIfPresent(roundedDate, (key, d) -> d.intValue() + 1); // Not sure this line ever runs
+                interactionSeenDates.add(roundedDate);
+            } else {
+                acquisitionsAtDate.computeIfPresent(roundedDate, (key, d) -> d.intValue() + 1);
             }
+        }
 
+        for (Map.Entry<Date, Number> acquisitions : acquisitionsAtDate.entrySet()) {
             double cost = 0;
 
-            cost += clicks
-                    .parallelStream()
-                    .filter(click ->
-                            click.getDate().after(previousConversion.getExitDate()) &&
-                                    click.getDate().before(currentConversion.getExitDate()))
-                    .mapToDouble(Click::getCost)
-                    .sum();
+            cost += distinctClicksCosts.get(acquisitions.getKey()).doubleValue();
+            cost += distinctImpressionCosts.get(acquisitions.getKey()).doubleValue();
 
-            cost += impressions
-                    .parallelStream()
-                    .filter(impression ->
-                            impression.getDate().after(previousConversion.getExitDate()) &&
-                                    impression.getDate().before(currentConversion.getExitDate()))
-                    .mapToDouble(Impression::getCost)
-                    .sum();
-
-            cpas.put(dateToString(currentConversion.getExitDate()), cost);
+            cpas.put(dateToString(acquisitions.getKey()), cost / acquisitions.getValue().doubleValue());
         }
 
         return mapToSeries("Cost-per-acquisition", cpas);
@@ -203,48 +223,45 @@ public class ViewDataParser {
 
     public static XYChart.Series<String, Number> getCPCTimeSeries(int timeResolution, List<Impression> impressions, List<Click> clicks) {
         final Map<String, Number> cpcs = new HashMap<>();
-        final List<Date> seenDates = new ArrayList<>();
+        final List<Date> clickSeenDates = new ArrayList<>();
+        final List<Date> impressionSeenDates = new ArrayList<>();
 
-        final Map<Click, Number> distinctClicksCosts = new HashMap<>();
+        final Map<Date, Number> distinctClicksCosts = new HashMap<>();
+        final Map<Date, Number> distinctImpressionCosts = new HashMap<>();
+        final Map<Date, Number> clicksAtDate = new HashMap<>();
 
         for (Click click : clicks) {
             final Date roundedDate = DateUtils.round(click.getDate(), timeResolution);
-            if (!seenDates.contains(roundedDate)) {
-                distinctClicksCosts.putIfAbsent(click, click.getCost());
-                distinctClicksCosts.computeIfPresent(click, (key, d) -> d.doubleValue() + click.getCost()); // Not sure this line ever runs
-                seenDates.add(roundedDate);
+            if (!clickSeenDates.contains(roundedDate)) {
+                distinctClicksCosts.putIfAbsent(roundedDate, click.getCost());
+                distinctClicksCosts.computeIfPresent(roundedDate, (key, d) -> d.doubleValue() + click.getCost()); // Not sure this line ever runs
+                clicksAtDate.putIfAbsent(roundedDate, 0);
+                clicksAtDate.computeIfPresent(roundedDate, (key, d) -> d.intValue() + 1); // Not sure this line ever runs
+                clickSeenDates.add(roundedDate);
+            } else {
+                distinctClicksCosts.computeIfPresent(roundedDate, (key, d) -> d.doubleValue() + click.getCost());
+                clicksAtDate.computeIfPresent(roundedDate, (key, d) -> d.intValue() + 1);
             }
-            distinctClicksCosts.computeIfPresent(click, (key, d) -> d.doubleValue() + click.getCost()); // Not sure this line ever runs
         }
 
-        final List<Click> sortedClicks = distinctClicksCosts.keySet()
-                .stream()
-                .sorted(Comparator.comparing(Click::getDate))
-                .collect(Collectors.toList());
+        for (Impression impression : impressions) {
+            final Date roundedDate = DateUtils.round(impression.getDate(), timeResolution);
+            if (!impressionSeenDates.contains(roundedDate)) {
+                distinctImpressionCosts.putIfAbsent(roundedDate, impression.getCost());
+                distinctImpressionCosts.computeIfPresent(roundedDate, (key, d) -> d.doubleValue() + impression.getCost()); // Not sure this line ever runs
+                impressionSeenDates.add(roundedDate);
+            } else {
+                distinctImpressionCosts.computeIfPresent(roundedDate, (key, d) -> d.doubleValue() + impression.getCost());
+            }
+        }
 
-        final List<Impression> sortedImpressions = impressions
-                .stream()
-                .sorted(Comparator.comparing(Impression::getDate))
-                .collect(Collectors.toList());
-
-        for (final Click currentClick : sortedClicks) {
+        for (Map.Entry<Date, Number> click : clicksAtDate.entrySet()) {
             double cost = 0;
 
-            cost += distinctClicksCosts.get(currentClick).doubleValue();
+            cost += distinctClicksCosts.get(click.getKey()).doubleValue();
+            cost += distinctImpressionCosts.get(click.getKey()).doubleValue();
 
-            Iterator<Impression> it = sortedImpressions.iterator();
-
-            while (it.hasNext()) {
-                Impression impression = it.next();
-                if (impression.getDate().before(currentClick.getDate())) {
-                    cost += impression.getCost();
-                    it.remove();
-                } else {
-                    break;
-                }
-            }
-
-            cpcs.put(dateToString(currentClick.getDate()), cost);
+            cpcs.put(dateToString(click.getKey()), cost / click.getValue().doubleValue());
         }
 
         return mapToSeries("Cost-per-click", cpcs);

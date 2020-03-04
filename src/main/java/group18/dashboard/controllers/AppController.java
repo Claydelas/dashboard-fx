@@ -287,7 +287,7 @@ public class AppController {
 
     private void updateChartMetrics(ExecutorService executor, int resolution) {
         executor.execute(() -> updateBounceRateSeries(resolution));
-        executor.execute(this::updateCPASeries);
+        executor.execute(() -> updateCPASeries(resolution));
         executor.execute(() -> updateCPCSeries(resolution));
         executor.execute(this::updateCPMSeries);
         executor.execute(() -> updateCTRSeries(resolution));
@@ -328,8 +328,8 @@ public class AppController {
         System.out.println("[Series] conversions... done");
     }
 
-    private void updateCPASeries() {
-        in.setCPASeries(ViewDataParser.getCPATimeSeries(in.getImpressions(), in.getClicks(), in.getInteractions()));
+    private void updateCPASeries(int resolution) {
+        in.setCPASeries(ViewDataParser.getCPATimeSeries(resolution, in.getImpressions(), in.getClicks(), in.getInteractions()));
         //Platform.runLater(()->seriesList.add(in.getCPASeries()));
         cpaButton.setDisable(false);
         System.out.println("[Series] CPA... done");

@@ -134,7 +134,7 @@ public class Campaign {
         System.out.printf("getCPCTimeSeries: %.02fs%n", (System.currentTimeMillis() - t) / 1000f);
 
         t = System.currentTimeMillis(); // TODO take less than 10s (easy)
-        ViewDataParser.getCPATimeSeries(c.getImpressions(), c.getClicks(), c.getInteractions());
+        ViewDataParser.getCPATimeSeries(Calendar.DAY_OF_MONTH, c.getImpressions(), c.getClicks(), c.getInteractions());
         System.out.printf("getCPATimeSeries: %.02fs%n", (System.currentTimeMillis() - t) / 1000f);
     }
 
