@@ -22,6 +22,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.TabPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
 
 import java.io.File;
@@ -44,7 +45,6 @@ public class AppController {
     public MenuItem exportPNGButton;
     public MenuItem importCampaignButton;
     public BorderPane appView;
-    public Label importNotification;
     public StackPane chartPane;
     public Label impressions;
     public Label clicks;
@@ -69,6 +69,7 @@ public class AppController {
     public JFXToggleButton cpmButton;
     public JFXToggleButton bounceRateButton;
     public TabPane tabs;
+    public VBox initImport;
 
     ObservableList<XYChart.Series<String, Number>> seriesList = FXCollections.observableArrayList();
     Property<ObservableList<XYChart.Series<String, Number>>> series = new SimpleListProperty<>(seriesList);
@@ -199,7 +200,7 @@ public class AppController {
             updateChartMetrics(executor, Calendar.DAY_OF_MONTH);
         });
         executor.shutdown();
-        chartPane.getChildren().remove(importNotification);
+        chartPane.getChildren().remove(initImport);
         mainChart.setVisible(true);
     }
 

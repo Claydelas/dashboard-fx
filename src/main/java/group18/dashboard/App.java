@@ -31,6 +31,9 @@ public class App extends Application {
     @Override
     public void start(Stage stage) throws IOException {
         scene = new Scene(loadFXML("app"), 1024, 600);
+        stage.setTitle("Ad Auction Dashboard alpha");
+        stage.setMinHeight(400);
+        stage.setMinWidth(700);
         stage.setScene(scene);
         stage.show();
     }

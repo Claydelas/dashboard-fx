@@ -6,6 +6,7 @@
 <?import javafx.scene.chart.CategoryAxis?>
 <?import javafx.scene.chart.LineChart?>
 <?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
@@ -17,6 +18,7 @@
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
 <BorderPane fx:id="appView" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="group18.dashboard.controllers.AppController">
@@ -57,11 +59,26 @@
                                         <NumberAxis fx:id="yAxis" side="LEFT" />
                                       </yAxis>
                                     </LineChart>
-                                    <Label fx:id="importNotification" text="Import a campaign to display a chart">
-                                       <font>
-                                          <Font size="24.0" />
-                                       </font>
-                                    </Label>
+                                    <VBox fx:id="initImport" alignment="CENTER">
+                                       <children>
+                                          <Label text="Import a campaign to display a chart">
+                                             <font>
+                                                <Font size="24.0" />
+                                             </font>
+                                          </Label>
+                                          <Button mnemonicParsing="false" onAction="#importCampaignButtonAction" text="Import Campaign">
+                                             <VBox.margin>
+                                                <Insets top="15.0" />
+                                             </VBox.margin>
+                                             <font>
+                                                <Font size="16.0" />
+                                             </font>
+                                          </Button>
+                                       </children>
+                                       <opaqueInsets>
+                                          <Insets />
+                                       </opaqueInsets>
+                                    </VBox>
                                  </children>
                               </StackPane>
                            </center>
