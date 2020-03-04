@@ -289,7 +289,7 @@ public class AppController {
         executor.execute(() -> updateBounceRateSeries(resolution));
         executor.execute(() -> updateCPASeries(resolution));
         executor.execute(() -> updateCPCSeries(resolution));
-        executor.execute(this::updateCPMSeries);
+        executor.execute(() -> updateCPMSeries(resolution));
         executor.execute(() -> updateCTRSeries(resolution));
         executor.execute(() -> updateTotalCostSeries(resolution));
         executor.execute(() -> updateClickCountSeries(resolution));
@@ -342,8 +342,8 @@ public class AppController {
         System.out.println("[Series] CPC... done");
     }
 
-    private void updateCPMSeries() {
-        in.setCPMSeries(ViewDataParser.getCPMTimeSeries(in.getImpressions(), in.getClicks()));
+    private void updateCPMSeries(int resolution) {
+        in.setCPMSeries(ViewDataParser.getCPMTimeSeries(resolution, in.getImpressions(), in.getClicks()));
         //Platform.runLater(()->seriesList.add(in.getCPMSeries()));
         cpmButton.setDisable(false);
         System.out.println("[Series] CPM... done");

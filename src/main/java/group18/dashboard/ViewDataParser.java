@@ -53,19 +53,16 @@ public class ViewDataParser {
     }
 
     // Every 1000 impressions calculate the (impressions + click) cost sum and plot them
-    public static XYChart.Series<String, Number> getCPMTimeSeries(List<Impression> impressions, List<Click> clicks) {
+    public static XYChart.Series<String, Number> getCPMTimeSeries(int timeResolution, List<Impression> impressions, List<Click> clicks) {
         final Map<String, Number> cpms = new HashMap<>();
+        final Map<Date, Number> cpmDatesNumber = new HashMap<>();
+        final Map<Date, Number> cpmDatesCost = new HashMap<>();
 
         final List<Impression> sortedImpressions = impressions
                 .stream()
                 .sorted(Comparator.comparing(Impression::getDate))
                 .limit(impressions.size() - impressions.size() % 1000) // Throw away last n < 1000 impressions
                 .collect(Collectors.toList());
-        // Maybe use this if searching through all clicks in the loop is too slow
-//        final List<Click> sortedClicks = clicks
-//                .stream()
-//                .sorted(Comparator.comparing(Click::getDate))
-//                .collect(Collectors.toList());
 
         for (int i = 0, length = sortedImpressions.size(); i < length; i += 1000) {
             double cpm = sortedImpressions
@@ -86,7 +83,17 @@ public class ViewDataParser {
                     .mapToDouble(Click::getCost)
                     .sum();
 
-            cpms.put(dateToString(sortedImpressions.get(i + 999).getDate()), cpm);
+            final Date roundedDate = DateUtils.round(sortedImpressions.get(i + 999).getDate(), timeResolution);
+            cpmDatesNumber.putIfAbsent(roundedDate, 0);
+            cpmDatesNumber.computeIfPresent(roundedDate, (k, v) -> v.intValue() + 1);
+            cpmDatesCost.putIfAbsent(roundedDate, 0);
+            double finalCpm = cpm; // Needed for lambda expression
+            cpmDatesCost.computeIfPresent(roundedDate, (k, v) -> v.doubleValue() + finalCpm);
+        }
+
+        for (Map.Entry<Date, Number> entry : cpmDatesCost.entrySet()) {
+            cpms.put(dateToString(entry.getKey()),
+                    entry.getValue().doubleValue() / cpmDatesNumber.get(entry.getKey()).intValue());
         }
 
         return mapToSeries("Cost-per-thousand impressions", cpms);

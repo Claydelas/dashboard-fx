@@ -130,7 +130,7 @@ public class Campaign {
         System.out.printf("getTotalCostSeries: %.02fs%n", (System.currentTimeMillis() - t) / 1000f);
 
         t = System.currentTimeMillis();
-        ViewDataParser.getCPMTimeSeries(c.getImpressions(), c.getClicks());
+        ViewDataParser.getCPMTimeSeries(Calendar.DAY_OF_MONTH, c.getImpressions(), c.getClicks());
         System.out.printf("getCPMTimeSeries: %.02fs%n", (System.currentTimeMillis() - t) / 1000f);
 
         t = System.currentTimeMillis();
