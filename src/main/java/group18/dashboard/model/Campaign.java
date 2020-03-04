@@ -38,6 +38,110 @@ public class Campaign {
     private XYChart.Series<String, Number> cpaSeries;
     private XYChart.Series<String, Number> cpcSeries;
     private XYChart.Series<String, Number> bounceRateSeries;
+    private XYChart.Series<String, Number> uniquesSeries;
+    private XYChart.Series<String, Number> impressionSeries;
+    private XYChart.Series<String, Number> clickCountSeries;
+    private XYChart.Series<String, Number> bouncesSeries;
+    private XYChart.Series<String, Number> conversionSeries;
+    private XYChart.Series<String, Number> totalCostSeries;
+
+    private static void benchmarks(String path) throws Exception {
+        System.out.println("----- TIMINGS ------\n");
+
+        long t = System.currentTimeMillis();
+        Campaign c = new Campaign();
+        c.readClicks(path);
+        c.readImpressions(path);
+        c.readInteractions(path);
+        System.out.printf("Initial CSV load: %.02fs%n", (System.currentTimeMillis() - t) / 1000f);
+
+        System.out.println("\n----- ONLY DATA ------\n"); // All negligible using 2-week sample data
+
+        t = System.currentTimeMillis();
+        ViewDataParser.getUniques(c.getClicks());
+        System.out.printf("getUniques: %.02fs%n", (System.currentTimeMillis() - t) / 1000f);
+
+        t = System.currentTimeMillis();
+        ViewDataParser.getBounces(c.getInteractions());
+        System.out.printf("getBounces: %.02fs%n", (System.currentTimeMillis() - t) / 1000f);
+
+        t = System.currentTimeMillis();
+        ViewDataParser.getConversions(c.getInteractions());
+        System.out.printf("getConversions: %.02fs%n", (System.currentTimeMillis() - t) / 1000f);
+
+        t = System.currentTimeMillis();
+        ViewDataParser.getTotalCost(c.getImpressions(), c.getClicks());
+        System.out.printf("getTotalCost: %.02fs%n", (System.currentTimeMillis() - t) / 1000f);
+
+        t = System.currentTimeMillis();
+        ViewDataParser.getCTR(c.getImpressions(), c.getClicks());
+        System.out.printf("getCTR: %.02fs%n", (System.currentTimeMillis() - t) / 1000f);
+
+        t = System.currentTimeMillis();
+        ViewDataParser.getCPA(c.getImpressions(), c.getClicks(), c.getInteractions());
+        System.out.printf("getCPA: %.02fs%n", (System.currentTimeMillis() - t) / 1000f);
+
+        t = System.currentTimeMillis();
+        ViewDataParser.getCPC(c.getImpressions(), c.getClicks());
+        System.out.printf("getCPC: %.02fs%n", (System.currentTimeMillis() - t) / 1000f);
+
+        t = System.currentTimeMillis();
+        ViewDataParser.getCPM(c.getImpressions(), c.getClicks());
+        System.out.printf("getCPM: %.02fs%n", (System.currentTimeMillis() - t) / 1000f);
+
+        t = System.currentTimeMillis();
+        ViewDataParser.getBounceRate(c.getClicks(), c.getInteractions());
+        System.out.printf("getBounceRate: %.02fs%n", (System.currentTimeMillis() - t) / 1000f);
+
+
+        System.out.println("\n----- TIME SERIES ------\n");
+
+        t = System.currentTimeMillis();
+        ViewDataParser.getCumulativeTimeSeries("Impressions", Calendar.DAY_OF_MONTH,
+                c.getImpressions().parallelStream().map(Impression::getDate).collect(Collectors.toList()));
+        System.out.printf("getCumulativeTimeSeries (Impressions): %.02fs%n", (System.currentTimeMillis() - t) / 1000f);
+
+        t = System.currentTimeMillis();
+        ViewDataParser.getCumulativeTimeSeries("Clicks", Calendar.DAY_OF_MONTH,
+                c.getClicks().parallelStream().map(Click::getDate).collect(Collectors.toList()));
+        System.out.printf("getCumulativeTimeSeries (Clicks): %.02fs%n", (System.currentTimeMillis() - t) / 1000f);
+
+        t = System.currentTimeMillis();
+        ViewDataParser.getCumulativeTimeSeries("Uniques", Calendar.DAY_OF_MONTH,
+                c.getClicks().parallelStream().filter(distinctByKey(Click::getDate)).map(Click::getDate).collect(Collectors.toList()));
+        System.out.printf("getCumulativeTimeSeries (Uniques): %.02fs%n", (System.currentTimeMillis() - t) / 1000f);
+
+        // TODO the rest
+
+        t = System.currentTimeMillis();
+        ViewDataParser.getCTRTimeSeries(Calendar.DAY_OF_MONTH, c.getImpressions(), c.getClicks());
+        System.out.printf("getCTRTimeSeries: %.02fs%n", (System.currentTimeMillis() - t) / 1000f);
+
+        t = System.currentTimeMillis();
+        ViewDataParser.getTotalCostSeries(Calendar.DAY_OF_MONTH, c.getImpressions(), c.getClicks());
+        System.out.printf("getTotalCostSeries: %.02fs%n", (System.currentTimeMillis() - t) / 1000f);
+
+        t = System.currentTimeMillis();
+        ViewDataParser.getCPMTimeSeries(c.getImpressions(), c.getClicks());
+        System.out.printf("getCPMTimeSeries: %.02fs%n", (System.currentTimeMillis() - t) / 1000f);
+
+        t = System.currentTimeMillis();
+        ViewDataParser.getBounceRateTimeSeries(Calendar.DAY_OF_MONTH, c.getClicks(), c.getInteractions());
+        System.out.printf("getBounceRateTimeSeries: %.02fs%n", (System.currentTimeMillis() - t) / 1000f);
+
+        t = System.currentTimeMillis(); // TODO take less than 15s (not sure how)
+        ViewDataParser.getCPCTimeSeries(Calendar.DAY_OF_MONTH, c.getImpressions(), c.getClicks());
+        System.out.printf("getCPCTimeSeries: %.02fs%n", (System.currentTimeMillis() - t) / 1000f);
+
+        t = System.currentTimeMillis(); // TODO take less than 10s (easy)
+        ViewDataParser.getCPATimeSeries(c.getImpressions(), c.getClicks(), c.getInteractions());
+        System.out.printf("getCPATimeSeries: %.02fs%n", (System.currentTimeMillis() - t) / 1000f);
+    }
+
+    public static <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {
+        Set<Object> seen = ConcurrentHashMap.newKeySet();
+        return t -> seen.add(keyExtractor.apply(t));
+    }
 
     public XYChart.Series<String, Number> getCtrSeries() {
         return ctrSeries;
@@ -54,9 +158,6 @@ public class Campaign {
     public void setTotalCostSeries(XYChart.Series<String, Number> totalCostSeries) {
         this.totalCostSeries = totalCostSeries;
     }
-
-    private XYChart.Series<String, Number> totalCostSeries;
-
 
     public SimpleLongProperty impressionCountProperty() {
         return impressionCount;
@@ -238,133 +339,75 @@ public class Campaign {
         return interactions;
     }
 
-    private static void benchmarks(String path) throws Exception {
-        System.out.println("----- TIMINGS ------\n");
-
-        long t = System.currentTimeMillis();
-        Campaign c = new Campaign();
-        c.readClicks(path);
-        c.readImpressions(path);
-        c.readInteractions(path);
-        System.out.printf("Initial CSV load: %.02fs%n", (System.currentTimeMillis() - t) / 1000f);
-
-        System.out.println("\n----- ONLY DATA ------\n"); // All negligible using 2-week sample data
-
-        t = System.currentTimeMillis();
-        ViewDataParser.getUniques(c.getClicks());
-        System.out.printf("getUniques: %.02fs%n", (System.currentTimeMillis() - t) / 1000f);
-
-        t = System.currentTimeMillis();
-        ViewDataParser.getBounces(c.getInteractions());
-        System.out.printf("getBounces: %.02fs%n", (System.currentTimeMillis() - t) / 1000f);
-
-        t = System.currentTimeMillis();
-        ViewDataParser.getConversions(c.getInteractions());
-        System.out.printf("getConversions: %.02fs%n", (System.currentTimeMillis() - t) / 1000f);
-
-        t = System.currentTimeMillis();
-        ViewDataParser.getTotalCost(c.getImpressions(), c.getClicks());
-        System.out.printf("getTotalCost: %.02fs%n", (System.currentTimeMillis() - t) / 1000f);
-
-        t = System.currentTimeMillis();
-        ViewDataParser.getCTR(c.getImpressions(), c.getClicks());
-        System.out.printf("getCTR: %.02fs%n", (System.currentTimeMillis() - t) / 1000f);
-
-        t = System.currentTimeMillis();
-        ViewDataParser.getCPA(c.getImpressions(), c.getClicks(), c.getInteractions());
-        System.out.printf("getCPA: %.02fs%n", (System.currentTimeMillis() - t) / 1000f);
-
-        t = System.currentTimeMillis();
-        ViewDataParser.getCPC(c.getImpressions(), c.getClicks());
-        System.out.printf("getCPC: %.02fs%n", (System.currentTimeMillis() - t) / 1000f);
-
-        t = System.currentTimeMillis();
-        ViewDataParser.getCPM(c.getImpressions(), c.getClicks());
-        System.out.printf("getCPM: %.02fs%n", (System.currentTimeMillis() - t) / 1000f);
-
-        t = System.currentTimeMillis();
-        ViewDataParser.getBounceRate(c.getClicks(), c.getInteractions());
-        System.out.printf("getBounceRate: %.02fs%n", (System.currentTimeMillis() - t) / 1000f);
-
-
-        System.out.println("\n----- TIME SERIES ------\n");
-
-        t = System.currentTimeMillis();
-        ViewDataParser.getCumulativeTimeSeries("Impressions", Calendar.DAY_OF_MONTH,
-                c.getImpressions().parallelStream().map(Impression::getDate).collect(Collectors.toList()));
-        System.out.printf("getCumulativeTimeSeries (Impressions): %.02fs%n", (System.currentTimeMillis() - t) / 1000f);
-
-        t = System.currentTimeMillis();
-        ViewDataParser.getCumulativeTimeSeries("Clicks", Calendar.DAY_OF_MONTH,
-                c.getClicks().parallelStream().map(Click::getDate).collect(Collectors.toList()));
-        System.out.printf("getCumulativeTimeSeries (Clicks): %.02fs%n", (System.currentTimeMillis() - t) / 1000f);
-
-        t = System.currentTimeMillis();
-        ViewDataParser.getCumulativeTimeSeries("Uniques", Calendar.DAY_OF_MONTH,
-                c.getClicks().parallelStream().filter(distinctByKey(Click::getDate)).map(Click::getDate).collect(Collectors.toList()));
-        System.out.printf("getCumulativeTimeSeries (Uniques): %.02fs%n", (System.currentTimeMillis() - t) / 1000f);
-
-        // TODO the rest
-
-        t = System.currentTimeMillis();
-        ViewDataParser.getCTRTimeSeries(Calendar.DAY_OF_MONTH, c.getImpressions(), c.getClicks());
-        System.out.printf("getCTRTimeSeries: %.02fs%n", (System.currentTimeMillis() - t) / 1000f);
-
-        t = System.currentTimeMillis();
-        ViewDataParser.getTotalCostSeries(Calendar.DAY_OF_MONTH, c.getImpressions(), c.getClicks());
-        System.out.printf("getTotalCostSeries: %.02fs%n", (System.currentTimeMillis() - t) / 1000f);
-
-        t = System.currentTimeMillis();
-        ViewDataParser.getCPMTimeSeries(c.getImpressions(), c.getClicks());
-        System.out.printf("getCPMTimeSeries: %.02fs%n", (System.currentTimeMillis() - t) / 1000f);
-
-        t = System.currentTimeMillis();
-        ViewDataParser.getBounceRateTimeSeries(Calendar.DAY_OF_MONTH, c.getClicks(), c.getInteractions());
-        System.out.printf("getBounceRateTimeSeries: %.02fs%n", (System.currentTimeMillis() - t) / 1000f);
-
-        t = System.currentTimeMillis(); // TODO take less than 15s (not sure how)
-        ViewDataParser.getCPCTimeSeries(Calendar.DAY_OF_MONTH, c.getImpressions(), c.getClicks());
-        System.out.printf("getCPCTimeSeries: %.02fs%n", (System.currentTimeMillis() - t) / 1000f);
-
-        t = System.currentTimeMillis(); // TODO take less than 10s (easy)
-        ViewDataParser.getCPATimeSeries(c.getImpressions(), c.getClicks(), c.getInteractions());
-        System.out.printf("getCPATimeSeries: %.02fs%n", (System.currentTimeMillis() - t) / 1000f);
-    }
-
-    public static <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {
-        Set<Object> seen = ConcurrentHashMap.newKeySet();
-        return t -> seen.add(keyExtractor.apply(t));
+    public XYChart.Series<String, Number> getCPMSeries() {
+        return cpmSeries;
     }
 
     public void setCPMSeries(XYChart.Series<String, Number> cpmSeries) {
         this.cpmSeries = cpmSeries;
     }
 
-    public XYChart.Series<String, Number> getCPMSeries() {
-        return cpmSeries;
+    public XYChart.Series<String, Number> getCPASeries() {
+        return cpaSeries;
     }
 
     public void setCPASeries(XYChart.Series<String, Number> cpaSeries) {
         this.cpaSeries = cpaSeries;
     }
 
-    public XYChart.Series<String, Number> getCPASeries() {
-        return cpaSeries;
+    public XYChart.Series<String, Number> getCPCSeries() {
+        return cpcSeries;
     }
 
     public void setCPCSeries(XYChart.Series<String, Number> cpcSeries) {
         this.cpcSeries = cpcSeries;
     }
 
-    public XYChart.Series<String, Number> getCPCSeries() {
-        return cpcSeries;
+    public XYChart.Series<String, Number> getBounceRateSeries() {
+        return bounceRateSeries;
     }
 
     public void setBounceRateSeries(XYChart.Series<String, Number> bounceRateSeries) {
         this.bounceRateSeries = bounceRateSeries;
     }
 
-    public XYChart.Series<String, Number> getBounceRateSeries() {
-        return bounceRateSeries;
+    public XYChart.Series<String, Number> getUniquesSeries() {
+        return uniquesSeries;
+    }
+
+    public void setUniquesSeries(XYChart.Series<String, Number> uniquesSeries) {
+        this.uniquesSeries = uniquesSeries;
+    }
+
+    public XYChart.Series<String, Number> getImpressionSeries() {
+        return impressionSeries;
+    }
+
+    public void setImpressionSeries(XYChart.Series<String, Number> impressionSeries) {
+        this.impressionSeries = impressionSeries;
+    }
+
+    public XYChart.Series<String, Number> getClickCountSeries() {
+        return clickCountSeries;
+    }
+
+    public void setClickCountSeries(XYChart.Series<String, Number> clickCountSeries) {
+        this.clickCountSeries = clickCountSeries;
+    }
+
+    public XYChart.Series<String, Number> getBouncesSeries() {
+        return bouncesSeries;
+    }
+
+    public void setBouncesSeries(XYChart.Series<String, Number> bouncesSeries) {
+        this.bouncesSeries = bouncesSeries;
+    }
+
+    public XYChart.Series<String, Number> getConversionSeries() {
+        return conversionSeries;
+    }
+
+    public void setConversionSeries(XYChart.Series<String, Number> conversionSeries) {
+        this.conversionSeries = conversionSeries;
     }
 }

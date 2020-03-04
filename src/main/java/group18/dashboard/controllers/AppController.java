@@ -4,6 +4,9 @@ import com.jfoenix.controls.JFXSlider;
 import com.jfoenix.controls.JFXToggleButton;
 import group18.dashboard.ViewDataParser;
 import group18.dashboard.model.Campaign;
+import group18.dashboard.model.Click;
+import group18.dashboard.model.Impression;
+import group18.dashboard.model.Interaction;
 import javafx.application.Platform;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleListProperty;
@@ -26,6 +29,9 @@ import java.util.Calendar;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
+
+import static group18.dashboard.model.Campaign.distinctByKey;
 
 public class AppController {
 
@@ -117,6 +123,26 @@ public class AppController {
         bounceRateButton.selectedProperty().addListener((o, old, selected) -> {
             if (selected) seriesList.add(campaign.getBounceRateSeries());
             else seriesList.remove(campaign.getBounceRateSeries());
+        });
+        impressionsButton.selectedProperty().addListener((o, old, selected) -> {
+            if (selected) seriesList.add(campaign.getImpressionSeries());
+            else seriesList.remove(campaign.getImpressionSeries());
+        });
+        clicksButton.selectedProperty().addListener((o, old, selected) -> {
+            if (selected) seriesList.add(campaign.getClickCountSeries());
+            else seriesList.remove(campaign.getClickCountSeries());
+        });
+        uniquesButton.selectedProperty().addListener((o, old, selected) -> {
+            if (selected) seriesList.add(campaign.getUniquesSeries());
+            else seriesList.remove(campaign.getUniquesSeries());
+        });
+        bouncesButton.selectedProperty().addListener((o, old, selected) -> {
+            if (selected) seriesList.add(campaign.getBouncesSeries());
+            else seriesList.remove(campaign.getBouncesSeries());
+        });
+        conversionsButton.selectedProperty().addListener((o, old, selected) -> {
+            if (selected) seriesList.add(campaign.getConversionSeries());
+            else seriesList.remove(campaign.getConversionSeries());
         });
     }
 
@@ -254,7 +280,11 @@ public class AppController {
         executor.execute(() -> updateCPMSeries());
         executor.execute(() -> updateCTRSeries(resolution));
         executor.execute(() -> updateTotalCostSeries(resolution));
-
+        executor.execute(() -> updateClickCountSeries(resolution));
+        executor.execute(() -> updateImpressionsSeries(resolution));
+        executor.execute(() -> updateUniquesSeries(resolution));
+        executor.execute(() -> updateBouncesSeries(resolution));
+        executor.execute(() -> updateConversionsSeries(resolution));
     }
 
     private void updateBounceRateSeries(int resolution) {
@@ -266,13 +296,24 @@ public class AppController {
 
     }
 
-    private void updateBouncesSeries() {
+    private void updateBouncesSeries(int resolution) {
+        in.setBouncesSeries(ViewDataParser.getCumulativeTimeSeries("Bounces", resolution,
+                in.getInteractions().parallelStream()
+                        .filter(interaction -> !interaction.isConversion()).map(Interaction::getEntryDate).collect(Collectors.toList())));
+        bouncesButton.setDisable(false);
     }
 
-    private void updateClickCountSeries() {
+    private void updateClickCountSeries(int resolution) {
+        in.setClickCountSeries(ViewDataParser.getCumulativeTimeSeries("Clicks", resolution,
+                in.getClicks().parallelStream().map(Click::getDate).collect(Collectors.toList())));
+        clicksButton.setDisable(false);
     }
 
-    private void updateConversionsSeries() {
+    private void updateConversionsSeries(int resolution) {
+        in.setConversionSeries(ViewDataParser.getCumulativeTimeSeries("Conversions", resolution,
+                in.getInteractions().parallelStream()
+                        .filter(Interaction::isConversion).map(Interaction::getEntryDate).collect(Collectors.toList())));
+        conversionsButton.setDisable(false);
     }
 
     private void updateCPASeries() {
@@ -299,7 +340,10 @@ public class AppController {
         ctrButton.setDisable(false);
     }
 
-    private void updateImpressionsSeries() {
+    private void updateImpressionsSeries(int resolution) {
+        in.setImpressionSeries(ViewDataParser.getCumulativeTimeSeries("Impressions", resolution,
+                in.getImpressions().parallelStream().map(Impression::getDate).collect(Collectors.toList())));
+        impressionsButton.setDisable(false);
     }
 
     private void updateTotalCostSeries(int resolution) {
@@ -308,6 +352,9 @@ public class AppController {
         totalCostButton.setDisable(false);
     }
 
-    private void updateUniquesSeries() {
+    private void updateUniquesSeries(int resolution) {
+        in.setUniquesSeries(ViewDataParser.getCumulativeTimeSeries("Uniques", resolution,
+                in.getClicks().parallelStream().filter(distinctByKey(Click::getDate)).map(Click::getDate).collect(Collectors.toList())));
+        uniquesButton.setDisable(false);
     }
 }
