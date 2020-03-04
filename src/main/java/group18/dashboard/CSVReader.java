@@ -122,7 +122,15 @@ public class CSVReader {
                 c.getClicks().parallelStream().filter(distinctByKey(Click::getDate)).map(Click::getDate).collect(Collectors.toList()));
         System.out.printf("getCumulativeTimeSeries (Uniques): %.02fs%n", (System.currentTimeMillis() - t) / 1000f);
 
-        // TODO the rest
+        t = System.currentTimeMillis();
+        ViewDataParser.getCumulativeTimeSeries("Bounces", Calendar.DAY_OF_MONTH,
+                c.getInteractions().parallelStream().filter(i -> !i.isConversion()).map(Interaction::getEntryDate).collect(Collectors.toList()));
+        System.out.printf("getCumulativeTimeSeries (Bounces): %.02fs%n", (System.currentTimeMillis() - t) / 1000f);
+
+        t = System.currentTimeMillis();
+        ViewDataParser.getCumulativeTimeSeries("Conversions", Calendar.DAY_OF_MONTH,
+                c.getInteractions().parallelStream().filter(Interaction::isConversion).map(Interaction::getEntryDate).collect(Collectors.toList()));
+        System.out.printf("getCumulativeTimeSeries (Conversions): %.02fs%n", (System.currentTimeMillis() - t) / 1000f);
 
         t = System.currentTimeMillis();
         ViewDataParser.getCTRTimeSeries(Calendar.DAY_OF_MONTH, c.getImpressions(), c.getClicks());
@@ -140,13 +148,14 @@ public class CSVReader {
         ViewDataParser.getBounceRateTimeSeries(Calendar.DAY_OF_MONTH, c.getClicks(), c.getInteractions());
         System.out.printf("getBounceRateTimeSeries: %.02fs%n", (System.currentTimeMillis() - t) / 1000f);
 
-        t = System.currentTimeMillis(); // TODO take less than 15s (not sure how)
+        t = System.currentTimeMillis();
+        ViewDataParser.getCPATimeSeries(Calendar.DAY_OF_MONTH, c.getImpressions(), c.getClicks(), c.getInteractions());
+        System.out.printf("getCPATimeSeries: %.02fs%n", (System.currentTimeMillis() - t) / 1000f);
+
+        t = System.currentTimeMillis(); // TODO take less than 15s
         ViewDataParser.getCPCTimeSeries(Calendar.DAY_OF_MONTH, c.getImpressions(), c.getClicks());
         System.out.printf("getCPCTimeSeries: %.02fs%n", (System.currentTimeMillis() - t) / 1000f);
 
-        t = System.currentTimeMillis(); // TODO take less than 10s (easy)
-        ViewDataParser.getCPATimeSeries(c.getImpressions(), c.getClicks(), c.getInteractions());
-        System.out.printf("getCPATimeSeries: %.02fs%n", (System.currentTimeMillis() - t) / 1000f);
     }
 
     public static <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {
