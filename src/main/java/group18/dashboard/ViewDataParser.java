@@ -95,7 +95,7 @@ public class ViewDataParser {
                     entry.getValue().doubleValue() / cpmDatesNumber.get(entry.getKey()).intValue());
         }
 
-        return mapToSeries("Cost-per-thousand impressions", cpms);
+        return mapToSeries("Cost-per-mille", cpms);
     }
 
     public static double getCPM(List<Impression> impressions, List<Click> clicks) {

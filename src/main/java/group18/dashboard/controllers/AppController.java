@@ -17,6 +17,7 @@ import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TabPane;
@@ -26,6 +27,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -150,6 +152,11 @@ public class AppController {
 
     @FXML
     public void themeButtonAction() {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("oops..");
+        alert.setHeaderText(null);
+        alert.setContentText("This feature has not been implemented yet!");
+        alert.showAndWait();
     }
 
     @FXML
@@ -157,6 +164,19 @@ public class AppController {
         DirectoryChooser directoryChooser = new DirectoryChooser();
         directoryChooser.setTitle("Select Campaign Folder");
         File dir = directoryChooser.showDialog(appView.getScene().getWindow());
+
+        if (dir != null && dir.isDirectory()) {
+            File[] files = dir.listFiles();
+            if (files != null && !(Arrays.stream(files).allMatch(file -> file.getName().equals("click_log.csv")
+                    || file.getName().equals("impression_log.csv") || file.getName().equals("server_log.csv")))) {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Missing files");
+                alert.setHeaderText(null);
+                alert.setContentText("Couldn't find all campaign files in the selected directory!\nPlease try again.");
+                alert.showAndWait();
+                return;
+            }
+        }
         if (dir == null) return;
 
         System.out.println("--Parsing Campaign--");
