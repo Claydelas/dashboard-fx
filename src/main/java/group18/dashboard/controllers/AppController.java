@@ -17,6 +17,7 @@ import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TabPane;
@@ -26,6 +27,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -45,7 +47,8 @@ public class AppController {
     public MenuItem exportPNGButton;
     public MenuItem importCampaignButton;
     public BorderPane appView;
-    public StackPane chartPane;
+    public StackPane mainView;
+    public BorderPane chartPane;
     public Label impressions;
     public Label clicks;
     public Label uniques;
@@ -69,12 +72,12 @@ public class AppController {
     public JFXToggleButton cpmButton;
     public JFXToggleButton bounceRateButton;
     public TabPane tabs;
-    public VBox initImport;
-
+    public VBox initView;
+    public StackPane loadingProgress;
     ObservableList<XYChart.Series<String, Number>> seriesList = FXCollections.observableArrayList();
     Property<ObservableList<XYChart.Series<String, Number>>> series = new SimpleListProperty<>(seriesList);
-
     Campaign in;
+    private CountDownLatch importProgress;
 
     @FXML
     public void initialize() {
@@ -149,6 +152,11 @@ public class AppController {
 
     @FXML
     public void themeButtonAction() {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("oops..");
+        alert.setHeaderText(null);
+        alert.setContentText("This feature has not been implemented yet!");
+        alert.showAndWait();
     }
 
     @FXML
@@ -156,11 +164,25 @@ public class AppController {
         DirectoryChooser directoryChooser = new DirectoryChooser();
         directoryChooser.setTitle("Select Campaign Folder");
         File dir = directoryChooser.showDialog(appView.getScene().getWindow());
+
+        if (dir != null && dir.isDirectory()) {
+            File[] files = dir.listFiles();
+            if (files != null && !(Arrays.stream(files).allMatch(file -> file.getName().equals("click_log.csv")
+                    || file.getName().equals("impression_log.csv") || file.getName().equals("server_log.csv")))) {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Missing files");
+                alert.setHeaderText(null);
+                alert.setContentText("Couldn't find all campaign files in the selected directory!\nPlease try again.");
+                alert.showAndWait();
+                return;
+            }
+        }
         if (dir == null) return;
 
         System.out.println("--Parsing Campaign--");
         ExecutorService executor = Executors.newWorkStealingPool();
         CountDownLatch latch = new CountDownLatch(3);
+        importProgress = new CountDownLatch(22);
 
         executor.execute(() -> {
             try {
@@ -199,9 +221,20 @@ public class AppController {
             updateMetrics(executor);
             updateChartMetrics(executor, Calendar.DAY_OF_MONTH);
         });
+        mainView.getChildren().remove(initView);
+        loadingProgress.setVisible(true);
+        executor.execute(() -> {
+            try {
+                importProgress.await();
+                Platform.runLater(() -> {
+                    mainView.getChildren().remove(loadingProgress);
+                    chartPane.setVisible(true);
+                });
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        });
         executor.shutdown();
-        chartPane.getChildren().remove(initImport);
-        mainChart.setVisible(true);
     }
 
     private void updateMetrics(ExecutorService executor) {
@@ -223,66 +256,77 @@ public class AppController {
         var bounceRate = ViewDataParser.getBounceRate(in.getClicks(), in.getInteractions());
         Platform.runLater(() -> in.setBounceRate(bounceRate));
         System.out.println("bounce rate... done");
+        importProgress.countDown();
     }
 
     private void updateBounces() {
         var bounces = ViewDataParser.getBounces(in.getInteractions());
         Platform.runLater(() -> in.setBounces(bounces));
         System.out.println("bounces... done");
+        importProgress.countDown();
     }
 
     private void updateClickCount() {
         var clicks = in.getClicks().size();
         Platform.runLater(() -> in.setClickCount(clicks));
         System.out.println("clicks... done");
+        importProgress.countDown();
     }
 
     private void updateConversions() {
         var conversions = ViewDataParser.getConversions(in.getInteractions());
         Platform.runLater(() -> in.setConversions(conversions));
         System.out.println("conversions... done");
+        importProgress.countDown();
     }
 
     private void updateCPA() {
         var cpa = ViewDataParser.getCPA(in.getImpressions(), in.getClicks(), in.getInteractions());
         Platform.runLater(() -> in.setCpa(cpa));
         System.out.println("CPA... done");
+        importProgress.countDown();
     }
 
     private void updateCPC() {
         var cpc = ViewDataParser.getCPC(in.getImpressions(), in.getClicks());
         Platform.runLater(() -> in.setCpc(cpc));
         System.out.println("CPC... done");
+        importProgress.countDown();
     }
 
     private void updateCPM() {
         var cpm = ViewDataParser.getCPM(in.getImpressions(), in.getClicks());
         Platform.runLater(() -> in.setCpm(cpm));
         System.out.println("CPM... done");
+        importProgress.countDown();
     }
 
     private void updateCTR() {
         var ctr = ViewDataParser.getCTR(in.getImpressions(), in.getClicks());
         Platform.runLater(() -> in.setCtr(ctr));
         System.out.println("CTR... done");
+        importProgress.countDown();
     }
 
     private void updateImpressions() {
         var impressions = in.getImpressions().size();
         Platform.runLater(() -> in.setImpressionCount(impressions));
         System.out.println("impressions... done");
+        importProgress.countDown();
     }
 
     private void updateTotalCost() {
         var totalCost = ViewDataParser.getTotalCost(in.getImpressions(), in.getClicks());
         Platform.runLater(() -> in.setTotalCost(totalCost));
         System.out.println("total cost... done");
+        importProgress.countDown();
     }
 
     private void updateUniques() {
         var uniques = ViewDataParser.getUniques(in.getClicks());
         Platform.runLater(() -> in.setUniques(uniques));
         System.out.println("uniques... done");
+        importProgress.countDown();
     }
 
     private void updateChartMetrics(ExecutorService executor, int resolution) {
@@ -303,6 +347,7 @@ public class AppController {
         in.setBounceRateSeries(ViewDataParser.getBounceRateTimeSeries(resolution, in.getClicks(), in.getInteractions()));
         bounceRateButton.setDisable(false);
         System.out.println("[Series] bounce rate... done");
+        importProgress.countDown();
     }
 
     private void updateBouncesSeries(int resolution) {
@@ -311,6 +356,7 @@ public class AppController {
                         .filter(interaction -> !interaction.isConversion()).map(Interaction::getEntryDate).collect(Collectors.toList())));
         bouncesButton.setDisable(false);
         System.out.println("[Series] bounces... done");
+        importProgress.countDown();
     }
 
     private void updateClickCountSeries(int resolution) {
@@ -318,6 +364,7 @@ public class AppController {
                 in.getClicks().parallelStream().map(Click::getDate).collect(Collectors.toList())));
         clicksButton.setDisable(false);
         System.out.println("[Series] clicks... done");
+        importProgress.countDown();
     }
 
     private void updateConversionsSeries(int resolution) {
@@ -326,6 +373,7 @@ public class AppController {
                         .filter(Interaction::isConversion).map(Interaction::getEntryDate).collect(Collectors.toList())));
         conversionsButton.setDisable(false);
         System.out.println("[Series] conversions... done");
+        importProgress.countDown();
     }
 
     private void updateCPASeries(int resolution) {
@@ -333,6 +381,7 @@ public class AppController {
         //Platform.runLater(()->seriesList.add(in.getCPASeries()));
         cpaButton.setDisable(false);
         System.out.println("[Series] CPA... done");
+        importProgress.countDown();
     }
 
     private void updateCPCSeries(int resolution) {
@@ -340,6 +389,7 @@ public class AppController {
         //Platform.runLater(()->seriesList.add(in.getCPCSeries()));
         cpcButton.setDisable(false);
         System.out.println("[Series] CPC... done");
+        importProgress.countDown();
     }
 
     private void updateCPMSeries(int resolution) {
@@ -347,13 +397,15 @@ public class AppController {
         //Platform.runLater(()->seriesList.add(in.getCPMSeries()));
         cpmButton.setDisable(false);
         System.out.println("[Series] CPM... done");
+        importProgress.countDown();
     }
 
     private void updateCTRSeries(int resolution) {
-        in.setCtrSeries(ViewDataParser.getTotalCostSeries(resolution, in.getImpressions(), in.getClicks()));
+        in.setCtrSeries(ViewDataParser.getCTRTimeSeries(resolution, in.getImpressions(), in.getClicks()));
         //Platform.runLater(()->seriesList.add(in.getCtrSeries()));
         ctrButton.setDisable(false);
         System.out.println("[Series] CTR... done");
+        importProgress.countDown();
     }
 
     private void updateImpressionsSeries(int resolution) {
@@ -361,13 +413,15 @@ public class AppController {
                 in.getImpressions().parallelStream().map(Impression::getDate).collect(Collectors.toList())));
         impressionsButton.setDisable(false);
         System.out.println("[Series] impressions... done");
+        importProgress.countDown();
     }
 
     private void updateTotalCostSeries(int resolution) {
-        in.setTotalCostSeries(ViewDataParser.getCTRTimeSeries(resolution, in.getImpressions(), in.getClicks()));
+        in.setTotalCostSeries(ViewDataParser.getTotalCostSeries(resolution, in.getImpressions(), in.getClicks()));
         //Platform.runLater(()->seriesList.add(in.getTotalCostSeries()));
         totalCostButton.setDisable(false);
         System.out.println("[Series] total cost... done");
+        importProgress.countDown();
     }
 
     private void updateUniquesSeries(int resolution) {
@@ -375,5 +429,6 @@ public class AppController {
                 in.getClicks().parallelStream().filter(distinctByKey(Click::getDate)).map(Click::getDate).collect(Collectors.toList())));
         uniquesButton.setDisable(false);
         System.out.println("[Series] uniques... done");
+        importProgress.countDown();
     }
 }

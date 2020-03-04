@@ -3,10 +3,9 @@ package group18.dashboard;
 import group18.dashboard.model.Click;
 import group18.dashboard.model.Impression;
 import group18.dashboard.model.Interaction;
+import javafx.scene.chart.XYChart;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.commons.lang.time.DateUtils;
-
-import javafx.scene.chart.XYChart;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -96,7 +95,7 @@ public class ViewDataParser {
                     entry.getValue().doubleValue() / cpmDatesNumber.get(entry.getKey()).intValue());
         }
 
-        return mapToSeries("Cost-per-thousand impressions", cpms);
+        return mapToSeries("Cost-per-mille", cpms);
     }
 
     public static double getCPM(List<Impression> impressions, List<Click> clicks) {
