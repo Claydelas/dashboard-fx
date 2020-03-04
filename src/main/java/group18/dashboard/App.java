@@ -15,14 +15,7 @@ public class App extends Application {
 
     private static Scene scene;
 
-    @Override
-    public void start(Stage stage) throws IOException {
-        scene = new Scene(loadFXML("primary"), 1024, 600);
-        stage.setScene(scene);
-        stage.show();
-    }
-
-    static void setRoot(String fxml) throws IOException {
+    public static void setRoot(String fxml) throws IOException {
         scene.setRoot(loadFXML(fxml));
     }
 
@@ -33,6 +26,16 @@ public class App extends Application {
 
     public static void main(String[] args) {
         launch();
+    }
+
+    @Override
+    public void start(Stage stage) throws IOException {
+        scene = new Scene(loadFXML("app"), 1024, 600);
+        stage.setTitle("Ad Auction Dashboard alpha");
+        stage.setMinHeight(400);
+        stage.setMinWidth(700);
+        stage.setScene(scene);
+        stage.show();
     }
 
 }
