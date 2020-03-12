@@ -26,8 +26,10 @@ import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
 
 import java.io.File;
+import java.text.NumberFormat;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Locale;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -160,17 +162,17 @@ public class DashboardController {
     }
 
     private void bindMetrics(Campaign campaign) {
-        impressions.textProperty().bind(campaign.impressionCountProperty().asString());
-        clicks.textProperty().bind(campaign.clickCountProperty().asString());
-        uniques.textProperty().bind(campaign.uniquesProperty().asString());
-        bounces.textProperty().bind(campaign.bouncesProperty().asString());
-        conversions.textProperty().bind(campaign.conversionsProperty().asString());
-        totalCost.textProperty().bind(campaign.totalCostProperty().asString());
-        ctr.textProperty().bind(campaign.ctrProperty().asString());
-        cpa.textProperty().bind(campaign.cpaProperty().asString());
-        cpc.textProperty().bind(campaign.cpcProperty().asString());
-        cpm.textProperty().bind(campaign.cpmProperty().asString());
-        bounceRate.textProperty().bind(campaign.bounceRateProperty().asString("%f%%"));
+        impressions.textProperty().bind(campaign.impressionCountProperty().asString("%,d"));
+        clicks.textProperty().bind(campaign.clickCountProperty().asString("%,d"));
+        uniques.textProperty().bind(campaign.uniquesProperty().asString("%,d"));
+        bounces.textProperty().bind(campaign.bouncesProperty().asString("%,d"));
+        conversions.textProperty().bind(campaign.conversionsProperty().asString("%,d"));
+        totalCost.textProperty().bind(campaign.totalCostProperty().asString("\u00A3%.2f"));
+        ctr.textProperty().bind(campaign.ctrProperty().asString("%.2f%%"));
+        cpa.textProperty().bind(campaign.cpaProperty().asString("\u00A3%.2f"));
+        cpc.textProperty().bind(campaign.cpcProperty().asString("\u00A3%.2f"));
+        cpm.textProperty().bind(campaign.cpmProperty().asString("\u00A3%.2f"));
+        bounceRate.textProperty().bind(campaign.bounceRateProperty().asString("%.2f%%"));
     }
 
     private void bindChartMetrics(Campaign campaign) {
