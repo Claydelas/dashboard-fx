@@ -1,7 +1,7 @@
 package group18.dashboard.controllers;
 
+import com.jfoenix.controls.JFXRadioButton;
 import com.jfoenix.controls.JFXSlider;
-import com.jfoenix.controls.JFXToggleButton;
 import group18.dashboard.ViewDataParser;
 import group18.dashboard.model.Campaign;
 import group18.dashboard.model.Click;
@@ -26,10 +26,8 @@ import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
 
 import java.io.File;
-import java.text.NumberFormat;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Locale;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -39,7 +37,6 @@ import static group18.dashboard.model.Campaign.distinctByKey;
 
 public class DashboardController {
 
-    public JFXSlider granularitySlider;
     public NumberAxis yAxis;
     public LineChart<String, Number> mainChart;
     public CategoryAxis xAxis;
@@ -56,17 +53,17 @@ public class DashboardController {
     public Label cpc;
     public Label cpm;
     public Label bounceRate;
-    public JFXToggleButton impressionsButton;
-    public JFXToggleButton clicksButton;
-    public JFXToggleButton uniquesButton;
-    public JFXToggleButton bouncesButton;
-    public JFXToggleButton conversionsButton;
-    public JFXToggleButton totalCostButton;
-    public JFXToggleButton ctrButton;
-    public JFXToggleButton cpaButton;
-    public JFXToggleButton cpcButton;
-    public JFXToggleButton cpmButton;
-    public JFXToggleButton bounceRateButton;
+    public JFXRadioButton impressionsButton;
+    public JFXRadioButton clicksButton;
+    public JFXRadioButton uniquesButton;
+    public JFXRadioButton bouncesButton;
+    public JFXRadioButton conversionsButton;
+    public JFXRadioButton totalCostButton;
+    public JFXRadioButton ctrButton;
+    public JFXRadioButton cpaButton;
+    public JFXRadioButton cpcButton;
+    public JFXRadioButton cpmButton;
+    public JFXRadioButton bounceRateButton;
     public VBox initView;
     public StackPane loadingProgress;
     public TabPane tabs;
@@ -178,6 +175,7 @@ public class DashboardController {
     private void bindChartMetrics(Campaign campaign) {
         mainChart.dataProperty().bind(series);
         mainChart.setAnimated(false);
+        mainChart.setLegendVisible(false);
 
         totalCostButton.selectedProperty().addListener((o, old, selected) -> {
             if (selected) seriesList.add(campaign.getTotalCostSeries());

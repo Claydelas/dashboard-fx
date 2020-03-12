@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import com.jfoenix.controls.JFXToggleButton?>
+<?import com.jfoenix.controls.JFXRadioButton?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.chart.CategoryAxis?>
 <?import javafx.scene.chart.LineChart?>
@@ -10,6 +10,7 @@
 <?import javafx.scene.control.ProgressIndicator?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
@@ -38,45 +39,92 @@
                             <left>
                                 <GridPane fx:id="metricsPane" BorderPane.alignment="CENTER">
                                     <columnConstraints>
-                                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="180.0" minWidth="10.0" prefWidth="185.0" />
-                                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="101.0" minWidth="10.0" prefWidth="65.0" />
+                                        <ColumnConstraints />
+                                        <ColumnConstraints />
                                     </columnConstraints>
                                     <rowConstraints>
-                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                        <RowConstraints minHeight="20.0" prefHeight="45.0" />
+                                        <RowConstraints minHeight="20.0" prefHeight="45.0" />
+                                        <RowConstraints minHeight="20.0" prefHeight="45.0" />
+                                        <RowConstraints minHeight="20.0" prefHeight="45.0" />
+                                        <RowConstraints minHeight="20.0" prefHeight="45.0" />
+                                        <RowConstraints minHeight="20.0" prefHeight="45.0" />
+                                        <RowConstraints minHeight="20.0" prefHeight="45.0" />
+                                        <RowConstraints minHeight="20.0" prefHeight="45.0" />
+                                        <RowConstraints minHeight="20.0" prefHeight="45.0" />
+                                        <RowConstraints minHeight="20.0" prefHeight="45.0" />
+                                        <RowConstraints minHeight="20.0" prefHeight="45.0" />
                                     </rowConstraints>
                                     <children>
-                                        <JFXToggleButton fx:id="impressionsButton" disable="true" text="Impressions" />
-                                        <JFXToggleButton fx:id="clicksButton" disable="true" text="Clicks" GridPane.rowIndex="1" />
-                                        <JFXToggleButton fx:id="uniquesButton" disable="true" text="Uniques" GridPane.rowIndex="2" />
-                                        <JFXToggleButton fx:id="bouncesButton" disable="true" text="Bounces" GridPane.rowIndex="3" />
-                                        <JFXToggleButton fx:id="conversionsButton" disable="true" text="Conversions" GridPane.rowIndex="4" />
-                                        <JFXToggleButton fx:id="totalCostButton" disable="true" text="Total Cost" GridPane.rowIndex="5" />
-                                        <JFXToggleButton fx:id="bounceRateButton" disable="true" text="Bounce Rate" GridPane.rowIndex="6" />
-                                        <JFXToggleButton fx:id="ctrButton" disable="true" text="Click-through-rate" GridPane.rowIndex="7" />
-                                        <JFXToggleButton fx:id="cpaButton" disable="true" text="Cost-per-acquisition" GridPane.rowIndex="8" />
-                                        <JFXToggleButton fx:id="cpcButton" disable="true" text="Cost-per-click" GridPane.rowIndex="9" />
-                                        <JFXToggleButton fx:id="cpmButton" disable="true" text="Cost-per-mille" GridPane.rowIndex="10" />
-                                        <Label fx:id="impressions" GridPane.columnIndex="1" GridPane.halignment="RIGHT" />
-                                        <Label fx:id="clicks" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="1" />
-                                        <Label fx:id="uniques" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="2" />
-                                        <Label fx:id="bounces" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="3" />
-                                        <Label fx:id="conversions" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="4" />
-                                        <Label fx:id="totalCost" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="5" />
-                                        <Label fx:id="bounceRate" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="6" />
-                                        <Label fx:id="ctr" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="7" />
-                                        <Label fx:id="cpa" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="8" />
-                                        <Label fx:id="cpc" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="9" />
-                                        <Label fx:id="cpm" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="10" />
+                                        <Label fx:id="impressions" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.valignment="CENTER" />
+                                        <Label fx:id="clicks" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="1" GridPane.valignment="CENTER" />
+                                        <Label fx:id="uniques" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="2" GridPane.valignment="CENTER" />
+                                        <Label fx:id="bounces" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="3" GridPane.valignment="CENTER" />
+                                        <Label fx:id="conversions" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="4" GridPane.valignment="CENTER" />
+                                        <Label fx:id="totalCost" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="5" GridPane.valignment="CENTER" />
+                                        <Label fx:id="bounceRate" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="6" GridPane.valignment="CENTER" />
+                                        <Label fx:id="ctr" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="7" GridPane.valignment="CENTER" />
+                                        <Label fx:id="cpa" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="8" GridPane.valignment="CENTER" />
+                                        <Label fx:id="cpc" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="9" GridPane.valignment="CENTER" />
+                                        <Label fx:id="cpm" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="10" GridPane.valignment="CENTER" />
+                              <JFXRadioButton fx:id="impressionsButton" alignment="TOP_LEFT" text="Impressions">
+                                 <toggleGroup>
+                                    <ToggleGroup fx:id="metrics" />
+                                 </toggleGroup>
+                                 <GridPane.margin>
+                                    <Insets left="15.0" />
+                                 </GridPane.margin>
+                              </JFXRadioButton>
+                              <JFXRadioButton fx:id="clicksButton" alignment="TOP_LEFT" text="Clicks" toggleGroup="$metrics" GridPane.rowIndex="1">
+                                 <GridPane.margin>
+                                    <Insets left="15.0" />
+                                 </GridPane.margin>
+                              </JFXRadioButton>
+                              <JFXRadioButton fx:id="uniquesButton" alignment="TOP_LEFT" text="Uniques" toggleGroup="$metrics" GridPane.rowIndex="2">
+                                 <GridPane.margin>
+                                    <Insets left="15.0" />
+                                 </GridPane.margin>
+                              </JFXRadioButton>
+                              <JFXRadioButton fx:id="bouncesButton" alignment="TOP_LEFT" text="Bounces" toggleGroup="$metrics" GridPane.rowIndex="3">
+                                 <GridPane.margin>
+                                    <Insets left="15.0" />
+                                 </GridPane.margin>
+                              </JFXRadioButton>
+                              <JFXRadioButton fx:id="conversionsButton" alignment="TOP_LEFT" text="Conversions" toggleGroup="$metrics" GridPane.rowIndex="4">
+                                 <GridPane.margin>
+                                    <Insets left="15.0" />
+                                 </GridPane.margin>
+                              </JFXRadioButton>
+                              <JFXRadioButton fx:id="totalCostButton" alignment="TOP_LEFT" text="Total Cost" toggleGroup="$metrics" GridPane.rowIndex="5">
+                                 <GridPane.margin>
+                                    <Insets left="15.0" />
+                                 </GridPane.margin>
+                              </JFXRadioButton>
+                              <JFXRadioButton fx:id="bounceRateButton" alignment="TOP_LEFT" text="Bounce Rate" toggleGroup="$metrics" GridPane.rowIndex="6">
+                                 <GridPane.margin>
+                                    <Insets left="15.0" />
+                                 </GridPane.margin>
+                              </JFXRadioButton>
+                              <JFXRadioButton fx:id="ctrButton" alignment="TOP_LEFT" text="Click-through-rate" toggleGroup="$metrics" GridPane.rowIndex="7">
+                                 <GridPane.margin>
+                                    <Insets left="15.0" />
+                                 </GridPane.margin>
+                              </JFXRadioButton>
+                              <JFXRadioButton fx:id="cpaButton" alignment="TOP_LEFT" text="Cost-per-acquisition" toggleGroup="$metrics" GridPane.rowIndex="8">
+                                 <GridPane.margin>
+                                    <Insets left="15.0" />
+                                 </GridPane.margin>
+                              </JFXRadioButton>
+                              <JFXRadioButton fx:id="cpcButton" alignment="TOP_LEFT" text="Cost-per-click" toggleGroup="$metrics" GridPane.rowIndex="9">
+                                 <GridPane.margin>
+                                    <Insets left="15.0" />
+                                 </GridPane.margin>
+                              </JFXRadioButton>
+                              <JFXRadioButton fx:id="cpmButton" alignment="TOP_LEFT" text="Cost-per-mille" toggleGroup="$metrics" GridPane.rowIndex="10">
+                                 <GridPane.margin>
+                                    <Insets left="15.0" />
+                                 </GridPane.margin>
+                              </JFXRadioButton>
                                     </children>
                                 </GridPane>
                             </left>
