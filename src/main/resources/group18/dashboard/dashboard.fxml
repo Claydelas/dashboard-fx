@@ -1,19 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import com.jfoenix.controls.JFXComboBox?>
 <?import com.jfoenix.controls.JFXRadioButton?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.chart.CategoryAxis?>
 <?import javafx.scene.chart.LineChart?>
 <?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.control.Accordion?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ProgressIndicator?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TitledPane?>
 <?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
@@ -27,14 +32,104 @@
                     <children>
                         <BorderPane fx:id="chartPane" visible="false">
                             <center>
-                                <LineChart fx:id="mainChart" prefHeight="507.0" prefWidth="685.0" BorderPane.alignment="CENTER">
-                                    <xAxis>
-                                        <CategoryAxis side="BOTTOM" fx:id="xAxis" />
-                                    </xAxis>
-                                    <yAxis>
-                                        <NumberAxis fx:id="yAxis" side="LEFT" />
-                                    </yAxis>
-                                </LineChart>
+                        <BorderPane BorderPane.alignment="CENTER">
+                           <center>
+                              <VBox alignment="CENTER">
+                                 <children>
+                                    <BorderPane>
+                                       <center>
+                                                  <LineChart fx:id="mainChart" animated="false" legendVisible="false" prefHeight="507.0" prefWidth="685.0">
+                                                      <xAxis>
+                                                          <CategoryAxis side="BOTTOM" fx:id="xAxis" />
+                                                      </xAxis>
+                                                      <yAxis>
+                                                          <NumberAxis fx:id="yAxis" side="LEFT" />
+                                                      </yAxis>
+                                                  </LineChart>
+                                       </center>
+                                       <right>
+                                          <VBox alignment="TOP_CENTER">
+                                             <children>
+                                                <Label text="Filters" VBox.vgrow="NEVER">
+                                                   <font>
+                                                      <Font name="System Bold" size="16.0" />
+                                                   </font>
+                                                </Label>
+                                                <Accordion>
+                                                  <panes>
+                                                    <TitledPane animated="false" text="placeholder 1">
+                                                         <content>
+                                                            <GridPane>
+                                                              <columnConstraints>
+                                                                <ColumnConstraints hgrow="SOMETIMES" />
+                                                              </columnConstraints>
+                                                              <rowConstraints>
+                                                                <RowConstraints vgrow="SOMETIMES" />
+                                                                <RowConstraints vgrow="SOMETIMES" />
+                                                                <RowConstraints vgrow="SOMETIMES" />
+                                                                  <RowConstraints vgrow="SOMETIMES" />
+                                                              </rowConstraints>
+                                                               <children>
+                                                                  <HBox spacing="5.0">
+                                                                     <children>
+                                                                        <Label text="Label" />
+                                                                        <Label text="Label" />
+                                                                     </children>
+                                                                  </HBox>
+                                                                  <HBox spacing="5.0" GridPane.rowIndex="1">
+                                                                     <children>
+                                                                        <Label text="Label" />
+                                                                        <Label text="Label" />
+                                                                        <Label text="Label" />
+                                                                     </children>
+                                                                  </HBox>
+                                                                  <HBox spacing="5.0" GridPane.rowIndex="2">
+                                                                     <children>
+                                                                        <Label text="Label" />
+                                                                        <Label text="Label" />
+                                                                        <Label text="Label" />
+                                                                        <Label text="Label" />
+                                                                        <Label text="Label" />
+                                                                     </children>
+                                                                  </HBox>
+                                                                  <HBox spacing="5.0" GridPane.rowIndex="3">
+                                                                     <children>
+                                                                        <Label text="Label" />
+                                                                        <Label text="Label" />
+                                                                        <Label text="Label" />
+                                                                        <Label text="Label" />
+                                                                        <Label text="Label" />
+                                                                        <Label text="Label" />
+                                                                     </children>
+                                                                  </HBox>
+                                                               </children>
+                                                            </GridPane>
+                                                         </content>
+                                                    </TitledPane>
+                                                  </panes>
+                                                </Accordion>
+                                             </children>
+                                          </VBox>
+                                       </right>
+                                    </BorderPane>
+                                 </children>
+                              </VBox>
+                           </center>
+                           <top>
+                              <HBox alignment="CENTER_RIGHT" spacing="10.0">
+                                 <children>
+                                    <Label text="from" />
+                                    <DatePicker fx:id="startDatePicker" promptText="Start Date" />
+                                    <Label text="to" textAlignment="CENTER" />
+                                    <DatePicker fx:id="endDatePicker" promptText="End Date" />
+                                    <JFXComboBox fx:id="timeGranularity" />
+                                 </children>
+                                 <BorderPane.margin>
+                                    <Insets right="5.0" top="5.0" />
+                                 </BorderPane.margin>
+                              </HBox>
+                           </top>
+                        </BorderPane>
                             </center>
                             <left>
                                 <GridPane fx:id="metricsPane" BorderPane.alignment="CENTER">

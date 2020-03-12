@@ -33,5 +33,6 @@ public class AppController {
 
     public void importCampaignButtonAction() {
         dashboardController.importCampaignButtonAction();
+        //this should open a new tab with init (import) view
     }
 }

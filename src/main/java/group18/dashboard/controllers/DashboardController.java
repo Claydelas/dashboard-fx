@@ -1,7 +1,7 @@
 package group18.dashboard.controllers;
 
+import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXRadioButton;
-import com.jfoenix.controls.JFXSlider;
 import group18.dashboard.ViewDataParser;
 import group18.dashboard.model.Campaign;
 import group18.dashboard.model.Click;
@@ -20,6 +20,7 @@ import javafx.scene.chart.XYChart;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.control.TabPane;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -67,6 +68,7 @@ public class DashboardController {
     public VBox initView;
     public StackPane loadingProgress;
     public TabPane tabs;
+    public JFXComboBox<String> timeGranularity;
 
     ObservableList<XYChart.Series<String, Number>> seriesList = FXCollections.observableArrayList();
     Property<ObservableList<XYChart.Series<String, Number>>> series = new SimpleListProperty<>(seriesList);
@@ -76,6 +78,11 @@ public class DashboardController {
     @FXML
     public void initialize() {
         in = new Campaign();
+
+        timeGranularity.setItems(FXCollections.observableArrayList("Hours", "Days", "Weeks"));
+        timeGranularity.getSelectionModel().clearAndSelect(1);
+        timeGranularity.setTooltip(new Tooltip("Time granularity of the chart"));
+
         bindMetrics(in);
         bindChartMetrics(in);
     }
@@ -174,8 +181,6 @@ public class DashboardController {
 
     private void bindChartMetrics(Campaign campaign) {
         mainChart.dataProperty().bind(series);
-        mainChart.setAnimated(false);
-        mainChart.setLegendVisible(false);
 
         totalCostButton.selectedProperty().addListener((o, old, selected) -> {
             if (selected) seriesList.add(campaign.getTotalCostSeries());
