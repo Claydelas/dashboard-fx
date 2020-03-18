@@ -3,15 +3,46 @@ package group18.dashboard.model;
 import group18.dashboard.exceptions.ParsingException;
 
 import java.text.ParseException;
-import java.util.Date;
 import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.function.Function;
 
 public class Interaction {
-    private Date entryDate;
-    private Date exitDate;
-    private long ID;
-    private int pageViews;
-    private boolean conversion;
+
+    //returns a parsed interaction object
+    static Function<String, Interaction> mapToItem = (line) -> {
+        String[] columns = line.split(",");
+        Interaction item = new Interaction();
+        try {
+            item.entryDate = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss").parse(columns[0]);
+            item.ID = Long.parseLong(columns[1]);
+            if (columns[2].equals("n/a")) {
+                item.exitDate = null;
+            } else {
+                item.exitDate = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss").parse(columns[2]);
+            }
+
+            item.pageViews = Integer.parseInt(columns[3]);
+
+            if (columns[4].equals("Yes")) {
+                item.conversion = true;
+            } else if (columns[4].equals("No")) {
+                item.conversion = false;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return item;
+    };
+    public Date entryDate;
+    public Date exitDate;
+    public long ID;
+    public int pageViews;
+    public boolean conversion;
+
+    public Interaction() {
+
+    }
 
     public Interaction(String lineIn) throws ParsingException {
         //Takes in a single line of the csv and parses it
@@ -37,10 +68,9 @@ public class Interaction {
 
         //Getting the exit date
         try {
-            if(columns[2].equals("n/a")){
+            if (columns[2].equals("n/a")) {
                 exitDate = null;
-            }
-            else {
+            } else {
                 exitDate = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss").parse(columns[2]);
             }
         } catch (ParseException e) {

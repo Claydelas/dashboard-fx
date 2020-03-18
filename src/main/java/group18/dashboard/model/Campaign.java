@@ -7,10 +7,9 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.chart.XYChart;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
+import java.io.*;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
@@ -45,14 +44,14 @@ public class Campaign {
     private XYChart.Series<String, Number> conversionSeries;
     private XYChart.Series<String, Number> totalCostSeries;
 
-    private static void benchmarks(String path) throws Exception {
+    public static void benchmarks(String path) throws Exception {
         System.out.println("----- TIMINGS ------\n");
 
         long t = System.currentTimeMillis();
         Campaign c = new Campaign();
-        c.readClicks(path);
-        c.readImpressions(path);
-        c.readInteractions(path);
+        c.updateClicks(path);
+        c.updateImpressions(path);
+        c.updateInteractions(path);
         System.out.printf("Initial CSV load: %.02fs%n", (System.currentTimeMillis() - t) / 1000f);
 
         System.out.println("\n----- ONLY DATA ------\n"); // All negligible using 2-week sample data
@@ -299,40 +298,36 @@ public class Campaign {
         this.bounceRate.set(bounceRate);
     }
 
-    public void readInteractions(String filepath) throws Exception {
-        //Servers
-        File serversFile = new File(filepath + File.separator + "server_log.csv");
-        BufferedReader brServers = new BufferedReader(new FileReader(serversFile));
-        String line = "";
-        //First line is the column headings so should be ignored
-        line = brServers.readLine();
-        while ((line = brServers.readLine()) != null) {
-            interactions.add(new Interaction((line)));
-        }
+    public void updateInteractions(String filepath) throws Exception {
+        List<Interaction> interactions;
+        File inputF = new File(filepath + File.separator + "server_log.csv");
+        InputStream inputFS = new FileInputStream(inputF);
+        BufferedReader br = new BufferedReader(new InputStreamReader(inputFS));
+        interactions = br.lines().parallel().skip(1).map(Interaction.mapToItem).collect(Collectors.toList());
+        br.close();
+        this.interactions = FXCollections.observableArrayList(interactions);
     }
 
-    public void readClicks(String filepath) throws Exception {
-        //Clicks
-        File clicksFile = new File(filepath + File.separator + "click_log.csv");
-        BufferedReader brClicks = new BufferedReader(new FileReader(clicksFile));
-        String line = "";
-        //First line is the column headings so should be ignored
-        line = brClicks.readLine();
-        while ((line = brClicks.readLine()) != null) {
-            clicks.add(new Click((line)));
-        }
+    public void updateClicks(String filepath) throws Exception {
+        List<Click> clicks;
+        File inputF = new File(filepath + File.separator + "click_log.csv");
+        InputStream inputFS = new FileInputStream(inputF);
+        BufferedReader br = new BufferedReader(new InputStreamReader(inputFS));
+        clicks = br.lines().parallel().skip(1).map(Click.mapToItem).collect(Collectors.toList());
+        br.close();
+
+        this.clicks = FXCollections.observableArrayList(clicks);
     }
 
-    public void readImpressions(String filepath) throws Exception {
-        //Impressions
-        File impressionsFile = new File(filepath + File.separator + "impression_log.csv");
-        BufferedReader brImpressions = new BufferedReader(new FileReader(impressionsFile));
-        String line = "";
-        //First line is the column headings so should be ignored
-        line = brImpressions.readLine();
-        while ((line = brImpressions.readLine()) != null) {
-            impressions.add(new Impression((line)));
-        }
+    public void updateImpressions(String filepath) throws Exception {
+        List<Impression> impressions;
+        File inputF = new File(filepath + File.separator + "impression_log.csv");
+        InputStream inputFS = new FileInputStream(inputF);
+        BufferedReader br = new BufferedReader(new InputStreamReader(inputFS));
+        impressions = br.lines().parallel().skip(1).map(Impression.mapToItem).collect(Collectors.toList());
+        br.close();
+
+        this.impressions = FXCollections.observableArrayList(impressions);
     }
 
     public ObservableList<Impression> getImpressions() {

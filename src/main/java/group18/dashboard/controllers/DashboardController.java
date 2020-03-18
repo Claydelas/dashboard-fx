@@ -114,8 +114,10 @@ public class DashboardController {
 
         executor.execute(() -> {
             try {
-                in.readClicks(dir.getAbsolutePath());
-                System.out.println("Clicks parsed: " + in.getClicks().size());
+                long startTime = System.currentTimeMillis();
+                in.updateClicks(dir.getAbsolutePath());
+                long endTime = System.currentTimeMillis();
+                System.out.println("Parsed " + in.getClicks().size() + " clicks in " + (endTime - startTime) + "ms");
                 latch.countDown();
             } catch (Exception e) {
                 e.printStackTrace();
@@ -124,8 +126,10 @@ public class DashboardController {
         executor.execute(() ->
         {
             try {
-                in.readImpressions(dir.getAbsolutePath());
-                System.out.println("Impressions parsed: " + in.getImpressions().size());
+                long startTime = System.currentTimeMillis();
+                in.updateImpressions(dir.getAbsolutePath());
+                long endTime = System.currentTimeMillis();
+                System.out.println("Parsed " + in.getImpressions().size() + " impressions in " + (endTime - startTime) + "ms");
                 latch.countDown();
             } catch (Exception e) {
                 e.printStackTrace();
@@ -133,8 +137,10 @@ public class DashboardController {
         });
         executor.execute(() -> {
             try {
-                in.readInteractions(dir.getAbsolutePath());
-                System.out.println("Interactions parsed: " + in.getInteractions().size());
+                long startTime = System.currentTimeMillis();
+                in.updateInteractions(dir.getAbsolutePath());
+                long endTime = System.currentTimeMillis();
+                System.out.println("Parsed " + in.getInteractions().size() + " interactions in " + (endTime - startTime) + "ms");
                 latch.countDown();
             } catch (Exception e) {
                 e.printStackTrace();
