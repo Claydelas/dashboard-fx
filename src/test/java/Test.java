@@ -38,7 +38,7 @@ public class Test {
     }
 
     static void loadDataTimings() throws Exception {
-        Campaign.benchmarks("D:\\dev\\Java\\Projects\\ad-auction-dashboard\\src\\test\\resources\\2_week_campaign_2");
+        Campaign.benchmarks("D:\\Projects\\Java\\2_week_campaign");
     }
 
 }
