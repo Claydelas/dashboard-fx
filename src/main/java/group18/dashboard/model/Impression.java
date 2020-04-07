@@ -16,7 +16,7 @@ public class Impression {
         try {
             item.date = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss").parse(p[0]);
             item.ID = Long.parseLong(p[1]);
-            item.gender = p[2];
+            item.gender = Enum.valueOf(Gender.class,p[2].toUpperCase());
 
             //Getting the upper and lower bounds of the age range
             if (p[3].contains("-")) {
@@ -29,8 +29,8 @@ public class Impression {
                     item.lowerBound = Integer.parseInt(p[3].split(">")[1]);
                 }
             }
-            item.income = p[4];
-            item.context = p[5];
+            item.income = Enum.valueOf(Income.class,p[4].toUpperCase());
+            item.context = Enum.valueOf(Context.class,p[5].replace(" ", "_").toUpperCase());
             item.cost = Double.parseDouble(p[6]);
         } catch (ParseException e) {
             e.printStackTrace();
@@ -39,11 +39,11 @@ public class Impression {
     };
     public Date date;
     public long ID;
-    public String gender;
+    public Gender gender;
     public int lowerBound = -1;
     public int upperBound = -1;
-    public String income;
-    public String context;
+    public Income income;
+    public Context context;
     public double cost;
 
     public Impression(String lineIn) throws ParsingException {
@@ -72,7 +72,7 @@ public class Impression {
 
         //Getting the gender
         try {
-            gender = columns[2];
+            gender = Enum.valueOf(Gender.class,columns[2].toUpperCase());
         } catch (Exception e) {
             throw new ParsingException("Gender could not be parsed for an impression.");
         }
@@ -93,13 +93,13 @@ public class Impression {
 
         // Getting the income
         try {
-            income = columns[4];
+            income = Enum.valueOf(Income.class,columns[4].toUpperCase());
         } catch (Exception e) {
             throw new ParsingException("Income could not be parsed for an impression.");
         }
 
         try {
-            context = columns[5];
+            context = Enum.valueOf(Context.class,columns[5].replace(" ", "_").toUpperCase());
         } catch (Exception e) {
             throw new ParsingException("Context could not be parsed for an impression.");
         }
@@ -123,7 +123,7 @@ public class Impression {
         return ID;
     }
 
-    public String getGender() {
+    public Gender getGender() {
         return gender;
     }
 
@@ -135,11 +135,11 @@ public class Impression {
         return upperBound;
     }
 
-    public String getIncome() {
+    public Income getIncome() {
         return income;
     }
 
-    public String getContext() {
+    public Context getContext() {
         return context;
     }
 

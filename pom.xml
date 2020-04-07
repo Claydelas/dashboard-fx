@@ -30,11 +30,6 @@
             <artifactId>jfoenix</artifactId>
             <version>9.0.9</version>
         </dependency>
-        <dependency>
-            <groupId>eu.hansolo</groupId>
-            <artifactId>tilesfx</artifactId>
-            <version>11.32</version>
-        </dependency>
     </dependencies>
     <build>
         <plugins>

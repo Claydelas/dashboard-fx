@@ -6,17 +6,17 @@
 <?import javafx.scene.chart.CategoryAxis?>
 <?import javafx.scene.chart.LineChart?>
 <?import javafx.scene.chart.NumberAxis?>
-<?import javafx.scene.control.Accordion?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ProgressIndicator?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
-<?import javafx.scene.control.TitledPane?>
 <?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.FlowPane?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
@@ -24,257 +24,186 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<TabPane fx:id="tabs" side="BOTTOM" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="group18.dashboard.controllers.DashboardController">
-    <tabs>
-        <Tab fx:id="defaultTab" closable="false" text="Campaign">
-            <content>
-                <StackPane fx:id="mainView">
-                    <children>
-                        <BorderPane fx:id="chartPane" visible="false">
-                            <center>
-                        <BorderPane BorderPane.alignment="CENTER">
-                           <center>
-                              <VBox alignment="CENTER">
-                                 <children>
-                                    <BorderPane>
-                                       <center>
-                                                  <LineChart fx:id="mainChart" animated="false" legendVisible="false" prefHeight="507.0" prefWidth="685.0">
-                                                      <xAxis>
-                                                          <CategoryAxis side="BOTTOM" fx:id="xAxis" />
-                                                      </xAxis>
-                                                      <yAxis>
-                                                          <NumberAxis fx:id="yAxis" side="LEFT" />
-                                                      </yAxis>
-                                                  </LineChart>
-                                       </center>
-                                       <right>
-                                          <VBox alignment="TOP_CENTER">
-                                             <children>
-                                                <Label text="Filters" VBox.vgrow="NEVER">
-                                                   <font>
-                                                      <Font name="System Bold" size="16.0" />
-                                                   </font>
-                                                </Label>
-                                                <Accordion>
-                                                  <panes>
-                                                    <TitledPane animated="false" text="placeholder 1">
-                                                         <content>
-                                                            <GridPane>
-                                                              <columnConstraints>
-                                                                <ColumnConstraints hgrow="SOMETIMES" />
-                                                              </columnConstraints>
-                                                              <rowConstraints>
-                                                                <RowConstraints vgrow="SOMETIMES" />
-                                                                <RowConstraints vgrow="SOMETIMES" />
-                                                                <RowConstraints vgrow="SOMETIMES" />
-                                                                  <RowConstraints vgrow="SOMETIMES" />
-                                                              </rowConstraints>
-                                                               <children>
-                                                                  <HBox spacing="5.0">
-                                                                     <children>
-                                                                        <Label text="Label" />
-                                                                        <Label text="Label" />
-                                                                     </children>
-                                                                  </HBox>
-                                                                  <HBox spacing="5.0" GridPane.rowIndex="1">
-                                                                     <children>
-                                                                        <Label text="Label" />
-                                                                        <Label text="Label" />
-                                                                        <Label text="Label" />
-                                                                     </children>
-                                                                  </HBox>
-                                                                  <HBox spacing="5.0" GridPane.rowIndex="2">
-                                                                     <children>
-                                                                        <Label text="Label" />
-                                                                        <Label text="Label" />
-                                                                        <Label text="Label" />
-                                                                        <Label text="Label" />
-                                                                        <Label text="Label" />
-                                                                     </children>
-                                                                  </HBox>
-                                                                  <HBox spacing="5.0" GridPane.rowIndex="3">
-                                                                     <children>
-                                                                        <Label text="Label" />
-                                                                        <Label text="Label" />
-                                                                        <Label text="Label" />
-                                                                        <Label text="Label" />
-                                                                        <Label text="Label" />
-                                                                        <Label text="Label" />
-                                                                     </children>
-                                                                  </HBox>
-                                                               </children>
-                                                            </GridPane>
-                                                         </content>
-                                                    </TitledPane>
-                                                  </panes>
-                                                </Accordion>
-                                             </children>
-                                          </VBox>
-                                       </right>
-                                    </BorderPane>
-                                 </children>
-                              </VBox>
-                           </center>
-                           <top>
-                              <HBox alignment="CENTER_RIGHT" spacing="10.0">
-                                 <children>
-                                    <Label text="from" />
-                                    <DatePicker fx:id="startDatePicker" promptText="Start Date" />
-                                    <Label text="to" textAlignment="CENTER" />
-                                    <DatePicker fx:id="endDatePicker" promptText="End Date" />
-                                    <JFXComboBox fx:id="timeGranularity" />
-                                 </children>
-                                 <BorderPane.margin>
-                                    <Insets right="5.0" top="5.0" />
-                                 </BorderPane.margin>
-                              </HBox>
-                           </top>
-                        </BorderPane>
-                            </center>
-                            <left>
-                                <GridPane fx:id="metricsPane" BorderPane.alignment="CENTER">
-                                    <columnConstraints>
-                                        <ColumnConstraints />
-                                        <ColumnConstraints />
-                                    </columnConstraints>
-                                    <rowConstraints>
-                                        <RowConstraints minHeight="20.0" prefHeight="45.0" />
-                                        <RowConstraints minHeight="20.0" prefHeight="45.0" />
-                                        <RowConstraints minHeight="20.0" prefHeight="45.0" />
-                                        <RowConstraints minHeight="20.0" prefHeight="45.0" />
-                                        <RowConstraints minHeight="20.0" prefHeight="45.0" />
-                                        <RowConstraints minHeight="20.0" prefHeight="45.0" />
-                                        <RowConstraints minHeight="20.0" prefHeight="45.0" />
-                                        <RowConstraints minHeight="20.0" prefHeight="45.0" />
-                                        <RowConstraints minHeight="20.0" prefHeight="45.0" />
-                                        <RowConstraints minHeight="20.0" prefHeight="45.0" />
-                                        <RowConstraints minHeight="20.0" prefHeight="45.0" />
-                                    </rowConstraints>
-                                    <children>
-                                        <Label fx:id="impressions" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.valignment="CENTER" />
-                                        <Label fx:id="clicks" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="1" GridPane.valignment="CENTER" />
-                                        <Label fx:id="uniques" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="2" GridPane.valignment="CENTER" />
-                                        <Label fx:id="bounces" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="3" GridPane.valignment="CENTER" />
-                                        <Label fx:id="conversions" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="4" GridPane.valignment="CENTER" />
-                                        <Label fx:id="totalCost" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="5" GridPane.valignment="CENTER" />
-                                        <Label fx:id="bounceRate" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="6" GridPane.valignment="CENTER" />
-                                        <Label fx:id="ctr" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="7" GridPane.valignment="CENTER" />
-                                        <Label fx:id="cpa" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="8" GridPane.valignment="CENTER" />
-                                        <Label fx:id="cpc" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="9" GridPane.valignment="CENTER" />
-                                        <Label fx:id="cpm" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="10" GridPane.valignment="CENTER" />
-                              <JFXRadioButton fx:id="impressionsButton" alignment="TOP_LEFT" text="Impressions">
-                                 <toggleGroup>
-                                    <ToggleGroup fx:id="metrics" />
-                                 </toggleGroup>
-                                 <GridPane.margin>
-                                    <Insets left="15.0" />
-                                 </GridPane.margin>
-                              </JFXRadioButton>
-                              <JFXRadioButton fx:id="clicksButton" alignment="TOP_LEFT" text="Clicks" toggleGroup="$metrics" GridPane.rowIndex="1">
-                                 <GridPane.margin>
-                                    <Insets left="15.0" />
-                                 </GridPane.margin>
-                              </JFXRadioButton>
-                              <JFXRadioButton fx:id="uniquesButton" alignment="TOP_LEFT" text="Uniques" toggleGroup="$metrics" GridPane.rowIndex="2">
-                                 <GridPane.margin>
-                                    <Insets left="15.0" />
-                                 </GridPane.margin>
-                              </JFXRadioButton>
-                              <JFXRadioButton fx:id="bouncesButton" alignment="TOP_LEFT" text="Bounces" toggleGroup="$metrics" GridPane.rowIndex="3">
-                                 <GridPane.margin>
-                                    <Insets left="15.0" />
-                                 </GridPane.margin>
-                              </JFXRadioButton>
-                              <JFXRadioButton fx:id="conversionsButton" alignment="TOP_LEFT" text="Conversions" toggleGroup="$metrics" GridPane.rowIndex="4">
-                                 <GridPane.margin>
-                                    <Insets left="15.0" />
-                                 </GridPane.margin>
-                              </JFXRadioButton>
-                              <JFXRadioButton fx:id="totalCostButton" alignment="TOP_LEFT" text="Total Cost" toggleGroup="$metrics" GridPane.rowIndex="5">
-                                 <GridPane.margin>
-                                    <Insets left="15.0" />
-                                 </GridPane.margin>
-                              </JFXRadioButton>
-                              <JFXRadioButton fx:id="bounceRateButton" alignment="TOP_LEFT" text="Bounce Rate" toggleGroup="$metrics" GridPane.rowIndex="6">
-                                 <GridPane.margin>
-                                    <Insets left="15.0" />
-                                 </GridPane.margin>
-                              </JFXRadioButton>
-                              <JFXRadioButton fx:id="ctrButton" alignment="TOP_LEFT" text="Click-through-rate" toggleGroup="$metrics" GridPane.rowIndex="7">
-                                 <GridPane.margin>
-                                    <Insets left="15.0" />
-                                 </GridPane.margin>
-                              </JFXRadioButton>
-                              <JFXRadioButton fx:id="cpaButton" alignment="TOP_LEFT" text="Cost-per-acquisition" toggleGroup="$metrics" GridPane.rowIndex="8">
-                                 <GridPane.margin>
-                                    <Insets left="15.0" />
-                                 </GridPane.margin>
-                              </JFXRadioButton>
-                              <JFXRadioButton fx:id="cpcButton" alignment="TOP_LEFT" text="Cost-per-click" toggleGroup="$metrics" GridPane.rowIndex="9">
-                                 <GridPane.margin>
-                                    <Insets left="15.0" />
-                                 </GridPane.margin>
-                              </JFXRadioButton>
-                              <JFXRadioButton fx:id="cpmButton" alignment="TOP_LEFT" text="Cost-per-mille" toggleGroup="$metrics" GridPane.rowIndex="10">
-                                 <GridPane.margin>
-                                    <Insets left="15.0" />
-                                 </GridPane.margin>
-                              </JFXRadioButton>
-                                    </children>
-                                </GridPane>
-                            </left>
-                        </BorderPane>
-                        <VBox fx:id="initView" alignment="CENTER">
-                            <children>
-                                <Label text="Select a folder containing:">
-                                    <font>
-                                        <Font size="24.0" />
-                                    </font>
-                                    <VBox.margin>
-                                        <Insets />
-                                    </VBox.margin>
-                                </Label>
-                                <Label text="click_log.csv">
-                                    <font>
-                                        <Font size="15.0" />
-                                    </font>
-                                </Label>
-                                <Label text="server_log.csv">
-                                    <font>
-                                        <Font size="15.0" />
-                                    </font>
-                                </Label>
-                                <Label text="impression_log.csv">
-                                    <font>
-                                        <Font size="15.0" />
-                                    </font>
-                                </Label>
-                                <Button mnemonicParsing="false" onAction="#importCampaignButtonAction" text="Import Campaign">
-                                    <VBox.margin>
-                                        <Insets top="10.0" />
-                                    </VBox.margin>
-                                    <font>
-                                        <Font size="16.0" />
-                                    </font>
-                                </Button>
-                            </children>
-                            <opaqueInsets>
-                                <Insets />
-                            </opaqueInsets>
-                        </VBox>
-                        <StackPane fx:id="loadingProgress" visible="false">
-                            <children>
-                                <Label text="Importing Campaign...">
-                                    <font>
-                                        <Font size="24.0" />
-                                    </font>
-                                </Label>
-                                <ProgressIndicator scaleX="7.0" scaleY="7.0" />
-                            </children>
-                        </StackPane>
-                    </children>
-                </StackPane>
-            </content>
-        </Tab>
-    </tabs>
-</TabPane>
+<StackPane fx:id="mainView" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="group18.dashboard.controllers.DashboardController">
+    <children>
+        <BorderPane fx:id="chartPane" visible="false">
+            <left>
+                <TabPane fx:id="tabs" side="LEFT">
+                    <tabs>
+                        <Tab fx:id="defaultTab" closable="false" text="Campaign">
+                            <content>
+                                  <GridPane fx:id="metricsPane" gridLinesVisible="true">
+                                      <columnConstraints>
+                                          <ColumnConstraints />
+                                          <ColumnConstraints />
+                                      </columnConstraints>
+                                      <rowConstraints>
+                                          <RowConstraints minHeight="20.0" prefHeight="45.0" />
+                                          <RowConstraints minHeight="20.0" prefHeight="45.0" />
+                                          <RowConstraints minHeight="20.0" prefHeight="45.0" />
+                                          <RowConstraints minHeight="20.0" prefHeight="45.0" />
+                                          <RowConstraints minHeight="20.0" prefHeight="45.0" />
+                                          <RowConstraints minHeight="20.0" prefHeight="45.0" />
+                                          <RowConstraints minHeight="20.0" prefHeight="45.0" />
+                                          <RowConstraints minHeight="20.0" prefHeight="45.0" />
+                                          <RowConstraints minHeight="20.0" prefHeight="45.0" />
+                                          <RowConstraints minHeight="20.0" prefHeight="45.0" />
+                                          <RowConstraints minHeight="20.0" prefHeight="45.0" />
+                                      </rowConstraints>
+                                      <children>
+                                          <Label fx:id="impressions" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.valignment="CENTER" />
+                                          <Label fx:id="clicks" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="1" GridPane.valignment="CENTER" />
+                                          <Label fx:id="uniques" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="2" GridPane.valignment="CENTER" />
+                                          <Label fx:id="bounces" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="3" GridPane.valignment="CENTER" />
+                                          <Label fx:id="conversions" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="4" GridPane.valignment="CENTER" />
+                                          <Label fx:id="totalCost" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="5" GridPane.valignment="CENTER" />
+                                          <Label fx:id="bounceRate" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="6" GridPane.valignment="CENTER" />
+                                          <Label fx:id="ctr" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="7" GridPane.valignment="CENTER" />
+                                          <Label fx:id="cpa" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="8" GridPane.valignment="CENTER" />
+                                          <Label fx:id="cpc" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="9" GridPane.valignment="CENTER" />
+                                          <Label fx:id="cpm" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="10" GridPane.valignment="CENTER" />
+                                          <JFXRadioButton fx:id="impressionsButton" alignment="TOP_LEFT" text="Impressions">
+                                              <toggleGroup>
+                                                  <ToggleGroup fx:id="metrics" />
+                                              </toggleGroup>
+                                              <GridPane.margin>
+                                                  <Insets left="15.0" />
+                                              </GridPane.margin>
+                                          </JFXRadioButton>
+                                          <JFXRadioButton fx:id="clicksButton" alignment="TOP_LEFT" text="Clicks" toggleGroup="$metrics" GridPane.rowIndex="1">
+                                              <GridPane.margin>
+                                                  <Insets left="15.0" />
+                                              </GridPane.margin>
+                                          </JFXRadioButton>
+                                          <JFXRadioButton fx:id="uniquesButton" alignment="TOP_LEFT" text="Uniques" toggleGroup="$metrics" GridPane.rowIndex="2">
+                                              <GridPane.margin>
+                                                  <Insets left="15.0" />
+                                              </GridPane.margin>
+                                          </JFXRadioButton>
+                                          <JFXRadioButton fx:id="bouncesButton" alignment="TOP_LEFT" text="Bounces" toggleGroup="$metrics" GridPane.rowIndex="3">
+                                              <GridPane.margin>
+                                                  <Insets left="15.0" />
+                                              </GridPane.margin>
+                                          </JFXRadioButton>
+                                          <JFXRadioButton fx:id="conversionsButton" alignment="TOP_LEFT" text="Conversions" toggleGroup="$metrics" GridPane.rowIndex="4">
+                                              <GridPane.margin>
+                                                  <Insets left="15.0" />
+                                              </GridPane.margin>
+                                          </JFXRadioButton>
+                                          <JFXRadioButton fx:id="totalCostButton" alignment="TOP_LEFT" text="Total Cost" toggleGroup="$metrics" GridPane.rowIndex="5">
+                                              <GridPane.margin>
+                                                  <Insets left="15.0" />
+                                              </GridPane.margin>
+                                          </JFXRadioButton>
+                                          <JFXRadioButton fx:id="bounceRateButton" alignment="TOP_LEFT" text="Bounce Rate" toggleGroup="$metrics" GridPane.rowIndex="6">
+                                              <GridPane.margin>
+                                                  <Insets left="15.0" />
+                                              </GridPane.margin>
+                                          </JFXRadioButton>
+                                          <JFXRadioButton fx:id="ctrButton" alignment="TOP_LEFT" text="Click-through-rate" toggleGroup="$metrics" GridPane.rowIndex="7">
+                                              <GridPane.margin>
+                                                  <Insets left="15.0" />
+                                              </GridPane.margin>
+                                          </JFXRadioButton>
+                                          <JFXRadioButton fx:id="cpaButton" alignment="TOP_LEFT" text="Cost-per-acquisition" toggleGroup="$metrics" GridPane.rowIndex="8">
+                                              <GridPane.margin>
+                                                  <Insets left="15.0" />
+                                              </GridPane.margin>
+                                          </JFXRadioButton>
+                                          <JFXRadioButton fx:id="cpcButton" alignment="TOP_LEFT" text="Cost-per-click" toggleGroup="$metrics" GridPane.rowIndex="9">
+                                              <GridPane.margin>
+                                                  <Insets left="15.0" />
+                                              </GridPane.margin>
+                                          </JFXRadioButton>
+                                          <JFXRadioButton fx:id="cpmButton" alignment="TOP_LEFT" text="Cost-per-mille" toggleGroup="$metrics" GridPane.rowIndex="10">
+                                              <GridPane.margin>
+                                                  <Insets left="15.0" />
+                                              </GridPane.margin>
+                                          </JFXRadioButton>
+                                      </children>
+                                  </GridPane>
+                            </content>
+                        </Tab>
+                    </tabs>
+                </TabPane>
+            </left>
+         <center>
+            <ScrollPane fitToHeight="true" fitToWidth="true" focusTraversable="false">
+               <content>
+                  <FlowPane fx:id="dashboardArea" alignment="CENTER" columnHalignment="CENTER" hgap="5.0" vgap="5.0">
+                     <children>
+                                  <LineChart fx:id="mainChart" animated="false" legendVisible="false" prefHeight="507.0" prefWidth="685.0">
+                                      <xAxis>
+                                          <CategoryAxis side="BOTTOM" fx:id="xAxis" />
+                                      </xAxis>
+                                      <yAxis>
+                                          <NumberAxis fx:id="yAxis" side="LEFT" />
+                                      </yAxis>
+                                  </LineChart>
+                     </children></FlowPane>
+               </content>
+               <BorderPane.margin>
+                  <Insets />
+               </BorderPane.margin>
+            </ScrollPane>
+         </center>
+        </BorderPane>
+        <VBox fx:id="initView" alignment="CENTER">
+            <children>
+                <Label text="Select a folder containing:">
+                    <font>
+                        <Font size="24.0" />
+                    </font>
+                    <VBox.margin>
+                        <Insets />
+                    </VBox.margin>
+                </Label>
+                <Label text="click_log.csv">
+                    <font>
+                        <Font size="15.0" />
+                    </font>
+                </Label>
+                <Label text="server_log.csv">
+                    <font>
+                        <Font size="15.0" />
+                    </font>
+                </Label>
+                <Label text="impression_log.csv">
+                    <font>
+                        <Font size="15.0" />
+                    </font>
+                </Label>
+                <Button mnemonicParsing="false" onAction="#importCampaignButtonAction" text="Import Campaign">
+                    <VBox.margin>
+                        <Insets top="10.0" />
+                    </VBox.margin>
+                    <font>
+                        <Font size="16.0" />
+                    </font>
+                </Button>
+            </children>
+            <opaqueInsets>
+                <Insets />
+            </opaqueInsets>
+        </VBox>
+        <StackPane fx:id="loadingProgress" visible="false">
+            <children>
+                <Label text="Importing Campaign...">
+                    <font>
+                        <Font size="24.0" />
+                    </font>
+                </Label>
+                <ProgressIndicator scaleX="7.0" scaleY="7.0" />
+            </children>
+        </StackPane>
+            <HBox alignment="CENTER_RIGHT" spacing="10.0" visible="false">
+                <children>
+                    <Label text="from" />
+                    <DatePicker fx:id="startDatePicker" promptText="Start Date" />
+                    <Label text="to" textAlignment="CENTER" />
+                    <DatePicker fx:id="endDatePicker" promptText="End Date" />
+                    <JFXComboBox fx:id="timeGranularity" />
+                </children>
+            </HBox>
+    </children>
+</StackPane>

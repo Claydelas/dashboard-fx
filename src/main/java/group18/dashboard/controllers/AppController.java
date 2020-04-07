@@ -5,15 +5,16 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TabPane;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.StackPane;
 
 public class AppController {
 
     public MenuItem themeButton;
     public MenuItem uiScalingButton;
-    public MenuItem exportPNGButton;
+    public MenuItem newChartButton;
     public MenuItem importCampaignButton;
     public BorderPane appView;
-    public TabPane dashboard;
+    public StackPane dashboard;
     @FXML
     private DashboardController dashboardController;
 
@@ -34,5 +35,8 @@ public class AppController {
     public void importCampaignButtonAction() {
         dashboardController.importCampaignButtonAction();
         //this should open a new tab with init (import) view
+    }
+    public void newChartButtonAction(){
+        dashboardController.newChartButtonAction();
     }
 }

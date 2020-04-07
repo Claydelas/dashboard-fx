@@ -13,6 +13,7 @@ import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
@@ -21,14 +22,16 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.Tooltip;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.Dragboard;
+import javafx.scene.input.TransferMode;
+import javafx.scene.layout.*;
 import javafx.stage.DirectoryChooser;
 
 import java.io.File;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Random;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -69,6 +72,7 @@ public class DashboardController {
     public StackPane loadingProgress;
     public TabPane tabs;
     public JFXComboBox<String> timeGranularity;
+    public FlowPane dashboardArea;
 
     ObservableList<XYChart.Series<String, Number>> seriesList = FXCollections.observableArrayList();
     Property<ObservableList<XYChart.Series<String, Number>>> series = new SimpleListProperty<>(seriesList);
@@ -427,5 +431,64 @@ public class DashboardController {
         uniquesButton.setDisable(false);
         System.out.println("[Series] uniques... done");
         importProgress.countDown();
+    }
+
+    public void newChartButtonAction() {
+        XYChart.Series<String, Number> series1 = new XYChart.Series();
+        series1.getData().add(new XYChart.Data("MO", new Random().nextInt()));
+        series1.getData().add(new XYChart.Data("TU", new Random().nextInt()));
+
+        final XYChart<String, Number> bp = new LineChart<>(new CategoryAxis(), new NumberAxis());
+        bp.getData().add(series1);
+
+        makeDraggable(bp);
+        dashboardArea.getChildren().add(bp);
+    }
+
+    private void makeDraggable(Node node) {
+        node.setOnDragDetected(event -> {
+            Dragboard db = node.startDragAndDrop(TransferMode.MOVE);
+            ClipboardContent clipboard = new ClipboardContent();
+            final int nodeIndex = node.getParent().getChildrenUnmodifiable()
+                    .indexOf(node);
+            clipboard.putString(Integer.toString(nodeIndex));
+            db.setContent(clipboard);
+            event.consume();
+        });
+        node.setOnDragOver(event -> {
+            boolean accept = true;
+            final Dragboard dragboard = event.getDragboard();
+            if (dragboard.hasString()) {
+                int incomingIndex = Integer.parseInt(dragboard.getString());
+                int myIndex = node.getParent().getChildrenUnmodifiable()
+                        .indexOf(node);
+                if (incomingIndex == myIndex) {
+                    accept = false;
+                }
+            } else {
+                accept = false;
+            }
+            if (accept) {
+                event.acceptTransferModes(TransferMode.MOVE);
+            }
+        });
+        node.setOnDragDropped(event -> {
+            boolean success = false;
+            final Dragboard dragboard = event.getDragboard();
+            if (dragboard.hasString()) {
+                int incomingIndex = Integer.parseInt(dragboard.getString());
+                final Pane parent = (Pane) node.getParent();
+                final ObservableList<Node> children = parent.getChildren();
+                int myIndex = children.indexOf(node);
+                final int laterIndex = Math.max(incomingIndex, myIndex);
+                Node removedLater = children.remove(laterIndex);
+                final int earlierIndex = Math.min(incomingIndex, myIndex);
+                Node removedEarlier = children.remove(earlierIndex);
+                children.add(earlierIndex, removedLater);
+                children.add(laterIndex, removedEarlier);
+                success = true;
+            }
+            event.setDropCompleted(success);
+        });
     }
 }
