@@ -8,9 +8,6 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
-/**
- * JavaFX App
- */
 public class App extends Application {
 
     private static Scene scene;
@@ -30,6 +27,9 @@ public class App extends Application {
 
     @Override
     public void start(Stage stage) throws IOException {
+
+        System.getProperties().setProperty("org.jooq.no-logo", "true");
+
         scene = new Scene(loadFXML("app"), 1024, 600);
         stage.setTitle("Ad Auction Dashboard alpha");
         stage.sizeToScene();

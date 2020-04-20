@@ -1,7 +1,7 @@
 package group18.dashboard.controllers;
 
 import com.jfoenix.controls.JFXComboBox;
-import com.jfoenix.controls.JFXRadioButton;
+import group18.dashboard.App;
 import group18.dashboard.ViewDataParser;
 import group18.dashboard.model.Campaign;
 import group18.dashboard.model.Click;
@@ -12,21 +12,24 @@ import javafx.beans.property.Property;
 import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Label;
-import javafx.scene.control.TabPane;
-import javafx.scene.control.Tooltip;
+import javafx.scene.control.*;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.*;
 import javafx.stage.DirectoryChooser;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 
 import java.io.File;
 import java.util.Arrays;
@@ -57,17 +60,6 @@ public class DashboardController {
     public Label cpc;
     public Label cpm;
     public Label bounceRate;
-    public JFXRadioButton impressionsButton;
-    public JFXRadioButton clicksButton;
-    public JFXRadioButton uniquesButton;
-    public JFXRadioButton bouncesButton;
-    public JFXRadioButton conversionsButton;
-    public JFXRadioButton totalCostButton;
-    public JFXRadioButton ctrButton;
-    public JFXRadioButton cpaButton;
-    public JFXRadioButton cpcButton;
-    public JFXRadioButton cpmButton;
-    public JFXRadioButton bounceRateButton;
     public VBox initView;
     public StackPane loadingProgress;
     public TabPane tabs;
@@ -86,6 +78,8 @@ public class DashboardController {
         timeGranularity.setItems(FXCollections.observableArrayList("Hours", "Days", "Weeks"));
         timeGranularity.getSelectionModel().clearAndSelect(1);
         timeGranularity.setTooltip(new Tooltip("Time granularity of the chart"));
+
+        dashboardArea.prefWrapLengthProperty().bind(dashboardArea.widthProperty());
 
         bindMetrics(in);
         bindChartMetrics(in);
@@ -176,23 +170,23 @@ public class DashboardController {
     }
 
     private void bindMetrics(Campaign campaign) {
-        impressions.textProperty().bind(campaign.impressionCountProperty().asString("%,d"));
-        clicks.textProperty().bind(campaign.clickCountProperty().asString("%,d"));
-        uniques.textProperty().bind(campaign.uniquesProperty().asString("%,d"));
-        bounces.textProperty().bind(campaign.bouncesProperty().asString("%,d"));
-        conversions.textProperty().bind(campaign.conversionsProperty().asString("%,d"));
-        totalCost.textProperty().bind(campaign.totalCostProperty().asString("\u00A3%.2f"));
-        ctr.textProperty().bind(campaign.ctrProperty().asString("%.2f%%"));
-        cpa.textProperty().bind(campaign.cpaProperty().asString("\u00A3%.2f"));
-        cpc.textProperty().bind(campaign.cpcProperty().asString("\u00A3%.2f"));
-        cpm.textProperty().bind(campaign.cpmProperty().asString("\u00A3%.2f"));
-        bounceRate.textProperty().bind(campaign.bounceRateProperty().asString("%.2f%%"));
+        impressions.textProperty().bind(campaign.impressionCountProperty().asString("Impressions: %,d"));
+        clicks.textProperty().bind(campaign.clickCountProperty().asString("Clicks: %,d"));
+        uniques.textProperty().bind(campaign.uniquesProperty().asString("Uniques: %,d"));
+        bounces.textProperty().bind(campaign.bouncesProperty().asString("Bounces: %,d"));
+        conversions.textProperty().bind(campaign.conversionsProperty().asString("Conversions: %,d"));
+        totalCost.textProperty().bind(campaign.totalCostProperty().asString("Total Cost: \u00A3%.2f"));
+        ctr.textProperty().bind(campaign.ctrProperty().asString("Click-through-rate: %.2f%%"));
+        cpa.textProperty().bind(campaign.cpaProperty().asString("Cost-per-acquisition: \u00A3%.2f"));
+        cpc.textProperty().bind(campaign.cpcProperty().asString("Cost-per-click: \u00A3%.2f"));
+        cpm.textProperty().bind(campaign.cpmProperty().asString("Cost-per-mille: \u00A3%.2f"));
+        bounceRate.textProperty().bind(campaign.bounceRateProperty().asString("Bounce Rate: %.2f%%"));
     }
 
     private void bindChartMetrics(Campaign campaign) {
         mainChart.dataProperty().bind(series);
 
-        totalCostButton.selectedProperty().addListener((o, old, selected) -> {
+        /*totalCostButton.selectedProperty().addListener((o, old, selected) -> {
             if (selected) seriesList.add(campaign.getTotalCostSeries());
             else seriesList.remove(campaign.getTotalCostSeries());
         });
@@ -235,7 +229,7 @@ public class DashboardController {
         conversionsButton.selectedProperty().addListener((o, old, selected) -> {
             if (selected) seriesList.add(campaign.getConversionSeries());
             else seriesList.remove(campaign.getConversionSeries());
-        });
+        });*/
     }
 
     private void updateMetrics(ExecutorService executor) {
@@ -346,7 +340,7 @@ public class DashboardController {
 
     private void updateBounceRateSeries(int resolution) {
         in.setBounceRateSeries(ViewDataParser.getBounceRateTimeSeries(resolution, in.getClicks(), in.getInteractions()));
-        bounceRateButton.setDisable(false);
+        //bounceRateButton.setDisable(false);
         System.out.println("[Series] bounce rate... done");
         importProgress.countDown();
     }
@@ -355,7 +349,7 @@ public class DashboardController {
         in.setBouncesSeries(ViewDataParser.getCumulativeTimeSeries("Bounces", resolution,
                 in.getInteractions().parallelStream()
                         .filter(interaction -> !interaction.isConversion()).map(Interaction::getEntryDate).collect(Collectors.toList())));
-        bouncesButton.setDisable(false);
+        //bouncesButton.setDisable(false);
         System.out.println("[Series] bounces... done");
         importProgress.countDown();
     }
@@ -363,7 +357,7 @@ public class DashboardController {
     private void updateClickCountSeries(int resolution) {
         in.setClickCountSeries(ViewDataParser.getCumulativeTimeSeries("Clicks", resolution,
                 in.getClicks().parallelStream().map(Click::getDate).collect(Collectors.toList())));
-        clicksButton.setDisable(false);
+        //clicksButton.setDisable(false);
         System.out.println("[Series] clicks... done");
         importProgress.countDown();
     }
@@ -372,7 +366,7 @@ public class DashboardController {
         in.setConversionSeries(ViewDataParser.getCumulativeTimeSeries("Conversions", resolution,
                 in.getInteractions().parallelStream()
                         .filter(Interaction::isConversion).map(Interaction::getEntryDate).collect(Collectors.toList())));
-        conversionsButton.setDisable(false);
+        //conversionsButton.setDisable(false);
         System.out.println("[Series] conversions... done");
         importProgress.countDown();
     }
@@ -380,7 +374,7 @@ public class DashboardController {
     private void updateCPASeries(int resolution) {
         in.setCPASeries(ViewDataParser.getCPATimeSeries(resolution, in.getImpressions(), in.getClicks(), in.getInteractions()));
         //Platform.runLater(()->seriesList.add(in.getCPASeries()));
-        cpaButton.setDisable(false);
+        //cpaButton.setDisable(false);
         System.out.println("[Series] CPA... done");
         importProgress.countDown();
     }
@@ -388,7 +382,7 @@ public class DashboardController {
     private void updateCPCSeries(int resolution) {
         in.setCPCSeries(ViewDataParser.getCPCTimeSeries(resolution, in.getImpressions(), in.getClicks()));
         //Platform.runLater(()->seriesList.add(in.getCPCSeries()));
-        cpcButton.setDisable(false);
+        //cpcButton.setDisable(false);
         System.out.println("[Series] CPC... done");
         importProgress.countDown();
     }
@@ -396,7 +390,7 @@ public class DashboardController {
     private void updateCPMSeries(int resolution) {
         in.setCPMSeries(ViewDataParser.getCPMTimeSeries(resolution, in.getImpressions(), in.getClicks()));
         //Platform.runLater(()->seriesList.add(in.getCPMSeries()));
-        cpmButton.setDisable(false);
+        //cpmButton.setDisable(false);
         System.out.println("[Series] CPM... done");
         importProgress.countDown();
     }
@@ -404,7 +398,7 @@ public class DashboardController {
     private void updateCTRSeries(int resolution) {
         in.setCtrSeries(ViewDataParser.getCTRTimeSeries(resolution, in.getImpressions(), in.getClicks()));
         //Platform.runLater(()->seriesList.add(in.getCtrSeries()));
-        ctrButton.setDisable(false);
+        //ctrButton.setDisable(false);
         System.out.println("[Series] CTR... done");
         importProgress.countDown();
     }
@@ -412,7 +406,7 @@ public class DashboardController {
     private void updateImpressionsSeries(int resolution) {
         in.setImpressionSeries(ViewDataParser.getCumulativeTimeSeries("Impressions", resolution,
                 in.getImpressions().parallelStream().map(Impression::getDate).collect(Collectors.toList())));
-        impressionsButton.setDisable(false);
+        //impressionsButton.setDisable(false);
         System.out.println("[Series] impressions... done");
         importProgress.countDown();
     }
@@ -420,7 +414,7 @@ public class DashboardController {
     private void updateTotalCostSeries(int resolution) {
         in.setTotalCostSeries(ViewDataParser.getTotalCostSeries(resolution, in.getImpressions(), in.getClicks()));
         //Platform.runLater(()->seriesList.add(in.getTotalCostSeries()));
-        totalCostButton.setDisable(false);
+        //totalCostButton.setDisable(false);
         System.out.println("[Series] total cost... done");
         importProgress.countDown();
     }
@@ -428,67 +422,28 @@ public class DashboardController {
     private void updateUniquesSeries(int resolution) {
         in.setUniquesSeries(ViewDataParser.getCumulativeTimeSeries("Uniques", resolution,
                 in.getClicks().parallelStream().filter(distinctByKey(Click::getDate)).map(Click::getDate).collect(Collectors.toList())));
-        uniquesButton.setDisable(false);
+        //uniquesButton.setDisable(false);
         System.out.println("[Series] uniques... done");
         importProgress.countDown();
     }
 
     public void newChartButtonAction() {
-        XYChart.Series<String, Number> series1 = new XYChart.Series();
-        series1.getData().add(new XYChart.Data("MO", new Random().nextInt()));
-        series1.getData().add(new XYChart.Data("TU", new Random().nextInt()));
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource("newchart.fxml"));
+            Parent chartForm = fxmlLoader.load();
+            ChartFactory chartController = fxmlLoader.getController();
 
-        final XYChart<String, Number> bp = new LineChart<>(new CategoryAxis(), new NumberAxis());
-        bp.getData().add(series1);
+            chartController.setChartPane(dashboardArea);
 
-        makeDraggable(bp);
-        dashboardArea.getChildren().add(bp);
+            Stage stage = new Stage();
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setScene(new Scene(chartForm));
+            stage.sizeToScene();
+            stage.setResizable(false);
+            stage.show();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
-    private void makeDraggable(Node node) {
-        node.setOnDragDetected(event -> {
-            Dragboard db = node.startDragAndDrop(TransferMode.MOVE);
-            ClipboardContent clipboard = new ClipboardContent();
-            final int nodeIndex = node.getParent().getChildrenUnmodifiable()
-                    .indexOf(node);
-            clipboard.putString(Integer.toString(nodeIndex));
-            db.setContent(clipboard);
-            event.consume();
-        });
-        node.setOnDragOver(event -> {
-            boolean accept = true;
-            final Dragboard dragboard = event.getDragboard();
-            if (dragboard.hasString()) {
-                int incomingIndex = Integer.parseInt(dragboard.getString());
-                int myIndex = node.getParent().getChildrenUnmodifiable()
-                        .indexOf(node);
-                if (incomingIndex == myIndex) {
-                    accept = false;
-                }
-            } else {
-                accept = false;
-            }
-            if (accept) {
-                event.acceptTransferModes(TransferMode.MOVE);
-            }
-        });
-        node.setOnDragDropped(event -> {
-            boolean success = false;
-            final Dragboard dragboard = event.getDragboard();
-            if (dragboard.hasString()) {
-                int incomingIndex = Integer.parseInt(dragboard.getString());
-                final Pane parent = (Pane) node.getParent();
-                final ObservableList<Node> children = parent.getChildren();
-                int myIndex = children.indexOf(node);
-                final int laterIndex = Math.max(incomingIndex, myIndex);
-                Node removedLater = children.remove(laterIndex);
-                final int earlierIndex = Math.min(incomingIndex, myIndex);
-                Node removedEarlier = children.remove(earlierIndex);
-                children.add(earlierIndex, removedLater);
-                children.add(laterIndex, removedEarlier);
-                success = true;
-            }
-            event.setDropCompleted(success);
-        });
-    }
 }

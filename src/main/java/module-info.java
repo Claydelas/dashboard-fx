@@ -3,6 +3,9 @@ module group18.dashboard {
     requires javafx.fxml;
     requires commons.lang;
     requires com.jfoenix;
+    requires java.sql;
+    requires com.h2database;
+    requires org.jooq;
 
     opens group18.dashboard.controllers to javafx.fxml;
     exports group18.dashboard;
