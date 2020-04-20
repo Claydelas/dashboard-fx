@@ -13,6 +13,8 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
+<?import javafx.collections.*?>
+<?import java.lang.String?>
 
 <GridPane hgap="10.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="550.0" vgap="10.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="group18.dashboard.controllers.ChartFactory">
    <columnConstraints>
@@ -80,7 +82,23 @@
          </children>
       </VBox>
       <JFXComboBox fx:id="campaignComboBox" maxWidth="1.7976931348623157E308" promptText="Campaign" GridPane.rowIndex="2" GridPane.valignment="TOP" />
-      <JFXComboBox fx:id="metricComboBox" maxWidth="1.7976931348623157E308" promptText="Metric" GridPane.columnIndex="1" GridPane.rowIndex="2" GridPane.valignment="TOP" />
+      <JFXComboBox fx:id="metricComboBox" maxWidth="1.7976931348623157E308" promptText="Metric" GridPane.columnIndex="1" GridPane.rowIndex="2" GridPane.valignment="TOP">
+         <items>
+            <FXCollections fx:factory="observableArrayList">
+               <String fx:value="Impressions"/>
+               <String fx:value="Clicks"/>
+               <String fx:value="Uniques"/>
+               <String fx:value="Bounces"/>
+               <String fx:value="Conversions"/>
+               <String fx:value="Total Cost"/>
+               <String fx:value="Click-through-rate"/>
+               <String fx:value="Cost-per-acquisition"/>
+               <String fx:value="Cost-per-click"/>
+               <String fx:value="Cost-per-mille"/>
+               <String fx:value="Bounce Rate"/>
+            </FXCollections>
+         </items>
+      </JFXComboBox>
       <HBox alignment="CENTER_RIGHT" spacing="5.0" GridPane.columnIndex="2" GridPane.columnSpan="2147483647" GridPane.rowIndex="2">
          <children>
             <Button fx:id="addChart" mnemonicParsing="false" onAction="#addChartAction" text="Add Chart" />
@@ -92,7 +110,13 @@
       </HBox>
       <HBox alignment="CENTER_LEFT" spacing="10.0" GridPane.columnSpan="2147483647">
          <children>
-            <JFXComboBox fx:id="chartTypeComboBox" minWidth="-Infinity" promptText="Chart type" />
+            <JFXComboBox fx:id="chartTypeComboBox" minWidth="-Infinity" promptText="Chart type">
+               <items>
+                  <FXCollections fx:factory="observableArrayList">
+                     <String fx:value="Line Chart"/>
+                  </FXCollections>
+               </items>
+            </JFXComboBox>
             <Label minWidth="-Infinity" text="from" />
             <DatePicker fx:id="fromDate" promptText="from" />
             <Label minWidth="-Infinity" text="to" />

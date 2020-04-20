@@ -7,6 +7,7 @@ import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.Dragboard;
@@ -14,9 +15,11 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.Pane;
+import javafx.stage.Stage;
 
 public class ChartFactory {
 
+    public Button cancel;
     private FlowPane dashboardArea;
 
     @FXML
@@ -26,10 +29,20 @@ public class ChartFactory {
     public void setChartPane(FlowPane p){
         this.dashboardArea = p;
     }
-    public void okButton(){
+    public void addChartAction(){
         final XYChart<String, Number> chart = new LineChart<>(new CategoryAxis(), new NumberAxis());
+
+
         makeDraggable(chart);
         dashboardArea.getChildren().add(chart);
+
+        //implicit closing of stage after a chart is added
+        cancelAction();
+    }
+
+    public void cancelAction(){
+        Stage stage = (Stage) cancel.getScene().getWindow();
+        stage.close();
     }
 
     private void makeDraggable(Node node) {
