@@ -14,6 +14,7 @@ public class DB {
      */
     public static Connection connection() {
         if (connection == null) {
+            //System.getProperties().setProperty("org.jooq.no-logo", "true");
             try {
                 Class.forName(driver());
 

@@ -3,9 +3,15 @@ package group18.dashboard.controllers;
 import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.validation.RequiredFieldValidator;
 import group18.dashboard.ViewDataParser;
+import group18.dashboard.database.enums.ImpressionAge;
+import group18.dashboard.database.enums.ImpressionContext;
+import group18.dashboard.database.enums.ImpressionGender;
+import group18.dashboard.database.enums.ImpressionIncome;
 import group18.dashboard.model.Campaign;
 import group18.dashboard.model.Impression;
+import group18.dashboard.util.DB;
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -21,10 +27,18 @@ import javafx.scene.input.TransferMode;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
+import org.jooq.Condition;
+import org.jooq.DSLContext;
+import org.jooq.SQLDialect;
+import org.jooq.impl.DSL;
 
+import java.time.ZoneOffset;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
+
+import static group18.dashboard.database.tables.Click.CLICK;
+import static group18.dashboard.database.tables.Impression.IMPRESSION;
 
 public class ChartFactory {
 
@@ -69,6 +83,8 @@ public class ChartFactory {
 
         ExecutorService executor = Executors.newWorkStealingPool();
 
+        DSLContext query = DSL.using(DB.connection(), SQLDialect.H2);
+
         executor.execute(() -> {
             Campaign temp = new Campaign();
             try {
@@ -87,16 +103,28 @@ public class ChartFactory {
                     chart = new LineChart<>(new CategoryAxis(), new NumberAxis());
             }
 
+            ObservableList<XYChart.Data<String, Number>> data = FXCollections.observableArrayList();
 
             switch (metricComboBox.getSelectionModel().getSelectedItem()) {
                 case "Impressions":
-                    chart.getData().add(ViewDataParser.getCumulativeTimeSeries(
+                    chart.getData().add(ViewDataParser.getSeriesOf(
                             "Impressions",
                             5,
-                            temp.getImpressions().parallelStream().map(Impression::getDate).collect(Collectors.toList())));
+                            query
+                                    .select()
+                                    .from(IMPRESSION)
+                                    .where(getFilter())
+                                    .fetch(IMPRESSION.DATE)));
                     break;
                 case "Clicks":
-                    System.out.println("hello");
+                    chart.getData().add(ViewDataParser.getSeriesOf(
+                            "Clicks",
+                            5,
+                            query
+                                    .select()
+                                    .from(CLICK)
+                                    .where(getFilter())
+                                    .fetch(CLICK.DATE)));
                     break;
             }
 
@@ -158,5 +186,43 @@ public class ChartFactory {
             }
             event.setDropCompleted(success);
         });
+    }
+
+    public Condition getFilter() {
+        Condition filter = DSL.noCondition();
+
+        Condition subcondition = DSL.noCondition();
+        if (filterBelow25.isSelected()) subcondition = subcondition.or(IMPRESSION.AGE.eq(ImpressionAge._3c25));
+        if (filter25to34.isSelected()) subcondition = subcondition.or(IMPRESSION.AGE.eq(ImpressionAge._25_34));
+        if (filter35to44.isSelected()) subcondition = subcondition.or(IMPRESSION.AGE.eq(ImpressionAge._35_44));
+        if (filter45to54.isSelected()) subcondition = subcondition.or(IMPRESSION.AGE.eq(ImpressionAge._45_54));
+        if (filterAbove54.isSelected()) subcondition = subcondition.or(IMPRESSION.AGE.eq(ImpressionAge._3e54));
+        filter = filter.and(subcondition);
+
+        subcondition = DSL.noCondition();
+        if (filterBlog.isSelected()) subcondition = subcondition.or(IMPRESSION.CONTEXT.eq(ImpressionContext.Blog));
+        if (filterHobbies.isSelected())
+            subcondition = subcondition.or(IMPRESSION.CONTEXT.eq(ImpressionContext.Hobbies));
+        if (filterNews.isSelected()) subcondition = subcondition.or(IMPRESSION.CONTEXT.eq(ImpressionContext.News));
+        if (filterShopping.isSelected())
+            subcondition = subcondition.or(IMPRESSION.CONTEXT.eq(ImpressionContext.Shopping));
+        if (filterSocialMedia.isSelected())
+            subcondition = subcondition.or(IMPRESSION.CONTEXT.eq(ImpressionContext.Social_Media));
+        if (filterTravel.isSelected()) subcondition = subcondition.or(IMPRESSION.CONTEXT.eq(ImpressionContext.Travel));
+        filter = filter.and(subcondition);
+
+        subcondition = DSL.noCondition();
+        if (filterMale.isSelected()) subcondition = subcondition.or(IMPRESSION.GENDER.eq(ImpressionGender.Male));
+        if (filterFemale.isSelected()) subcondition = subcondition.or(IMPRESSION.GENDER.eq(ImpressionGender.Female));
+        filter = filter.and(subcondition);
+
+        subcondition = DSL.noCondition();
+        if (filterLow.isSelected()) subcondition = subcondition.or(IMPRESSION.INCOME.eq(ImpressionIncome.Low));
+        if (filterMedium.isSelected()) subcondition = subcondition.or(IMPRESSION.INCOME.eq(ImpressionIncome.Medium));
+        if (filterHigh.isSelected()) subcondition = subcondition.or(IMPRESSION.INCOME.eq(ImpressionIncome.High));
+        filter = filter.and(subcondition);
+
+        System.out.println(filter);
+        return filter;
     }
 }
