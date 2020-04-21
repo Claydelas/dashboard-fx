@@ -8,7 +8,6 @@ import group18.dashboard.database.enums.ImpressionContext;
 import group18.dashboard.database.enums.ImpressionGender;
 import group18.dashboard.database.enums.ImpressionIncome;
 import group18.dashboard.model.Campaign;
-import group18.dashboard.model.Impression;
 import group18.dashboard.util.DB;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -32,13 +31,12 @@ import org.jooq.DSLContext;
 import org.jooq.SQLDialect;
 import org.jooq.impl.DSL;
 
-import java.time.ZoneOffset;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.stream.Collectors;
 
 import static group18.dashboard.database.tables.Click.CLICK;
 import static group18.dashboard.database.tables.Impression.IMPRESSION;
+import static group18.dashboard.database.tables.Interaction.INTERACTION;
 
 public class ChartFactory {
 
@@ -109,7 +107,6 @@ public class ChartFactory {
                 case "Impressions":
                     chart.getData().add(ViewDataParser.getSeriesOf(
                             "Impressions",
-                            5,
                             query
                                     .select()
                                     .from(IMPRESSION)
@@ -119,9 +116,16 @@ public class ChartFactory {
                 case "Clicks":
                     chart.getData().add(ViewDataParser.getSeriesOf(
                             "Clicks",
-                            5,
                             query
                                     .select()
+                                    .from(CLICK)
+                                    .where(getFilter())
+                                    .fetch(CLICK.DATE)));
+                    break;
+                case "Uniques":
+                    chart.getData().add(ViewDataParser.getSeriesOf("Uniques",
+                            query
+                                    .selectDistinct()
                                     .from(CLICK)
                                     .where(getFilter())
                                     .fetch(CLICK.DATE)));

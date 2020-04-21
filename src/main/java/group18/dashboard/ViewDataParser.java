@@ -26,7 +26,7 @@ public class ViewDataParser {
 
         return mapToSeries(dataName, quantities);
     }
-    public static XYChart.Series<String, Number> getSeriesOf(String dataName, int timeResolution, List<LocalDateTime> times) {
+    public static XYChart.Series<String, Number> getSeriesOf(String dataName, List<LocalDateTime> times) {
         final Map<String, Number> quantities = new HashMap<>();
 
         for (LocalDateTime time : times) {

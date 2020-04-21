@@ -108,7 +108,7 @@ public class DashboardController {
         System.out.println("--Parsing Campaign--");
         ExecutorService executor = Executors.newWorkStealingPool();
         CountDownLatch latch = new CountDownLatch(3);
-        importProgress = new CountDownLatch(22);
+        importProgress = new CountDownLatch(3);
 
         executor.execute(() -> {
             try {
@@ -151,7 +151,7 @@ public class DashboardController {
                 e.printStackTrace();
             }
             updateMetrics(executor);
-            updateChartMetrics(executor, Calendar.DAY_OF_MONTH);
+            //updateChartMetrics(executor, Calendar.DAY_OF_MONTH);
         });
         mainView.getChildren().remove(initView);
         loadingProgress.setVisible(true);
