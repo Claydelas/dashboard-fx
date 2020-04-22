@@ -4,7 +4,7 @@ import group18.dashboard.database.enums.*;
 
 public class Parsing {
 
-    static Enum<? extends Enum<?>> toEnum(String s) {
+    public static Enum<? extends Enum<?>> toEnum(String s) {
         switch (s) {
             case "<25":
                 return ImpressionAge._3c25;

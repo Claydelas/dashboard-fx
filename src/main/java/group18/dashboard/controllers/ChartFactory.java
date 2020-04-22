@@ -1,18 +1,19 @@
 package group18.dashboard.controllers;
 
+import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.validation.RequiredFieldValidator;
+import group18.dashboard.App;
 import group18.dashboard.ViewDataParser;
 import group18.dashboard.database.enums.ImpressionAge;
 import group18.dashboard.database.enums.ImpressionContext;
 import group18.dashboard.database.enums.ImpressionGender;
 import group18.dashboard.database.enums.ImpressionIncome;
-import group18.dashboard.model.Campaign;
 import group18.dashboard.util.DB;
 import javafx.application.Platform;
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.LineChart;
@@ -20,11 +21,13 @@ import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
@@ -36,7 +39,7 @@ import java.util.concurrent.Executors;
 
 import static group18.dashboard.database.tables.Click.CLICK;
 import static group18.dashboard.database.tables.Impression.IMPRESSION;
-import static group18.dashboard.database.tables.Interaction.INTERACTION;
+import static org.jooq.impl.DSL.select;
 
 public class ChartFactory {
 
@@ -84,12 +87,13 @@ public class ChartFactory {
         DSLContext query = DSL.using(DB.connection(), SQLDialect.H2);
 
         executor.execute(() -> {
-            Campaign temp = new Campaign();
+            /*Campaign temp = new Campaign();
             try {
                 temp.updateImpressions("D:\\Projects\\Java\\2_week_campaign");
             } catch (Exception e) {
                 e.printStackTrace();
-            }
+            }*/
+
             final XYChart<String, Number> chart;
 
             switch (chartTypeComboBox.getSelectionModel().getSelectedItem()) {
@@ -101,7 +105,7 @@ public class ChartFactory {
                     chart = new LineChart<>(new CategoryAxis(), new NumberAxis());
             }
 
-            ObservableList<XYChart.Data<String, Number>> data = FXCollections.observableArrayList();
+            //ObservableList<XYChart.Data<String, Number>> data = FXCollections.observableArrayList();
 
             switch (metricComboBox.getSelectionModel().getSelectedItem()) {
                 case "Impressions":
@@ -119,21 +123,38 @@ public class ChartFactory {
                             query
                                     .select()
                                     .from(CLICK)
-                                    .where(getFilter())
+                                    .where(CLICK.USER.in(
+                                            select(IMPRESSION.USER)
+                                                    .from(IMPRESSION)
+                                                    .where(getFilter())))
                                     .fetch(CLICK.DATE)));
                     break;
                 case "Uniques":
                     chart.getData().add(ViewDataParser.getSeriesOf("Uniques",
                             query
-                                    .selectDistinct()
+                                    .selectDistinct(CLICK.DATE)
                                     .from(CLICK)
-                                    .where(getFilter())
+                                    .where(CLICK.USER.in(
+                                            select(IMPRESSION.USER)
+                                                    .from(IMPRESSION)
+                                                    .where(getFilter())))
                                     .fetch(CLICK.DATE)));
                     break;
             }
+            final JFXButton close = new JFXButton();
+            ImageView image = new ImageView(App.class.getResource("icons/baseline_cancel_black_18dp.png").toString());
+            image.setFitWidth(20);
+            image.setFitHeight(20);
+            image.setPreserveRatio(true);
+            close.setGraphic(image);
 
-            makeDraggable(chart);
-            Platform.runLater(() -> dashboardArea.getChildren().add(chart));
+            final StackPane pane = new StackPane(chart, close);
+
+            StackPane.setAlignment(close, Pos.TOP_RIGHT);
+
+            close.setOnMouseClicked(e -> dashboardArea.getChildren().remove(pane));
+            makeDraggable(pane);
+            Platform.runLater(() -> dashboardArea.getChildren().add(pane));
         });
         executor.shutdown();
         //implicit closing of stage after a chart is added

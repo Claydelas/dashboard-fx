@@ -15,6 +15,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -78,6 +79,15 @@ public class DashboardController {
         timeGranularity.setItems(FXCollections.observableArrayList("Hours", "Days", "Weeks"));
         timeGranularity.getSelectionModel().clearAndSelect(1);
         timeGranularity.setTooltip(new Tooltip("Time granularity of the chart"));
+
+        Button debug = new Button("debug");
+        mainView.getChildren().add(debug);
+        StackPane.setAlignment(debug, Pos.TOP_RIGHT);
+        debug.setOnMouseClicked(e -> {
+            mainView.getChildren().remove(initView);
+            mainView.getChildren().remove(debug);
+            chartPane.setVisible(true);
+        });
 
         dashboardArea.prefWrapLengthProperty().bind(dashboardArea.widthProperty());
 
@@ -445,5 +455,4 @@ public class DashboardController {
             e.printStackTrace();
         }
     }
-
 }
