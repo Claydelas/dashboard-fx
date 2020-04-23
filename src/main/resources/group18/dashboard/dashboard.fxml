@@ -2,9 +2,6 @@
 
 <?import com.jfoenix.controls.JFXComboBox?>
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.chart.CategoryAxis?>
-<?import javafx.scene.chart.LineChart?>
-<?import javafx.scene.chart.NumberAxis?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
@@ -59,6 +56,7 @@
                                       </children>
                            <columnConstraints>
                               <ColumnConstraints />
+                              <ColumnConstraints />
                            </columnConstraints>
                                   </GridPane>
                             </content>
@@ -69,17 +67,7 @@
          <center>
             <ScrollPane fitToHeight="true" fitToWidth="true" focusTraversable="false">
                <content>
-                  <FlowPane fx:id="dashboardArea" alignment="CENTER" columnHalignment="CENTER" hgap="5.0" vgap="5.0">
-                     <children>
-                                  <LineChart fx:id="mainChart" animated="false" legendVisible="false" prefHeight="507.0" prefWidth="685.0">
-                                      <xAxis>
-                                          <CategoryAxis side="BOTTOM" fx:id="xAxis" />
-                                      </xAxis>
-                                      <yAxis>
-                                          <NumberAxis fx:id="yAxis" side="LEFT" />
-                                      </yAxis>
-                                  </LineChart>
-                     </children></FlowPane>
+                  <FlowPane fx:id="dashboardArea" alignment="CENTER" columnHalignment="CENTER" hgap="5.0" vgap="5.0" />
                </content>
                <BorderPane.margin>
                   <Insets />
