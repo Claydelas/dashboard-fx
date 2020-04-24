@@ -23,7 +23,7 @@ public class Interaction {
 
         //Getting the entry date
         try {
-            entryDate = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss").parse(columns[0]);
+            entryDate = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").parse(columns[0]);
         } catch (ParseException e) {
             throw new ParsingException("Entry date could not be parsed for an interaction.");
         }
@@ -41,7 +41,7 @@ public class Interaction {
                 exitDate = null;
             }
             else {
-                exitDate = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss").parse(columns[2]);
+                exitDate = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").parse(columns[2]);
             }
         } catch (ParseException e) {
             throw new ParsingException("Exit date could not be parsed for an interaction.");

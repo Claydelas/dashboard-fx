@@ -20,13 +20,13 @@ public class Impression {
         //Takes in a single line of the csv and parses it
         //Checks for validity as the file is parsed, throwing an exception
         String[] columns = lineIn.split(",");
-//        if (columns.length!=7){
-//            throw new ParsingException("Incorrect number of columns were given for an impression");
-//        }
+        if (columns.length!=7){
+            throw new ParsingException("Incorrect number of columns were given for an impression");
+        }
 
         //Getting the date
         try {
-            date = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss").parse(columns[0]);
+            date = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").parse(columns[0]);
 
         }
         catch (ParseException e){

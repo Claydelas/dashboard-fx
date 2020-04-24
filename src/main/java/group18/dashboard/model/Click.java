@@ -22,7 +22,7 @@ public class Click {
 
         //Getting the date
         try {
-            date = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss").parse(columns[0]);
+            date = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").parse(columns[0]);
         }
         catch (ParseException e){
             throw new ParsingException("Date could not be parsed for a click.");
@@ -61,6 +61,7 @@ public class Click {
     public int hashCode() {
         return Objects.hash(getDate(), getID());
     }
+
 
     public long getID() {
         return ID;
