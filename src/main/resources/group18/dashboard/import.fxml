@@ -22,7 +22,7 @@
         <ColumnConstraints hgrow="ALWAYS" percentWidth="25.0" />
     </columnConstraints>
     <rowConstraints>
-        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
+        <RowConstraints vgrow="NEVER" />
         <RowConstraints vgrow="NEVER" />
         <RowConstraints vgrow="NEVER" />
     </rowConstraints>
@@ -66,6 +66,8 @@
                         </FXCollections>
                     </items>
                 </JFXComboBox>
+            <Label text="as" />
+            <TextField fx:id="campaignNameField" promptText="campaign name" />
             </children>
         </HBox>
       <StackPane fx:id="panes" GridPane.columnSpan="2147483647" GridPane.rowIndex="1">
@@ -74,7 +76,7 @@
                <children>
                   <HBox spacing="5.0">
                      <children>
-                        <TextField fx:id="folderPath" prefWidth="200.0" />
+                        <TextField fx:id="folderPath" prefWidth="285.0" promptText="Folder containing impression, click and server logs" />
                         <Button fx:id="browseFolder" mnemonicParsing="false" onAction="#selectFolder" text="Browse" />
                      </children>
                   </HBox>
@@ -85,19 +87,19 @@
                <children>
                   <HBox spacing="5.0">
                      <children>
-                        <TextField fx:id="impressionLogPath" prefWidth="200.0" promptText="Impression Log" />
+                        <TextField fx:id="impressionLogPath" prefWidth="285.0" promptText="Impression Log" />
                         <Button fx:id="browseImpressionLog" mnemonicParsing="false" onAction="#selectImpressionLog" text="Browse" />
                      </children>
                   </HBox>
                   <HBox spacing="5.0">
                      <children>
-                        <TextField fx:id="clickLogPath" prefWidth="200.0" promptText="Click Log" />
+                        <TextField fx:id="clickLogPath" prefWidth="285.0" promptText="Click Log" />
                         <Button fx:id="browseClickLog" mnemonicParsing="false" onAction="#selectClickLog" text="Browse" />
                      </children>
                   </HBox>
                   <HBox spacing="5.0">
                      <children>
-                        <TextField fx:id="interactionLogPath" prefWidth="200.0" promptText="Server Log" />
+                        <TextField fx:id="interactionLogPath" prefWidth="285.0" promptText="Server Log" />
                         <Button fx:id="browseInteractionLog" mnemonicParsing="false" onAction="#selectInteractionLog" text="Browse" />
                      </children>
                   </HBox>
@@ -108,7 +110,7 @@
                <children>
                   <HBox spacing="5.0">
                      <children>
-                        <TextField fx:id="zipPath" prefWidth="200.0" />
+                        <TextField fx:id="zipPath" prefWidth="285.0" />
                         <Button fx:id="browseZip" mnemonicParsing="false" onAction="#selectZip" text="Browse" />
                      </children>
                   </HBox>

@@ -8,6 +8,7 @@ import group18.dashboard.database.Keys;
 import group18.dashboard.database.Public;
 import group18.dashboard.database.tables.records.CampaignRecord;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 
@@ -16,7 +17,7 @@ import org.jooq.ForeignKey;
 import org.jooq.Identity;
 import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Row2;
+import org.jooq.Row15;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
@@ -32,7 +33,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Campaign extends TableImpl<CampaignRecord> {
 
-    private static final long serialVersionUID = 616030275;
+    private static final long serialVersionUID = 1224373350;
 
     /**
      * The reference instance of <code>PUBLIC.CAMPAIGN</code>
@@ -53,9 +54,74 @@ public class Campaign extends TableImpl<CampaignRecord> {
     public final TableField<CampaignRecord, Integer> CID = createField(DSL.name("CID"), org.jooq.impl.SQLDataType.INTEGER.nullable(false).identity(true), this, "");
 
     /**
-     * The column <code>PUBLIC.CAMPAIGN.CNAME</code>.
+     * The column <code>PUBLIC.CAMPAIGN.NAME</code>.
      */
-    public final TableField<CampaignRecord, String> CNAME = createField(DSL.name("CNAME"), org.jooq.impl.SQLDataType.VARCHAR(2147483647), this, "");
+    public final TableField<CampaignRecord, String> NAME = createField(DSL.name("NAME"), org.jooq.impl.SQLDataType.VARCHAR(2147483647), this, "");
+
+    /**
+     * The column <code>PUBLIC.CAMPAIGN.START_DATE</code>.
+     */
+    public final TableField<CampaignRecord, LocalDateTime> START_DATE = createField(DSL.name("START_DATE"), org.jooq.impl.SQLDataType.LOCALDATETIME, this, "");
+
+    /**
+     * The column <code>PUBLIC.CAMPAIGN.END_DATE</code>.
+     */
+    public final TableField<CampaignRecord, LocalDateTime> END_DATE = createField(DSL.name("END_DATE"), org.jooq.impl.SQLDataType.LOCALDATETIME, this, "");
+
+    /**
+     * The column <code>PUBLIC.CAMPAIGN.IMPRESSIONS</code>.
+     */
+    public final TableField<CampaignRecord, Integer> IMPRESSIONS = createField(DSL.name("IMPRESSIONS"), org.jooq.impl.SQLDataType.INTEGER, this, "");
+
+    /**
+     * The column <code>PUBLIC.CAMPAIGN.CLICKS</code>.
+     */
+    public final TableField<CampaignRecord, Integer> CLICKS = createField(DSL.name("CLICKS"), org.jooq.impl.SQLDataType.INTEGER, this, "");
+
+    /**
+     * The column <code>PUBLIC.CAMPAIGN.INTERACTIONS</code>.
+     */
+    public final TableField<CampaignRecord, Integer> INTERACTIONS = createField(DSL.name("INTERACTIONS"), org.jooq.impl.SQLDataType.INTEGER, this, "");
+
+    /**
+     * The column <code>PUBLIC.CAMPAIGN.BOUNCES</code>.
+     */
+    public final TableField<CampaignRecord, Integer> BOUNCES = createField(DSL.name("BOUNCES"), org.jooq.impl.SQLDataType.INTEGER, this, "");
+
+    /**
+     * The column <code>PUBLIC.CAMPAIGN.CONVERSIONS</code>.
+     */
+    public final TableField<CampaignRecord, Integer> CONVERSIONS = createField(DSL.name("CONVERSIONS"), org.jooq.impl.SQLDataType.INTEGER, this, "");
+
+    /**
+     * The column <code>PUBLIC.CAMPAIGN.CTR</code>.
+     */
+    public final TableField<CampaignRecord, Double> CTR = createField(DSL.name("CTR"), org.jooq.impl.SQLDataType.DOUBLE, this, "");
+
+    /**
+     * The column <code>PUBLIC.CAMPAIGN.CPA</code>.
+     */
+    public final TableField<CampaignRecord, Double> CPA = createField(DSL.name("CPA"), org.jooq.impl.SQLDataType.DOUBLE, this, "");
+
+    /**
+     * The column <code>PUBLIC.CAMPAIGN.CPC</code>.
+     */
+    public final TableField<CampaignRecord, Double> CPC = createField(DSL.name("CPC"), org.jooq.impl.SQLDataType.DOUBLE, this, "");
+
+    /**
+     * The column <code>PUBLIC.CAMPAIGN.CPM</code>.
+     */
+    public final TableField<CampaignRecord, Double> CPM = createField(DSL.name("CPM"), org.jooq.impl.SQLDataType.DOUBLE, this, "");
+
+    /**
+     * The column <code>PUBLIC.CAMPAIGN.BOUNCE_RATE</code>.
+     */
+    public final TableField<CampaignRecord, Double> BOUNCE_RATE = createField(DSL.name("BOUNCE_RATE"), org.jooq.impl.SQLDataType.DOUBLE, this, "");
+
+    /**
+     * The column <code>PUBLIC.CAMPAIGN.TOTAL_COST</code>.
+     */
+    public final TableField<CampaignRecord, Double> TOTAL_COST = createField(DSL.name("TOTAL_COST"), org.jooq.impl.SQLDataType.DOUBLE, this, "");
 
     /**
      * Create a <code>PUBLIC.CAMPAIGN</code> table reference
@@ -137,11 +203,11 @@ public class Campaign extends TableImpl<CampaignRecord> {
     }
 
     // -------------------------------------------------------------------------
-    // Row2 type methods
+    // Row15 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row2<Integer, String> fieldsRow() {
-        return (Row2) super.fieldsRow();
+    public Row15<Integer, String, LocalDateTime, LocalDateTime, Integer, Integer, Integer, Integer, Integer, Double, Double, Double, Double, Double, Double> fieldsRow() {
+        return (Row15) super.fieldsRow();
     }
 }

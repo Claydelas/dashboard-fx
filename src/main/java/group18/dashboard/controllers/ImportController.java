@@ -35,6 +35,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 
+import static group18.dashboard.database.tables.Campaign.CAMPAIGN;
 import static group18.dashboard.database.tables.Click.CLICK;
 import static group18.dashboard.database.tables.Impression.IMPRESSION;
 import static group18.dashboard.database.tables.Interaction.INTERACTION;
@@ -54,6 +55,7 @@ public class ImportController {
     public StackPane panes;
     public TextField zipPath;
     public Button browseZip;
+    public TextField campaignNameField;
 
     DSLContext query;
     ExecutorService executor;
@@ -123,6 +125,11 @@ public class ImportController {
         return false;
     }
 
+    public String generateCampaignName(){
+        String name = campaignNameField.getText();
+        return name.isBlank() ? "Campaign " + (query.selectCount().from(CAMPAIGN).fetchOne(DSL.count()) + 1) : name;
+    }
+
     public void importFolder() {
         if (isValidFolder(folder)) {
             Arrays.stream(folder.listFiles()).forEach(file -> {
@@ -175,33 +182,25 @@ public class ImportController {
     }
 
     public void selectImpressionLog() {
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Select Impression Log");
-        fileChooser.getExtensionFilters().add(
-                new FileChooser.ExtensionFilter("Impression Log", "*.csv"));
-        File impressionLog = fileChooser.showOpenDialog(importForm.getScene().getWindow());
-        if (impressionLog == null) return;
-        impressionLogPath.setText(impressionLog.getAbsolutePath());
+        selectLog("Impression Log", impressionLogPath);
     }
 
     public void selectClickLog() {
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Select Click Log");
-        fileChooser.getExtensionFilters().add(
-                new FileChooser.ExtensionFilter("Click Log", "*.csv"));
-        File clickLog = fileChooser.showOpenDialog(importForm.getScene().getWindow());
-        if (clickLog == null) return;
-        clickLogPath.setText(clickLog.getAbsolutePath());
+        selectLog("Click Log", clickLogPath);
     }
 
     public void selectInteractionLog() {
+        selectLog("Server Log", interactionLogPath);
+    }
+
+    public void selectLog(String fileType, TextField pathField) {
         FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Select Server Log");
+        fileChooser.setTitle("Select " + fileType);
         fileChooser.getExtensionFilters().add(
-                new FileChooser.ExtensionFilter("Server Log", "*.csv"));
-        File interactionLog = fileChooser.showOpenDialog(importForm.getScene().getWindow());
-        if (interactionLog == null) return;
-        interactionLogPath.setText(interactionLog.getAbsolutePath());
+                new FileChooser.ExtensionFilter(fileType, "*.csv"));
+        File log = fileChooser.showOpenDialog(importForm.getScene().getWindow());
+        if (log == null) return;
+        pathField.setText(log.getAbsolutePath());
     }
 
     @FXML
