@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import com.jfoenix.controls.JFXComboBox?>
+<?import java.lang.String?>
+<?import javafx.collections.FXCollections?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.CheckBox?>
@@ -12,9 +14,6 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
-
-<?import javafx.collections.*?>
-<?import java.lang.String?>
 
 <GridPane hgap="10.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="550.0" vgap="10.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="group18.dashboard.controllers.ChartFactory">
    <columnConstraints>
@@ -85,17 +84,17 @@
       <JFXComboBox fx:id="metricComboBox" maxWidth="1.7976931348623157E308" promptText="Metric" GridPane.columnIndex="1" GridPane.rowIndex="2" GridPane.valignment="TOP">
          <items>
             <FXCollections fx:factory="observableArrayList">
-               <String fx:value="Impressions"/>
-               <String fx:value="Clicks"/>
-               <String fx:value="Uniques"/>
-               <String fx:value="Bounces"/>
-               <String fx:value="Conversions"/>
-               <String fx:value="Total Cost"/>
-               <String fx:value="Click-through-rate"/>
-               <String fx:value="Cost-per-acquisition"/>
-               <String fx:value="Cost-per-click"/>
-               <String fx:value="Cost-per-mille"/>
-               <String fx:value="Bounce Rate"/>
+               <String fx:value="Impressions" />
+               <String fx:value="Clicks" />
+               <String fx:value="Uniques" />
+               <String fx:value="Bounces" />
+               <String fx:value="Conversions" />
+               <String fx:value="Total Cost" />
+               <String fx:value="Click-through-rate" />
+               <String fx:value="Cost-per-acquisition" />
+               <String fx:value="Cost-per-click" />
+               <String fx:value="Cost-per-mille" />
+               <String fx:value="Bounce Rate" />
             </FXCollections>
          </items>
       </JFXComboBox>
@@ -113,7 +112,7 @@
             <JFXComboBox fx:id="chartTypeComboBox" minWidth="-Infinity" promptText="Chart type">
                <items>
                   <FXCollections fx:factory="observableArrayList">
-                     <String fx:value="Line Chart"/>
+                     <String fx:value="Line Chart" />
                   </FXCollections>
                </items>
             </JFXComboBox>

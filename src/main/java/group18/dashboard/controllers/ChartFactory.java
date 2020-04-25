@@ -262,7 +262,7 @@ public class ChartFactory {
             return field.ge(from.atStartOfDay());
         }
         if (to != null) {
-            return field.le(to.atStartOfDay());
+            return field.lt(to.atStartOfDay());
         }
         return DSL.noCondition();
     }

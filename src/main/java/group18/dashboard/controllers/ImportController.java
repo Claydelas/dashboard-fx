@@ -5,14 +5,11 @@ import group18.dashboard.database.enums.ImpressionAge;
 import group18.dashboard.database.enums.ImpressionContext;
 import group18.dashboard.database.enums.ImpressionGender;
 import group18.dashboard.database.enums.ImpressionIncome;
-import group18.dashboard.model.Campaign;
 import group18.dashboard.util.DB;
-import group18.dashboard.util.Parsing;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
@@ -29,9 +26,8 @@ import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
-import java.util.concurrent.CountDownLatch;
+import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
@@ -40,6 +36,8 @@ import static group18.dashboard.database.tables.Campaign.CAMPAIGN;
 import static group18.dashboard.database.tables.Click.CLICK;
 import static group18.dashboard.database.tables.Impression.IMPRESSION;
 import static group18.dashboard.database.tables.Interaction.INTERACTION;
+import static group18.dashboard.util.Parsing.dateFormat;
+import static group18.dashboard.util.Parsing.toEnum;
 
 public class ImportController {
 
@@ -57,63 +55,62 @@ public class ImportController {
     public TextField zipPath;
     public Button browseZip;
     public TextField campaignNameField;
-
     DSLContext query;
     ExecutorService executor;
-    DashboardController parentController;
     File folder;
+    private int campaignID;
 
-
-    private Consumer<String> toClick = (line) -> {
+    private final Consumer<String> toClick = (line) -> {
         String[] columns = line.split(",");
 
         query.insertInto(CLICK,
                 CLICK.DATE, CLICK.USER, CLICK.COST, CLICK.CID)
                 .values(
-                        LocalDateTime.parse(columns[0], DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
+                        LocalDateTime.parse(columns[0], dateFormat),
                         Long.valueOf(columns[1]),
                         Double.valueOf(columns[2]),
-                        1)
+                        campaignID)
                 .execute();
     };
-    private Consumer<String> toInteraction = (line) -> {
+    private final Consumer<String> toInteraction = (line) -> {
         String[] columns = line.split(",");
 
         query.insertInto(INTERACTION,
                 INTERACTION.ENTRY_DATE, INTERACTION.USER, INTERACTION.EXIT_DATE,
                 INTERACTION.VIEWS, INTERACTION.CONVERSION, INTERACTION.CID)
                 .values(
-                        LocalDateTime.parse(columns[0], DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
+                        LocalDateTime.parse(columns[0], dateFormat),
                         Long.valueOf(columns[1]),
-                        !columns[2].equals("n/a") ? LocalDateTime.parse(columns[2], DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) : null,
+                        !columns[2].equals("n/a") ? LocalDateTime.parse(columns[2], dateFormat) : null,
                         Integer.parseInt(columns[3]),
                         columns[4].equalsIgnoreCase("Yes"),
-                        1)
+                        campaignID)
                 .execute();
     };
-    private Consumer<String> toImpression = (line) -> {
+    private final Consumer<String> toImpression = (line) -> {
         String[] columns = line.split(",");
 
         query.insertInto(IMPRESSION,
                 IMPRESSION.DATE, IMPRESSION.USER, IMPRESSION.GENDER, IMPRESSION.AGE,
                 IMPRESSION.INCOME, IMPRESSION.CONTEXT, IMPRESSION.COST, IMPRESSION.CID)
                 .values(
-                        LocalDateTime.parse(columns[0], DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
+                        LocalDateTime.parse(columns[0], dateFormat),
                         Long.valueOf(columns[1]),
                         ImpressionGender.valueOf(columns[2]),
-                        (ImpressionAge) Parsing.toEnum(columns[3]),
+                        (ImpressionAge) toEnum(columns[3]),
                         ImpressionIncome.valueOf(columns[4]),
-                        (ImpressionContext) Parsing.toEnum(columns[5]),
+                        (ImpressionContext) toEnum(columns[5]),
                         Double.valueOf(columns[6]),
-                        1)
+                        campaignID)
                 .execute();
     };
 
     boolean isValidFolder(File dir) {
-        if (dir != null && dir.isDirectory()) {
+        if (dir == null) return false;
+        if (dir.isDirectory()) {
             File[] files = dir.listFiles();
-            if (files != null && !(Arrays.stream(files).allMatch(file -> file.getName().equals("click_log.csv")
-                    || file.getName().equals("impression_log.csv") || file.getName().equals("server_log.csv")))) {
+            if (files != null && Arrays.stream(files).noneMatch(file -> file.getName().equals("click_log.csv")
+                    || file.getName().equals("impression_log.csv") || file.getName().equals("server_log.csv"))) {
                 Alert alert = new Alert(Alert.AlertType.ERROR);
                 alert.setTitle("Missing files");
                 alert.setHeaderText(null);
@@ -126,14 +123,29 @@ public class ImportController {
         return false;
     }
 
+    // returns the text of the name textfield or generates a name (Campaign ID) if the textfield is empty
     public String generateCampaignName() {
         String name = campaignNameField.getText();
         return name.isBlank() ? "Campaign " + (query.selectCount().from(CAMPAIGN).fetchOne(DSL.count()) + 1) : name;
     }
 
+    // inserts a new entry to the Campaign table and sets the uniquely generated id as a member variable
+    private void insertCampaign() {
+        String campaignName = generateCampaignName();
+        campaignID = query
+                .insertInto(CAMPAIGN, CAMPAIGN.NAME)
+                .values(campaignName)
+                .returningResult(CAMPAIGN.CID)
+                .fetchOne().value1();
+        System.out.println("Added new campaign " + campaignName + " with id: " + campaignID);
+    }
+
     public void importFolder() {
         if (isValidFolder(folder)) {
-            Arrays.stream(folder.listFiles()).forEach(file -> {
+
+            insertCampaign();
+
+            Arrays.stream(Objects.requireNonNull(folder.listFiles())).forEach(file -> {
                 try {
                     String name = file.getName();
                     if (name.equals("impression_log.csv"))
@@ -159,6 +171,9 @@ public class ImportController {
             if (Files.isReadable(Paths.get(impressions))
                     && Files.isReadable(Paths.get(clicks))
                     && Files.isReadable(Paths.get(interactions))) {
+
+                insertCampaign();
+
                 executor.execute(() -> parse(impressions, toImpression));
                 executor.execute(() -> parse(clicks, toClick));
                 executor.execute(() -> parse(interactions, toInteraction));
@@ -220,75 +235,28 @@ public class ImportController {
     }
 
     public void parse(String path, Consumer<String> consumer) {
-        System.out.println("tried parsing " + path);
+        System.out.println("Debug: Attempted parsing of " + path);
     }
 
     public void parse2(String path, Consumer<String> consumer) throws Exception {
         File file = new File(path);
+
         System.out.println("Parsing " + file.getAbsolutePath());
+        long startTime = System.currentTimeMillis();
+
         BufferedReader input = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
         input.lines().parallel().skip(1).forEach(consumer);
         input.close();
-        System.out.println("Done parsing " + file.getAbsolutePath());
-    }
 
-    public void importCampaign() {
-
-        System.out.println("--Parsing Campaign--");
-
-        CountDownLatch latch = new CountDownLatch(3);
-        Campaign in = new Campaign();
-
-        executor.execute(() -> {
-            try {
-                long startTime = System.currentTimeMillis();
-                in.updateClicks(folder.getAbsolutePath());
-                long endTime = System.currentTimeMillis();
-                System.out.println("Parsed " + in.getClicks().size() + " clicks in " + (endTime - startTime) + "ms");
-                latch.countDown();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
-        executor.execute(() ->
-        {
-            try {
-                long startTime = System.currentTimeMillis();
-                in.updateImpressions(folder.getAbsolutePath());
-                long endTime = System.currentTimeMillis();
-                System.out.println("Parsed " + in.getImpressions().size() + " impressions in " + (endTime - startTime) + "ms");
-                latch.countDown();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
-        executor.execute(() -> {
-            try {
-                long startTime = System.currentTimeMillis();
-                in.updateInteractions(folder.getAbsolutePath());
-                long endTime = System.currentTimeMillis();
-                System.out.println("Parsed " + in.getInteractions().size() + " interactions in " + (endTime - startTime) + "ms");
-                latch.countDown();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
-        executor.execute(() -> {
-            try {
-                latch.await();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            parentController.updateMetrics(executor);
-        });
-        executor.shutdown();
+        long endTime = System.currentTimeMillis();
+        System.out.println("Done parsing " + file.getAbsolutePath() + " in " + (endTime - startTime) + "ms");
     }
 
     public void selectZip() {
-
+        //TODO
     }
 
     public void importZip() {
-
+        //TODO
     }
 }
