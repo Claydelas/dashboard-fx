@@ -11,6 +11,7 @@ import group18.dashboard.database.enums.ImpressionGender;
 import group18.dashboard.database.enums.ImpressionIncome;
 import group18.dashboard.util.DB;
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
@@ -38,6 +39,7 @@ import java.time.LocalDateTime;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import static group18.dashboard.database.tables.Campaign.CAMPAIGN;
 import static group18.dashboard.database.tables.Click.CLICK;
 import static group18.dashboard.database.tables.Impression.IMPRESSION;
 import static org.jooq.impl.DSL.select;
@@ -67,15 +69,22 @@ public class ChartFactory {
     public Button addChart;
     public DatePicker fromDate;
     public DatePicker toDate;
+    DSLContext query;
+    ExecutorService executor;
     private FlowPane dashboardArea;
 
     @FXML
     public void initialize() {
+
+        query = DSL.using(DB.connection(), SQLDialect.H2);
+        executor = Executors.newWorkStealingPool();
+
+        campaignComboBox.setItems(FXCollections.observableArrayList(
+                query.select(CAMPAIGN.NAME).from(CAMPAIGN).fetch(CAMPAIGN.NAME)));
+
         metricComboBox.setValidators(new RequiredFieldValidator());
         campaignComboBox.setValidators(new RequiredFieldValidator());
         chartTypeComboBox.setValidators(new RequiredFieldValidator());
-        fromDate.valueProperty().addListener(observable -> getDateRange(IMPRESSION.DATE));
-        toDate.valueProperty().addListener(observable -> getDateRange(CLICK.DATE));
     }
 
     public void setChartPane(FlowPane p) {
@@ -84,11 +93,15 @@ public class ChartFactory {
 
     public void addChartAction() {
         // validates all required fields on entry
-        if (!chartTypeComboBox.validate() /*|| !campaignComboBox.validate()*/ || !metricComboBox.validate()) return;
+        if (!chartTypeComboBox.validate() || !campaignComboBox.validate() || !metricComboBox.validate()) return;
 
-        ExecutorService executor = Executors.newWorkStealingPool();
-
-        DSLContext query = DSL.using(DB.connection(), SQLDialect.H2);
+        final String campaignName = campaignComboBox.getSelectionModel().getSelectedItem();
+        final int campaignID = query
+                .select(CAMPAIGN.CID)
+                .from(CAMPAIGN)
+                .where(CAMPAIGN.NAME.eq(campaignName))
+                .fetchOne()
+                .value1();
 
         executor.execute(() -> {
 
@@ -110,21 +123,25 @@ public class ChartFactory {
                     chart.getData().add(ViewDataParser.getSeriesOf(
                             "Impressions",
                             query
-                                    .select()
+                                    .select(IMPRESSION.DATE)
                                     .from(IMPRESSION)
-                                    .where(getFilter().and(getDateRange(IMPRESSION.DATE)))
+                                    .where(IMPRESSION.CID.eq(campaignID)
+                                            .and(getFilter())
+                                            .and(getDateRange(IMPRESSION.DATE)))
                                     .fetch(IMPRESSION.DATE)));
                     break;
                 case "Clicks":
                     chart.getData().add(ViewDataParser.getSeriesOf(
                             "Clicks",
                             query
-                                    .select()
+                                    .select(CLICK.DATE)
                                     .from(CLICK)
-                                    .where(CLICK.USER.in(
-                                            select(IMPRESSION.USER)
-                                                    .from(IMPRESSION)
-                                                    .where(getFilter()))
+                                    .where(CLICK.CID.eq(campaignID)
+                                            .and(CLICK.USER.in(
+                                                    select(IMPRESSION.USER)
+                                                            .from(IMPRESSION)
+                                                            .where(IMPRESSION.CID.eq(campaignID)
+                                                                    .and(getFilter()))))
                                             .and(getDateRange(CLICK.DATE)))
                                     .fetch(CLICK.DATE)));
                     break;
@@ -134,10 +151,12 @@ public class ChartFactory {
                                     .select(CLICK.DATE)
                                     .distinctOn(CLICK.USER)
                                     .from(CLICK)
-                                    .where(CLICK.USER.in(
-                                            select(IMPRESSION.USER)
-                                                    .from(IMPRESSION)
-                                                    .where(getFilter()))
+                                    .where(CLICK.CID.eq(campaignID)
+                                            .and(CLICK.USER.in(
+                                                    select(IMPRESSION.USER)
+                                                            .from(IMPRESSION)
+                                                            .where(IMPRESSION.CID.eq(campaignID)
+                                                                    .and(getFilter()))))
                                             .and(getDateRange(CLICK.DATE)))
                                     .fetch(CLICK.DATE)));
                     break;
@@ -248,7 +267,7 @@ public class ChartFactory {
         if (filterHigh.isSelected()) subcondition = subcondition.or(IMPRESSION.INCOME.eq(ImpressionIncome.High));
         filter = filter.and(subcondition);
 
-        System.out.println(filter);
+        System.out.println("Applied filter: " + filter);
         return filter;
     }
 

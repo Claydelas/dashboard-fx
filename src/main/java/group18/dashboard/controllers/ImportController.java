@@ -1,10 +1,6 @@
 package group18.dashboard.controllers;
 
 import com.jfoenix.controls.JFXComboBox;
-import group18.dashboard.database.enums.ImpressionAge;
-import group18.dashboard.database.enums.ImpressionContext;
-import group18.dashboard.database.enums.ImpressionGender;
-import group18.dashboard.database.enums.ImpressionIncome;
 import group18.dashboard.util.DB;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
@@ -25,7 +21,6 @@ import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
@@ -33,11 +28,7 @@ import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 
 import static group18.dashboard.database.tables.Campaign.CAMPAIGN;
-import static group18.dashboard.database.tables.Click.CLICK;
-import static group18.dashboard.database.tables.Impression.IMPRESSION;
-import static group18.dashboard.database.tables.Interaction.INTERACTION;
-import static group18.dashboard.util.Parsing.dateFormat;
-import static group18.dashboard.util.Parsing.toEnum;
+import static group18.dashboard.util.Parsing.*;
 
 public class ImportController {
 
@@ -59,51 +50,6 @@ public class ImportController {
     ExecutorService executor;
     File folder;
     private int campaignID;
-
-    private final Consumer<String> toClick = (line) -> {
-        String[] columns = line.split(",");
-
-        query.insertInto(CLICK,
-                CLICK.DATE, CLICK.USER, CLICK.COST, CLICK.CID)
-                .values(
-                        LocalDateTime.parse(columns[0], dateFormat),
-                        Long.valueOf(columns[1]),
-                        Double.valueOf(columns[2]),
-                        campaignID)
-                .execute();
-    };
-    private final Consumer<String> toInteraction = (line) -> {
-        String[] columns = line.split(",");
-
-        query.insertInto(INTERACTION,
-                INTERACTION.ENTRY_DATE, INTERACTION.USER, INTERACTION.EXIT_DATE,
-                INTERACTION.VIEWS, INTERACTION.CONVERSION, INTERACTION.CID)
-                .values(
-                        LocalDateTime.parse(columns[0], dateFormat),
-                        Long.valueOf(columns[1]),
-                        !columns[2].equals("n/a") ? LocalDateTime.parse(columns[2], dateFormat) : null,
-                        Integer.parseInt(columns[3]),
-                        columns[4].equalsIgnoreCase("Yes"),
-                        campaignID)
-                .execute();
-    };
-    private final Consumer<String> toImpression = (line) -> {
-        String[] columns = line.split(",");
-
-        query.insertInto(IMPRESSION,
-                IMPRESSION.DATE, IMPRESSION.USER, IMPRESSION.GENDER, IMPRESSION.AGE,
-                IMPRESSION.INCOME, IMPRESSION.CONTEXT, IMPRESSION.COST, IMPRESSION.CID)
-                .values(
-                        LocalDateTime.parse(columns[0], dateFormat),
-                        Long.valueOf(columns[1]),
-                        ImpressionGender.valueOf(columns[2]),
-                        (ImpressionAge) toEnum(columns[3]),
-                        ImpressionIncome.valueOf(columns[4]),
-                        (ImpressionContext) toEnum(columns[5]),
-                        Double.valueOf(columns[6]),
-                        campaignID)
-                .execute();
-    };
 
     boolean isValidFolder(File dir) {
         if (dir == null) return false;
@@ -137,7 +83,7 @@ public class ImportController {
                 .values(campaignName)
                 .returningResult(CAMPAIGN.CID)
                 .fetchOne().value1();
-        System.out.println("Added new campaign " + campaignName + " with id: " + campaignID);
+        System.out.println("Added new campaign \"" + campaignName + "\" with id: " + campaignID);
     }
 
     public void importFolder() {
@@ -149,11 +95,11 @@ public class ImportController {
                 try {
                     String name = file.getName();
                     if (name.equals("impression_log.csv"))
-                        executor.execute(() -> parse(file.getAbsolutePath(), toImpression));
+                        executor.execute(() -> parse(file.getAbsolutePath(), toImpression(query, campaignID)));
                     if (name.equals("click_log.csv"))
-                        executor.execute(() -> parse(file.getAbsolutePath(), toClick));
+                        executor.execute(() -> parse(file.getAbsolutePath(), toClick(query, campaignID)));
                     if (name.equals("server_log.csv"))
-                        executor.execute(() -> parse(file.getAbsolutePath(), toInteraction));
+                        executor.execute(() -> parse(file.getAbsolutePath(), toInteraction(query, campaignID)));
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -174,9 +120,9 @@ public class ImportController {
 
                 insertCampaign();
 
-                executor.execute(() -> parse(impressions, toImpression));
-                executor.execute(() -> parse(clicks, toClick));
-                executor.execute(() -> parse(interactions, toInteraction));
+                executor.execute(() -> parse(impressions, toImpression(query, campaignID)));
+                executor.execute(() -> parse(clicks, toClick(query, campaignID)));
+                executor.execute(() -> parse(interactions, toInteraction(query, campaignID)));
                 //update progress here
                 exit();
             }
