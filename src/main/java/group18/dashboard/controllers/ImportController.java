@@ -14,6 +14,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -50,7 +51,7 @@ public class ImportController {
     public Button browseInteractionLog;
     public TextField folderPath;
     public Button browseFolder;
-    public GridPane importForm;
+    public VBox importForm;
     public JFXComboBox<String> source;
     public StackPane panes;
     public TextField zipPath;
@@ -125,7 +126,7 @@ public class ImportController {
         return false;
     }
 
-    public String generateCampaignName(){
+    public String generateCampaignName() {
         String name = campaignNameField.getText();
         return name.isBlank() ? "Campaign " + (query.selectCount().from(CAMPAIGN).fetchOne(DSL.count()) + 1) : name;
     }
