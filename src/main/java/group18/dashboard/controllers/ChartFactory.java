@@ -21,6 +21,7 @@ import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.DatePicker;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.Dragboard;
@@ -29,11 +30,11 @@ import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
-import org.jooq.Condition;
-import org.jooq.DSLContext;
-import org.jooq.SQLDialect;
+import org.jooq.*;
 import org.jooq.impl.DSL;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -64,6 +65,8 @@ public class ChartFactory {
     public JFXComboBox<String> campaignComboBox;
     public JFXComboBox<String> chartTypeComboBox;
     public Button addChart;
+    public DatePicker fromDate;
+    public DatePicker toDate;
     private FlowPane dashboardArea;
 
     @FXML
@@ -71,7 +74,8 @@ public class ChartFactory {
         metricComboBox.setValidators(new RequiredFieldValidator());
         campaignComboBox.setValidators(new RequiredFieldValidator());
         chartTypeComboBox.setValidators(new RequiredFieldValidator());
-
+        fromDate.valueProperty().addListener(observable -> getDateRange(IMPRESSION.DATE));
+        toDate.valueProperty().addListener(observable -> getDateRange(CLICK.DATE));
     }
 
     public void setChartPane(FlowPane p) {
@@ -87,15 +91,10 @@ public class ChartFactory {
         DSLContext query = DSL.using(DB.connection(), SQLDialect.H2);
 
         executor.execute(() -> {
-            /*Campaign temp = new Campaign();
-            try {
-                temp.updateImpressions("D:\\Projects\\Java\\2_week_campaign");
-            } catch (Exception e) {
-                e.printStackTrace();
-            }*/
 
             final XYChart<String, Number> chart;
 
+            // CHART TYPE SELECTION LOGIC
             switch (chartTypeComboBox.getSelectionModel().getSelectedItem()) {
                 case "Line Chart":
                     chart = new LineChart<>(new CategoryAxis(), new NumberAxis());
@@ -105,8 +104,7 @@ public class ChartFactory {
                     chart = new LineChart<>(new CategoryAxis(), new NumberAxis());
             }
 
-            //ObservableList<XYChart.Data<String, Number>> data = FXCollections.observableArrayList();
-
+            // METRIC SELECTION LOGIC
             switch (metricComboBox.getSelectionModel().getSelectedItem()) {
                 case "Impressions":
                     chart.getData().add(ViewDataParser.getSeriesOf(
@@ -114,7 +112,7 @@ public class ChartFactory {
                             query
                                     .select()
                                     .from(IMPRESSION)
-                                    .where(getFilter())
+                                    .where(getFilter().and(getDateRange(IMPRESSION.DATE)))
                                     .fetch(IMPRESSION.DATE)));
                     break;
                 case "Clicks":
@@ -126,18 +124,21 @@ public class ChartFactory {
                                     .where(CLICK.USER.in(
                                             select(IMPRESSION.USER)
                                                     .from(IMPRESSION)
-                                                    .where(getFilter())))
+                                                    .where(getFilter()))
+                                            .and(getDateRange(CLICK.DATE)))
                                     .fetch(CLICK.DATE)));
                     break;
                 case "Uniques":
                     chart.getData().add(ViewDataParser.getSeriesOf("Uniques",
                             query
-                                    .selectDistinct(CLICK.DATE)
+                                    .select(CLICK.DATE)
+                                    .distinctOn(CLICK.USER)
                                     .from(CLICK)
                                     .where(CLICK.USER.in(
                                             select(IMPRESSION.USER)
                                                     .from(IMPRESSION)
-                                                    .where(getFilter())))
+                                                    .where(getFilter()))
+                                            .and(getDateRange(CLICK.DATE)))
                                     .fetch(CLICK.DATE)));
                     break;
             }
@@ -249,5 +250,20 @@ public class ChartFactory {
 
         System.out.println(filter);
         return filter;
+    }
+
+    public <R extends Record> Condition getDateRange(TableField<R, LocalDateTime> field) {
+        LocalDate from = fromDate.getValue();
+        LocalDate to = toDate.getValue();
+        if (from != null && to != null) {
+            return field.between(from.atStartOfDay(), to.atStartOfDay());
+        }
+        if (from != null) {
+            return field.ge(from.atStartOfDay());
+        }
+        if (to != null) {
+            return field.le(to.atStartOfDay());
+        }
+        return DSL.noCondition();
     }
 }
