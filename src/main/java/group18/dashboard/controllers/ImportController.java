@@ -15,10 +15,7 @@ import org.jooq.DSLContext;
 import org.jooq.SQLDialect;
 import org.jooq.impl.DSL;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -95,11 +92,20 @@ public class ImportController {
                 try {
                     String name = file.getName();
                     if (name.equals("impression_log.csv"))
-                        executor.execute(() -> parse(file.getAbsolutePath(), toImpression(query, campaignID)));
+                        executor.execute(() -> {
+                            parse(file.getAbsolutePath(), toImpression(query, campaignID));
+                            DB.commit();
+                        });
                     if (name.equals("click_log.csv"))
-                        executor.execute(() -> parse(file.getAbsolutePath(), toClick(query, campaignID)));
+                        executor.execute(() -> {
+                            parse(file.getAbsolutePath(), toClick(query, campaignID));
+                            DB.commit();
+                        });
                     if (name.equals("server_log.csv"))
-                        executor.execute(() -> parse(file.getAbsolutePath(), toInteraction(query, campaignID)));
+                        executor.execute(() -> {
+                            parse(file.getAbsolutePath(), toInteraction(query, campaignID));
+                            DB.commit();
+                        });
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -120,9 +126,18 @@ public class ImportController {
 
                 insertCampaign();
 
-                executor.execute(() -> parse(impressions, toImpression(query, campaignID)));
-                executor.execute(() -> parse(clicks, toClick(query, campaignID)));
-                executor.execute(() -> parse(interactions, toInteraction(query, campaignID)));
+                executor.execute(() -> {
+                    parse(impressions, toImpression(query, campaignID));
+                    DB.commit();
+                });
+                executor.execute(() -> {
+                    parse(clicks, toClick(query, campaignID));
+                    DB.commit();
+                });
+                executor.execute(() -> {
+                    parse(interactions, toInteraction(query, campaignID));
+                    DB.commit();
+                });
                 //update progress here
                 exit();
             }
@@ -180,19 +195,23 @@ public class ImportController {
 
     }
 
-    public void parse(String path, Consumer<String> consumer) {
+    public void parse2(String path, Consumer<String> consumer) {
         System.out.println("Debug: Attempted parsing of " + path);
     }
 
-    public void parse2(String path, Consumer<String> consumer) throws Exception {
+    public void parse(String path, Consumer<String> consumer) {
         File file = new File(path);
 
         System.out.println("Parsing " + file.getAbsolutePath());
         long startTime = System.currentTimeMillis();
 
-        BufferedReader input = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
-        input.lines().parallel().skip(1).forEach(consumer);
-        input.close();
+        try {
+            BufferedReader input = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
+            input.lines().skip(1).forEach(consumer);
+            input.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         long endTime = System.currentTimeMillis();
         System.out.println("Done parsing " + file.getAbsolutePath() + " in " + (endTime - startTime) + "ms");

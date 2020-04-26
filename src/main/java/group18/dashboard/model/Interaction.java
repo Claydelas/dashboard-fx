@@ -14,12 +14,12 @@ public class Interaction {
         String[] columns = line.split(",");
         Interaction item = new Interaction();
         try {
-            item.entryDate = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss").parse(columns[0]);
+            item.entryDate = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").parse(columns[0]);
             item.ID = Long.parseLong(columns[1]);
             if (columns[2].equals("n/a")) {
                 item.exitDate = null;
             } else {
-                item.exitDate = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss").parse(columns[2]);
+                item.exitDate = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").parse(columns[2]);
             }
 
             item.pageViews = Integer.parseInt(columns[3]);

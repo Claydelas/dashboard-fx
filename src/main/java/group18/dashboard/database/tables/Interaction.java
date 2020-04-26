@@ -33,7 +33,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Interaction extends TableImpl<InteractionRecord> {
 
-    private static final long serialVersionUID = 628316583;
+    private static final long serialVersionUID = 659385164;
 
     /**
      * The reference instance of <code>PUBLIC.INTERACTION</code>
@@ -133,7 +133,7 @@ public class Interaction extends TableImpl<InteractionRecord> {
 
     @Override
     public List<UniqueKey<InteractionRecord>> getKeys() {
-        return Arrays.<UniqueKey<InteractionRecord>>asList(Keys.UNIQUEINTERACTION, Keys.INTERACTION_PK);
+        return Arrays.<UniqueKey<InteractionRecord>>asList(Keys.INTERACTION_PK);
     }
 
     @Override

@@ -2,19 +2,19 @@ package group18.dashboard.util;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.Properties;
 
 public class DB {
 
-    static Properties properties;
     static Connection connection;
+    static Properties properties;
 
     /**
      * Get a fresh connection from H2.
      */
     public static Connection connection() {
         if (connection == null) {
-            //System.getProperties().setProperty("org.jooq.no-logo", "true");
             try {
                 Class.forName(driver());
 
@@ -22,7 +22,7 @@ public class DB {
                         url(),
                         username(),
                         password());
-                //connection.setAutoCommit(false);
+                connection.setAutoCommit(false);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -45,6 +45,14 @@ public class DB {
 
     public static String driver() {
         return properties().getProperty("db.driver");
+    }
+
+    public static void commit() {
+        try {
+            connection.commit();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     /**

@@ -74,7 +74,7 @@ public class DashboardController {
         }
     }
 
-    private void bindMetrics(Campaign campaign) {
+    /*private void bindMetrics(Campaign campaign) {
         impressions.textProperty().bind(campaign.impressionCountProperty().asString("Impressions: %,d"));
         clicks.textProperty().bind(campaign.clickCountProperty().asString("Clicks: %,d"));
         uniques.textProperty().bind(campaign.uniquesProperty().asString("Uniques: %,d"));
@@ -86,7 +86,7 @@ public class DashboardController {
         cpc.textProperty().bind(campaign.cpcProperty().asString("Cost-per-click: \u00A3%.2f"));
         cpm.textProperty().bind(campaign.cpmProperty().asString("Cost-per-mille: \u00A3%.2f"));
         bounceRate.textProperty().bind(campaign.bounceRateProperty().asString("Bounce Rate: %.2f%%"));
-    }
+    }*/
 
     public void newChartButtonAction() {
         try {

@@ -41,10 +41,8 @@ public class Keys {
     // -------------------------------------------------------------------------
 
     public static final UniqueKey<CampaignRecord> CAMPAIGN_PK = UniqueKeys0.CAMPAIGN_PK;
-    public static final UniqueKey<ClickRecord> UNIQUECLICK = UniqueKeys0.UNIQUECLICK;
     public static final UniqueKey<ClickRecord> CLICK_PK = UniqueKeys0.CLICK_PK;
     public static final UniqueKey<ImpressionRecord> IMPRESSION_PK = UniqueKeys0.IMPRESSION_PK;
-    public static final UniqueKey<InteractionRecord> UNIQUEINTERACTION = UniqueKeys0.UNIQUEINTERACTION;
     public static final UniqueKey<InteractionRecord> INTERACTION_PK = UniqueKeys0.INTERACTION_PK;
 
     // -------------------------------------------------------------------------
@@ -68,10 +66,8 @@ public class Keys {
 
     private static class UniqueKeys0 {
         public static final UniqueKey<CampaignRecord> CAMPAIGN_PK = Internal.createUniqueKey(Campaign.CAMPAIGN, "CAMPAIGN_PK", new TableField[] { Campaign.CAMPAIGN.CID }, true);
-        public static final UniqueKey<ClickRecord> UNIQUECLICK = Internal.createUniqueKey(Click.CLICK, "UNIQUECLICK", new TableField[] { Click.CLICK.DATE, Click.CLICK.USER }, true);
         public static final UniqueKey<ClickRecord> CLICK_PK = Internal.createUniqueKey(Click.CLICK, "CLICK_PK", new TableField[] { Click.CLICK.CLICKID }, true);
         public static final UniqueKey<ImpressionRecord> IMPRESSION_PK = Internal.createUniqueKey(Impression.IMPRESSION, "IMPRESSION_PK", new TableField[] { Impression.IMPRESSION.IMPRESSIONID }, true);
-        public static final UniqueKey<InteractionRecord> UNIQUEINTERACTION = Internal.createUniqueKey(Interaction.INTERACTION, "UNIQUEINTERACTION", new TableField[] { Interaction.INTERACTION.ENTRY_DATE, Interaction.INTERACTION.USER }, true);
         public static final UniqueKey<InteractionRecord> INTERACTION_PK = Internal.createUniqueKey(Interaction.INTERACTION, "INTERACTION_PK", new TableField[] { Interaction.INTERACTION.INTERACTIONID }, true);
     }
 

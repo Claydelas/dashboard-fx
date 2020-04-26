@@ -33,7 +33,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Click extends TableImpl<ClickRecord> {
 
-    private static final long serialVersionUID = 480793172;
+    private static final long serialVersionUID = -59059707;
 
     /**
      * The reference instance of <code>PUBLIC.CLICK</code>
@@ -123,7 +123,7 @@ public class Click extends TableImpl<ClickRecord> {
 
     @Override
     public List<UniqueKey<ClickRecord>> getKeys() {
-        return Arrays.<UniqueKey<ClickRecord>>asList(Keys.UNIQUECLICK, Keys.CLICK_PK);
+        return Arrays.<UniqueKey<ClickRecord>>asList(Keys.CLICK_PK);
     }
 
     @Override
