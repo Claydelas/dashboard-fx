@@ -4,7 +4,6 @@
 package group18.dashboard.database.tables;
 
 
-import group18.dashboard.database.Indexes;
 import group18.dashboard.database.Keys;
 import group18.dashboard.database.Public;
 import group18.dashboard.database.enums.ImpressionAge;
@@ -20,7 +19,6 @@ import java.util.List;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
 import org.jooq.Identity;
-import org.jooq.Index;
 import org.jooq.Name;
 import org.jooq.Record;
 import org.jooq.Row9;
@@ -39,7 +37,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Impression extends TableImpl<ImpressionRecord> {
 
-    private static final long serialVersionUID = -382539833;
+    private static final long serialVersionUID = 1989403806;
 
     /**
      * The reference instance of <code>PUBLIC.IMPRESSION</code>
@@ -135,11 +133,6 @@ public class Impression extends TableImpl<ImpressionRecord> {
     @Override
     public Schema getSchema() {
         return Public.PUBLIC;
-    }
-
-    @Override
-    public List<Index> getIndexes() {
-        return Arrays.<Index>asList(Indexes.USERINDEX);
     }
 
     @Override

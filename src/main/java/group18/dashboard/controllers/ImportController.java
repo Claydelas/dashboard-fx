@@ -110,7 +110,7 @@ public class ImportController {
                     e.printStackTrace();
                 }
             });
-            //update progress here
+            //TODO update progress indicator
         } else return;
         exit();
     }
@@ -138,7 +138,7 @@ public class ImportController {
                     parse(interactions, toInteraction(query, campaignID));
                     DB.commit();
                 });
-                //update progress here
+                //TODO update progress indicator
                 exit();
             }
         }

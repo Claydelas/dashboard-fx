@@ -17,7 +17,7 @@ import org.jooq.ForeignKey;
 import org.jooq.Identity;
 import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Row15;
+import org.jooq.Row16;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
@@ -33,7 +33,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Campaign extends TableImpl<CampaignRecord> {
 
-    private static final long serialVersionUID = 1224373350;
+    private static final long serialVersionUID = -409935300;
 
     /**
      * The reference instance of <code>PUBLIC.CAMPAIGN</code>
@@ -124,6 +124,11 @@ public class Campaign extends TableImpl<CampaignRecord> {
     public final TableField<CampaignRecord, Double> TOTAL_COST = createField(DSL.name("TOTAL_COST"), org.jooq.impl.SQLDataType.DOUBLE, this, "");
 
     /**
+     * The column <code>PUBLIC.CAMPAIGN.PARSED</code>.
+     */
+    public final TableField<CampaignRecord, Boolean> PARSED = createField(DSL.name("PARSED"), org.jooq.impl.SQLDataType.BOOLEAN.nullable(false).defaultValue(org.jooq.impl.DSL.field("FALSE", org.jooq.impl.SQLDataType.BOOLEAN)), this, "");
+
+    /**
      * Create a <code>PUBLIC.CAMPAIGN</code> table reference
      */
     public Campaign() {
@@ -203,11 +208,11 @@ public class Campaign extends TableImpl<CampaignRecord> {
     }
 
     // -------------------------------------------------------------------------
-    // Row15 type methods
+    // Row16 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row15<Integer, String, LocalDateTime, LocalDateTime, Integer, Integer, Integer, Integer, Integer, Double, Double, Double, Double, Double, Double> fieldsRow() {
-        return (Row15) super.fieldsRow();
+    public Row16<Integer, String, LocalDateTime, LocalDateTime, Integer, Integer, Integer, Integer, Integer, Double, Double, Double, Double, Double, Double, Boolean> fieldsRow() {
+        return (Row16) super.fieldsRow();
     }
 }

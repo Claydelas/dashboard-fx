@@ -79,6 +79,7 @@ public class ChartFactory {
         query = DSL.using(DB.connection(), SQLDialect.H2);
         executor = Executors.newWorkStealingPool();
 
+        //TODO display only CAMPAIGN.PARSED entries
         campaignComboBox.setItems(FXCollections.observableArrayList(
                 query.select(CAMPAIGN.NAME).from(CAMPAIGN).fetch(CAMPAIGN.NAME)));
 
@@ -159,6 +160,30 @@ public class ChartFactory {
                                                                     .and(getFilter()))))
                                             .and(getDateRange(CLICK.DATE)))
                                     .fetch(CLICK.DATE)));
+                    break;
+                case "Bounces":
+                    //TODO Bounces Series
+                    break;
+                case "Conversions":
+                    //TODO Conversions Series
+                    break;
+                case "Total Cost":
+                    //TODO Total Cost Series
+                    break;
+                case "Click-through-rate":
+                    //TODO Click-through-rate Series
+                    break;
+                case "Cost-per-acquisition":
+                    //TODO Cost-per-acquisition Series
+                    break;
+                case "Cost-per-click":
+                    //TODO Cost-per-click Series
+                    break;
+                case "Cost-per-mille":
+                    //TODO Cost-per-mille Series
+                    break;
+                case "Bounce Rate":
+                    //TODO Bounce Rate Series
                     break;
             }
             final JFXButton close = new JFXButton();
