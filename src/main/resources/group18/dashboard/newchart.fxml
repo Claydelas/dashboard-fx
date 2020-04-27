@@ -98,13 +98,22 @@
             </FXCollections>
          </items>
       </JFXComboBox>
-      <HBox alignment="CENTER_RIGHT" spacing="5.0" GridPane.columnIndex="2" GridPane.columnSpan="2147483647" GridPane.rowIndex="2">
+      <JFXComboBox fx:id="granularity" GridPane.columnIndex="2" GridPane.rowIndex="2" GridPane.valignment="TOP">
+         <items>
+            <FXCollections fx:factory="observableArrayList">
+               <String fx:value="Hourly" />
+               <String fx:value="Daily" />
+               <String fx:value="Weekly" />
+            </FXCollections>
+         </items>
+      </JFXComboBox>
+      <HBox spacing="5.0" GridPane.columnIndex="3" GridPane.rowIndex="2">
          <children>
-            <Button fx:id="addChart" mnemonicParsing="false" onAction="#addChartAction" text="Add Chart" />
+            <Button fx:id="addChart" mnemonicParsing="false" onAction="#addChartAction" text="Done" />
             <Button fx:id="cancel" mnemonicParsing="false" onAction="#cancelAction" text="Cancel" />
          </children>
          <padding>
-            <Insets bottom="10.0" right="10.0" top="10.0" />
+            <Insets bottom="5.0" right="5.0" top="5.0" />
          </padding>
       </HBox>
       <HBox alignment="CENTER_LEFT" spacing="10.0" GridPane.columnSpan="2147483647">
@@ -117,9 +126,9 @@
                </items>
             </JFXComboBox>
             <Label minWidth="-Infinity" text="from" />
-            <DatePicker fx:id="fromDate" promptText="from" />
+            <DatePicker fx:id="fromDate" promptText="date" />
             <Label minWidth="-Infinity" text="to" />
-            <DatePicker fx:id="toDate" promptText="to" />
+            <DatePicker fx:id="toDate" promptText="date" />
          </children>
       </HBox>
    </children>

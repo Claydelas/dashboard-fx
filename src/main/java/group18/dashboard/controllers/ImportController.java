@@ -1,6 +1,7 @@
 package group18.dashboard.controllers;
 
 import com.jfoenix.controls.JFXComboBox;
+import group18.dashboard.App;
 import group18.dashboard.util.DB;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
@@ -24,6 +25,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 
+import static group18.dashboard.App.*;
 import static group18.dashboard.database.tables.Campaign.CAMPAIGN;
 import static group18.dashboard.util.Parsing.*;
 
@@ -43,7 +45,6 @@ public class ImportController {
     public TextField zipPath;
     public Button browseZip;
     public TextField campaignNameField;
-    DSLContext query;
     ExecutorService executor;
     File folder;
     private int campaignID;

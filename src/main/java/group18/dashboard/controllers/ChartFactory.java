@@ -39,6 +39,7 @@ import java.time.LocalDateTime;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import static group18.dashboard.App.*;
 import static group18.dashboard.database.tables.Campaign.CAMPAIGN;
 import static group18.dashboard.database.tables.Click.CLICK;
 import static group18.dashboard.database.tables.Impression.IMPRESSION;
@@ -69,19 +70,18 @@ public class ChartFactory {
     public Button addChart;
     public DatePicker fromDate;
     public DatePicker toDate;
-    DSLContext query;
+    public JFXComboBox<String> granularity;
     ExecutorService executor;
     private FlowPane dashboardArea;
 
     @FXML
     public void initialize() {
-
-        query = DSL.using(DB.connection(), SQLDialect.H2);
         executor = Executors.newWorkStealingPool();
 
-        //TODO display only CAMPAIGN.PARSED entries
+        granularity.getSelectionModel().select(1);
+
         campaignComboBox.setItems(FXCollections.observableArrayList(
-                query.select(CAMPAIGN.NAME).from(CAMPAIGN).fetch(CAMPAIGN.NAME)));
+                query.select(CAMPAIGN.NAME).from(CAMPAIGN).where(CAMPAIGN.PARSED).fetch(CAMPAIGN.NAME)));
 
         metricComboBox.setValidators(new RequiredFieldValidator());
         campaignComboBox.setValidators(new RequiredFieldValidator());

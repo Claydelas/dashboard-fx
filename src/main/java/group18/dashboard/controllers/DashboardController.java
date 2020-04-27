@@ -21,8 +21,6 @@ import javafx.stage.Stage;
 
 public class DashboardController {
 
-    public NumberAxis yAxis;
-    public CategoryAxis xAxis;
     public StackPane mainView;
     public BorderPane chartPane;
     public Label impressions;
@@ -36,22 +34,11 @@ public class DashboardController {
     public Label cpc;
     public Label cpm;
     public Label bounceRate;
-    public VBox initView;
-    public StackPane loadingProgress;
     public TabPane tabs;
     public FlowPane dashboardArea;
 
     @FXML
     public void initialize() {
-
-        Button debug = new Button("debug");
-        mainView.getChildren().add(debug);
-        StackPane.setAlignment(debug, Pos.TOP_RIGHT);
-        debug.setOnMouseClicked(e -> {
-            mainView.getChildren().remove(initView);
-            mainView.getChildren().remove(debug);
-            chartPane.setVisible(true);
-        });
 
         dashboardArea.prefWrapLengthProperty().bind(dashboardArea.widthProperty());
     }
@@ -66,6 +53,7 @@ public class DashboardController {
             Stage stage = new Stage();
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.setScene(new Scene(importForm));
+            stage.setTitle("Import Campaign Data");
             stage.sizeToScene();
             stage.setResizable(false);
             stage.show();
@@ -99,6 +87,7 @@ public class DashboardController {
             Stage stage = new Stage();
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.setScene(new Scene(chartForm));
+            stage.setTitle("New Chart");
             stage.sizeToScene();
             stage.setResizable(false);
             stage.show();
