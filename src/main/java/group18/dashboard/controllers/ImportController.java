@@ -7,14 +7,12 @@ import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
-import javafx.scene.control.TabPane;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import org.jooq.Result;
 import org.jooq.SQLDialect;
 import org.jooq.impl.DSL;
 
@@ -218,10 +216,14 @@ public class ImportController {
         query = DSL.using(DB.connection(), SQLDialect.H2);
         executor = Executors.newWorkStealingPool();
 
+        panes.getChildren().forEach(node -> node.managedProperty().bind(node.visibleProperty()));
         //changes view depending on combobox selection
         source.getSelectionModel().selectedIndexProperty().addListener((p, o, newval) -> {
-            panes.getChildren().forEach(node -> node.setVisible(false));
+            panes.getChildren().forEach(node -> {
+                node.setVisible(false);
+            });
             panes.getChildren().get(newval.intValue()).setVisible(true);
+            Platform.runLater(() -> importForm.getScene().getWindow().sizeToScene());
         });
         //initial selection
         source.getSelectionModel().selectFirst();
@@ -291,11 +293,12 @@ public class ImportController {
         System.out.println((totalCost / (impressions * 1000)));
         DB.commit();
         System.out.println("Metrics calculated successfully.");
-        Platform.runLater(()-> {
+        Platform.runLater(() -> {
             parentController.loadTab(result);
             parentController.addCampaign(result.getName());
         });
     }
+
     public void setParentController(DashboardController dashboardController) {
         this.parentController = dashboardController;
     }
