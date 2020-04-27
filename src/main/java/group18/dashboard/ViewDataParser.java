@@ -3,11 +3,12 @@ package group18.dashboard;
 import group18.dashboard.model.Click;
 import group18.dashboard.model.Impression;
 import group18.dashboard.model.Interaction;
+import javafx.scene.chart.XYChart;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.commons.lang.time.DateUtils;
 
-import javafx.scene.chart.XYChart;
-
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -24,6 +25,17 @@ public class ViewDataParser {
         }
 
         return mapToSeries(dataName, quantities);
+    }
+    public static XYChart.Series<String, Number> getSeriesOf(String dataName, List<LocalDateTime> times) {
+        final Map<String, Number> quantities = new HashMap<>();
+
+        for (LocalDateTime time : times) {
+            String roundedTime = DateTimeFormatter.ISO_DATE.format(time);
+            quantities.putIfAbsent(roundedTime, 0);
+            quantities.computeIfPresent(roundedTime, (key, value) -> value.intValue() + 1);
+        }
+
+        return mapToSeries2(dataName, quantities);
     }
 
     private static String dateToString(Date date) {
@@ -96,7 +108,7 @@ public class ViewDataParser {
                     entry.getValue().doubleValue() / cpmDatesNumber.get(entry.getKey()).intValue());
         }
 
-        return mapToSeries("Cost-per-thousand impressions", cpms);
+        return mapToSeries("Cost-per-mille", cpms);
     }
 
     public static double getCPM(List<Impression> impressions, List<Click> clicks) {
@@ -320,6 +332,21 @@ public class ViewDataParser {
 
         for (Map.Entry<Date, U> entry : orderedEntries) {
             series.getData().add(new XYChart.Data<>(dateToString(entry.getKey()), entry.getValue()));
+        }
+
+        return series;
+    }
+    private static <U> XYChart.Series<String, U> mapToSeries2(String seriesName, Map<String, U> map) {
+        final XYChart.Series<String, U> series = new XYChart.Series<>();
+        series.setName(seriesName);
+
+        final List<Map.Entry<String, U>> orderedEntries = map.entrySet()
+                .stream()
+                .sorted(Map.Entry.comparingByKey())
+                .collect(Collectors.toList());
+
+        for (Map.Entry<String, U> entry : orderedEntries) {
+            series.getData().add(new XYChart.Data<>(entry.getKey(), entry.getValue()));
         }
 
         return series;

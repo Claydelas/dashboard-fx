@@ -1,16 +1,86 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.Button?>
+<?import com.jfoenix.controls.JFXComboBox?>
+<?import java.lang.String?>
+<?import javafx.collections.FXCollections?>
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
 
-<VBox alignment="CENTER" spacing="20.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="group18.dashboard.controllers.ImportController">
-    <children>
-        <Label text="Secondary View" />
-        <Button fx:id="importButton" text="Import" onAction="#importCampaign" />
-    </children>
-    <padding>
-        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
-    </padding>
+
+<VBox fx:id="importForm" spacing="10.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="group18.dashboard.controllers.ImportController">
+   <children>
+        <HBox alignment="CENTER" spacing="10.0">
+            <children>
+            <Label text="Import from" />
+                <JFXComboBox fx:id="source" minWidth="-Infinity" promptText="source">
+                    <items>
+                        <FXCollections fx:factory="observableArrayList">
+                            <String fx:value="folder" />
+                            <String fx:value="files" />
+                            <String fx:value="zip?" />
+                        </FXCollections>
+                    </items>
+                </JFXComboBox>
+            <Label text="as" />
+            <TextField fx:id="campaignNameField" promptText="campaign name" />
+            </children>
+        </HBox>
+      <StackPane fx:id="panes">
+         <children>
+            <VBox spacing="5.0">
+               <children>
+                  <HBox spacing="5.0">
+                     <children>
+                        <TextField fx:id="folderPath" prefWidth="285.0" promptText="Folder containing impression, click and server logs" />
+                        <Button fx:id="browseFolder" mnemonicParsing="false" onAction="#selectFolder" text="Browse" />
+                     </children>
+                  </HBox>
+                  <Button mnemonicParsing="false" onAction="#importFolder" text="Import Folder" />
+               </children>
+            </VBox>
+            <VBox spacing="5.0">
+               <children>
+                  <HBox spacing="5.0">
+                     <children>
+                        <TextField fx:id="impressionLogPath" prefWidth="285.0" promptText="Impression Log" />
+                        <Button fx:id="browseImpressionLog" mnemonicParsing="false" onAction="#selectImpressionLog" text="Browse" />
+                     </children>
+                  </HBox>
+                  <HBox spacing="5.0">
+                     <children>
+                        <TextField fx:id="clickLogPath" prefWidth="285.0" promptText="Click Log" />
+                        <Button fx:id="browseClickLog" mnemonicParsing="false" onAction="#selectClickLog" text="Browse" />
+                     </children>
+                  </HBox>
+                  <HBox spacing="5.0">
+                     <children>
+                        <TextField fx:id="interactionLogPath" prefWidth="285.0" promptText="Server Log" />
+                        <Button fx:id="browseInteractionLog" mnemonicParsing="false" onAction="#selectInteractionLog" text="Browse" />
+                     </children>
+                  </HBox>
+                  <Button mnemonicParsing="false" onAction="#importFiles" text="Import Files" />
+               </children>
+            </VBox>
+            <VBox spacing="5.0">
+               <children>
+                  <HBox spacing="5.0">
+                     <children>
+                        <TextField fx:id="zipPath" prefWidth="285.0" />
+                        <Button fx:id="browseZip" mnemonicParsing="false" onAction="#selectZip" text="Browse" />
+                     </children>
+                  </HBox>
+                  <Button mnemonicParsing="false" onAction="#importZip" text="Import Zip" />
+               </children>
+            </VBox>
+         </children>
+      </StackPane>
+   </children>
+   <padding>
+      <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+   </padding>
 </VBox>

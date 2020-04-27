@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.StackPane?>
+
+<StackPane fx:id="mainView" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="group18.dashboard.controllers.DashboardController">
+    <children>
+        <BorderPane fx:id="chartPane">
+            <left>
+                <TabPane fx:id="tabs" side="LEFT">
+                    <tabs>
+                        <Tab fx:id="defaultTab" closable="false" text="Campaign">
+                            <content>
+                                  <GridPane fx:id="metricsPane">
+                                      <rowConstraints>
+                                          <RowConstraints minHeight="20.0" prefHeight="45.0" />
+                                          <RowConstraints minHeight="20.0" prefHeight="45.0" />
+                                          <RowConstraints minHeight="20.0" prefHeight="45.0" />
+                                          <RowConstraints minHeight="20.0" prefHeight="45.0" />
+                                          <RowConstraints minHeight="20.0" prefHeight="45.0" />
+                                          <RowConstraints minHeight="20.0" prefHeight="45.0" />
+                                          <RowConstraints minHeight="20.0" prefHeight="45.0" />
+                                          <RowConstraints minHeight="20.0" prefHeight="45.0" />
+                                          <RowConstraints minHeight="20.0" prefHeight="45.0" />
+                                          <RowConstraints minHeight="20.0" prefHeight="45.0" />
+                                          <RowConstraints minHeight="20.0" prefHeight="45.0" />
+                                      </rowConstraints>
+                                      <children>
+                                          <Label fx:id="impressions" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.valignment="CENTER" />
+                                          <Label fx:id="clicks" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="1" GridPane.valignment="CENTER" />
+                                          <Label fx:id="uniques" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="2" GridPane.valignment="CENTER" />
+                                          <Label fx:id="bounces" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="3" GridPane.valignment="CENTER" />
+                                          <Label fx:id="conversions" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="4" GridPane.valignment="CENTER" />
+                                          <Label fx:id="totalCost" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="5" GridPane.valignment="CENTER" />
+                                          <Label fx:id="bounceRate" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="6" GridPane.valignment="CENTER" />
+                                          <Label fx:id="ctr" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="7" GridPane.valignment="CENTER" />
+                                          <Label fx:id="cpa" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="8" GridPane.valignment="CENTER" />
+                                          <Label fx:id="cpc" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="9" GridPane.valignment="CENTER" />
+                                          <Label fx:id="cpm" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="10" GridPane.valignment="CENTER" />
+                                      </children>
+                           <columnConstraints>
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                           </columnConstraints>
+                                  </GridPane>
+                            </content>
+                        </Tab>
+                    </tabs>
+                </TabPane>
+            </left>
+         <center>
+            <ScrollPane fitToHeight="true" fitToWidth="true" focusTraversable="false">
+               <content>
+                  <FlowPane fx:id="dashboardArea" alignment="CENTER" columnHalignment="CENTER" hgap="5.0" vgap="5.0" />
+               </content>
+               <BorderPane.margin>
+                  <Insets />
+               </BorderPane.margin>
+            </ScrollPane>
+         </center>
+        </BorderPane>
+    </children>
+</StackPane>
