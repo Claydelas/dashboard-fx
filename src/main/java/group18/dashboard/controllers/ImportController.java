@@ -1,7 +1,6 @@
 package group18.dashboard.controllers;
 
 import com.jfoenix.controls.JFXComboBox;
-import group18.dashboard.App;
 import group18.dashboard.util.DB;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
@@ -12,7 +11,6 @@ import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import org.jooq.DSLContext;
 import org.jooq.SQLDialect;
 import org.jooq.impl.DSL;
 
@@ -21,12 +19,16 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Objects;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 
-import static group18.dashboard.App.*;
+import static group18.dashboard.App.query;
 import static group18.dashboard.database.tables.Campaign.CAMPAIGN;
+import static group18.dashboard.database.tables.Click.CLICK;
+import static group18.dashboard.database.tables.Impression.IMPRESSION;
+import static group18.dashboard.database.tables.Interaction.INTERACTION;
 import static group18.dashboard.util.Parsing.*;
 
 public class ImportController {
@@ -70,7 +72,7 @@ public class ImportController {
     // returns the text of the name textfield or generates a name (Campaign ID) if the textfield is empty
     public String generateCampaignName() {
         String name = campaignNameField.getText();
-        return name.isBlank() ? "Campaign " + (query.selectCount().from(CAMPAIGN).fetchOne(DSL.count()) + 1) : name;
+        return name.isBlank() ? "Campaign " + (query.selectCount().from(CAMPAIGN).fetchOneInto(int.class) + 1) : name;
     }
 
     // inserts a new entry to the Campaign table and sets the uniquely generated id as a member variable
@@ -88,6 +90,7 @@ public class ImportController {
         if (isValidFolder(folder)) {
 
             insertCampaign();
+            CountDownLatch latch = new CountDownLatch(3);
 
             Arrays.stream(Objects.requireNonNull(folder.listFiles())).forEach(file -> {
                 try {
@@ -96,18 +99,29 @@ public class ImportController {
                         executor.execute(() -> {
                             parse(file.getAbsolutePath(), toImpression(query, campaignID));
                             DB.commit();
+                            latch.countDown();
                         });
                     if (name.equals("click_log.csv"))
                         executor.execute(() -> {
                             parse(file.getAbsolutePath(), toClick(query, campaignID));
                             DB.commit();
+                            latch.countDown();
                         });
                     if (name.equals("server_log.csv"))
                         executor.execute(() -> {
                             parse(file.getAbsolutePath(), toInteraction(query, campaignID));
                             DB.commit();
+                            latch.countDown();
                         });
                 } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            });
+            executor.execute(() -> {
+                try {
+                    latch.await();
+                    calculateMetrics();
+                } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             });
@@ -126,19 +140,33 @@ public class ImportController {
                     && Files.isReadable(Paths.get(interactions))) {
 
                 insertCampaign();
+                CountDownLatch latch = new CountDownLatch(3);
 
                 executor.execute(() -> {
                     parse(impressions, toImpression(query, campaignID));
                     DB.commit();
+                    latch.countDown();
                 });
                 executor.execute(() -> {
                     parse(clicks, toClick(query, campaignID));
                     DB.commit();
+                    latch.countDown();
                 });
                 executor.execute(() -> {
                     parse(interactions, toInteraction(query, campaignID));
                     DB.commit();
+                    latch.countDown();
                 });
+                executor.execute(() -> {
+                    try {
+                        latch.await();
+
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    calculateMetrics();
+                });
+
                 //TODO update progress indicator
                 exit();
             }
@@ -196,10 +224,6 @@ public class ImportController {
 
     }
 
-    public void parse2(String path, Consumer<String> consumer) {
-        System.out.println("Debug: Attempted parsing of " + path);
-    }
-
     public void parse(String path, Consumer<String> consumer) {
         File file = new File(path);
 
@@ -224,5 +248,44 @@ public class ImportController {
 
     public void importZip() {
         //TODO
+    }
+
+    void calculateMetrics() {
+
+        System.out.println("Calculating metrics.");
+
+        int clicks = query.selectCount().from(CLICK).where(CLICK.CID.eq(campaignID)).fetchOneInto(int.class);
+        System.out.println(clicks);
+        int impressions = query.selectCount().from(IMPRESSION).where(IMPRESSION.CID.eq(campaignID)).fetchOneInto(int.class);
+        System.out.println(impressions);
+        int bounces = query.selectCount().from(INTERACTION).where(INTERACTION.CID.eq(campaignID).and(INTERACTION.CONVERSION.isFalse())).fetchOneInto(int.class);
+        System.out.println(bounces);
+        int uniques = query.select(DSL.countDistinct(CLICK.USER)).from(CLICK).where(CLICK.CID.eq(campaignID)).fetchOneInto(int.class);
+        System.out.println(uniques);
+        int conversions = query.selectCount().from(INTERACTION).where(INTERACTION.CID.eq(campaignID).and(INTERACTION.CONVERSION)).fetchOneInto(int.class);
+        System.out.println(conversions);
+        double impressionCostSum = query.select(DSL.sum(IMPRESSION.COST)).from(IMPRESSION).where(IMPRESSION.CID.eq(campaignID)).fetchOneInto(double.class);
+        System.out.println(impressionCostSum);
+        double clickCostSum = query.select(DSL.sum(CLICK.COST)).from(CLICK).where(CLICK.CID.eq(campaignID)).fetchOneInto(double.class);
+        System.out.println(clickCostSum);
+        double totalCost = impressionCostSum + clickCostSum;
+        System.out.println(totalCost);
+
+        query.update(CAMPAIGN).set(CAMPAIGN.IMPRESSIONS, impressions).where(CAMPAIGN.CID.eq(campaignID)).execute();
+        query.update(CAMPAIGN).set(CAMPAIGN.CLICKS, clicks).where(CAMPAIGN.CID.eq(campaignID)).execute();
+        query.update(CAMPAIGN).set(CAMPAIGN.UNIQUES, uniques).where(CAMPAIGN.CID.eq(campaignID)).execute();
+        query.update(CAMPAIGN).set(CAMPAIGN.BOUNCES, bounces).where(CAMPAIGN.CID.eq(campaignID)).execute();
+        query.update(CAMPAIGN).set(CAMPAIGN.CONVERSIONS, conversions).where(CAMPAIGN.CID.eq(campaignID)).execute();
+        query.update(CAMPAIGN).set(CAMPAIGN.CTR, (double) clicks / impressions).where(CAMPAIGN.CID.eq(campaignID)).execute();
+        query.update(CAMPAIGN).set(CAMPAIGN.CPA, totalCost / conversions).where(CAMPAIGN.CID.eq(campaignID)).execute();
+        query.update(CAMPAIGN).set(CAMPAIGN.CPC, totalCost / clicks).where(CAMPAIGN.CID.eq(campaignID)).execute();
+        query.update(CAMPAIGN).set(CAMPAIGN.CPM, (totalCost / (impressions * 1000))).where(CAMPAIGN.CID.eq(campaignID)).execute();
+        query.update(CAMPAIGN).set(CAMPAIGN.BOUNCE_RATE, (double) bounces / clicks).where(CAMPAIGN.CID.eq(campaignID)).execute();
+        query.update(CAMPAIGN).set(CAMPAIGN.TOTAL_COST, totalCost).where(CAMPAIGN.CID.eq(campaignID)).execute();
+
+        query.update(CAMPAIGN).set(CAMPAIGN.PARSED, true).execute();
+        System.out.println((totalCost / (impressions * 1000)));
+        DB.commit();
+        System.out.println("Metrics calculated successfully.");
     }
 }

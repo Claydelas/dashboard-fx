@@ -9,6 +9,7 @@ import org.apache.commons.lang.time.DateUtils;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -31,6 +32,7 @@ public class ViewDataParser {
 
         for (LocalDateTime time : times) {
             String roundedTime = DateTimeFormatter.ISO_DATE.format(time);
+            //String roundedTime = DateTimeFormatter.ISO_DATE.format(time.truncatedTo(timeResolution));
             quantities.putIfAbsent(roundedTime, 0);
             quantities.computeIfPresent(roundedTime, (key, value) -> value.intValue() + 1);
         }

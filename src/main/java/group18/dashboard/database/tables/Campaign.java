@@ -8,7 +8,6 @@ import group18.dashboard.database.Keys;
 import group18.dashboard.database.Public;
 import group18.dashboard.database.tables.records.CampaignRecord;
 
-import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 
@@ -17,7 +16,7 @@ import org.jooq.ForeignKey;
 import org.jooq.Identity;
 import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Row16;
+import org.jooq.Row14;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
@@ -33,7 +32,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Campaign extends TableImpl<CampaignRecord> {
 
-    private static final long serialVersionUID = -409935300;
+    private static final long serialVersionUID = -593769277;
 
     /**
      * The reference instance of <code>PUBLIC.CAMPAIGN</code>
@@ -59,16 +58,6 @@ public class Campaign extends TableImpl<CampaignRecord> {
     public final TableField<CampaignRecord, String> NAME = createField(DSL.name("NAME"), org.jooq.impl.SQLDataType.VARCHAR(2147483647), this, "");
 
     /**
-     * The column <code>PUBLIC.CAMPAIGN.START_DATE</code>.
-     */
-    public final TableField<CampaignRecord, LocalDateTime> START_DATE = createField(DSL.name("START_DATE"), org.jooq.impl.SQLDataType.LOCALDATETIME, this, "");
-
-    /**
-     * The column <code>PUBLIC.CAMPAIGN.END_DATE</code>.
-     */
-    public final TableField<CampaignRecord, LocalDateTime> END_DATE = createField(DSL.name("END_DATE"), org.jooq.impl.SQLDataType.LOCALDATETIME, this, "");
-
-    /**
      * The column <code>PUBLIC.CAMPAIGN.IMPRESSIONS</code>.
      */
     public final TableField<CampaignRecord, Integer> IMPRESSIONS = createField(DSL.name("IMPRESSIONS"), org.jooq.impl.SQLDataType.INTEGER, this, "");
@@ -79,9 +68,9 @@ public class Campaign extends TableImpl<CampaignRecord> {
     public final TableField<CampaignRecord, Integer> CLICKS = createField(DSL.name("CLICKS"), org.jooq.impl.SQLDataType.INTEGER, this, "");
 
     /**
-     * The column <code>PUBLIC.CAMPAIGN.INTERACTIONS</code>.
+     * The column <code>PUBLIC.CAMPAIGN.UNIQUES</code>.
      */
-    public final TableField<CampaignRecord, Integer> INTERACTIONS = createField(DSL.name("INTERACTIONS"), org.jooq.impl.SQLDataType.INTEGER, this, "");
+    public final TableField<CampaignRecord, Integer> UNIQUES = createField(DSL.name("UNIQUES"), org.jooq.impl.SQLDataType.INTEGER, this, "");
 
     /**
      * The column <code>PUBLIC.CAMPAIGN.BOUNCES</code>.
@@ -208,11 +197,11 @@ public class Campaign extends TableImpl<CampaignRecord> {
     }
 
     // -------------------------------------------------------------------------
-    // Row16 type methods
+    // Row14 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row16<Integer, String, LocalDateTime, LocalDateTime, Integer, Integer, Integer, Integer, Integer, Double, Double, Double, Double, Double, Double, Boolean> fieldsRow() {
-        return (Row16) super.fieldsRow();
+    public Row14<Integer, String, Integer, Integer, Integer, Integer, Integer, Double, Double, Double, Double, Double, Double, Boolean> fieldsRow() {
+        return (Row14) super.fieldsRow();
     }
 }
