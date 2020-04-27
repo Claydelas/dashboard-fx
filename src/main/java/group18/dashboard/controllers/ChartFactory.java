@@ -9,7 +9,6 @@ import group18.dashboard.database.enums.ImpressionAge;
 import group18.dashboard.database.enums.ImpressionContext;
 import group18.dashboard.database.enums.ImpressionGender;
 import group18.dashboard.database.enums.ImpressionIncome;
-import group18.dashboard.util.DB;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -31,7 +30,9 @@ import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
-import org.jooq.*;
+import org.jooq.Condition;
+import org.jooq.Record;
+import org.jooq.TableField;
 import org.jooq.impl.DSL;
 
 import java.time.LocalDate;
@@ -39,7 +40,7 @@ import java.time.LocalDateTime;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import static group18.dashboard.App.*;
+import static group18.dashboard.App.query;
 import static group18.dashboard.database.tables.Campaign.CAMPAIGN;
 import static group18.dashboard.database.tables.Click.CLICK;
 import static group18.dashboard.database.tables.Impression.IMPRESSION;
@@ -79,9 +80,6 @@ public class ChartFactory {
         executor = Executors.newWorkStealingPool();
 
         granularity.getSelectionModel().select(1);
-
-        campaignComboBox.setItems(FXCollections.observableArrayList(
-                query.select(CAMPAIGN.NAME).from(CAMPAIGN).where(CAMPAIGN.PARSED).fetch(CAMPAIGN.NAME)));
 
         metricComboBox.setValidators(new RequiredFieldValidator());
         campaignComboBox.setValidators(new RequiredFieldValidator());
@@ -309,5 +307,9 @@ public class ChartFactory {
             return field.lt(to.atStartOfDay());
         }
         return DSL.noCondition();
+    }
+
+    public void setCampaigns(ObservableList<String> campaigns) {
+        campaignComboBox.setItems(campaigns);
     }
 }

@@ -1,16 +1,20 @@
 package group18.dashboard.controllers;
 
 import com.jfoenix.controls.JFXComboBox;
+import group18.dashboard.database.tables.records.CampaignRecord;
 import group18.dashboard.util.DB;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.TabPane;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import org.jooq.Result;
 import org.jooq.SQLDialect;
 import org.jooq.impl.DSL;
 
@@ -50,6 +54,7 @@ public class ImportController {
     ExecutorService executor;
     File folder;
     private int campaignID;
+    private DashboardController parentController;
 
     boolean isValidFolder(File dir) {
         if (dir == null) return false;
@@ -160,11 +165,10 @@ public class ImportController {
                 executor.execute(() -> {
                     try {
                         latch.await();
-
+                        calculateMetrics();
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                    calculateMetrics();
                 });
 
                 //TODO update progress indicator
@@ -255,21 +259,21 @@ public class ImportController {
         System.out.println("Calculating metrics.");
 
         int clicks = query.selectCount().from(CLICK).where(CLICK.CID.eq(campaignID)).fetchOneInto(int.class);
-        System.out.println(clicks);
+
         int impressions = query.selectCount().from(IMPRESSION).where(IMPRESSION.CID.eq(campaignID)).fetchOneInto(int.class);
-        System.out.println(impressions);
+
         int bounces = query.selectCount().from(INTERACTION).where(INTERACTION.CID.eq(campaignID).and(INTERACTION.CONVERSION.isFalse())).fetchOneInto(int.class);
-        System.out.println(bounces);
+
         int uniques = query.select(DSL.countDistinct(CLICK.USER)).from(CLICK).where(CLICK.CID.eq(campaignID)).fetchOneInto(int.class);
-        System.out.println(uniques);
+
         int conversions = query.selectCount().from(INTERACTION).where(INTERACTION.CID.eq(campaignID).and(INTERACTION.CONVERSION)).fetchOneInto(int.class);
-        System.out.println(conversions);
+
         double impressionCostSum = query.select(DSL.sum(IMPRESSION.COST)).from(IMPRESSION).where(IMPRESSION.CID.eq(campaignID)).fetchOneInto(double.class);
-        System.out.println(impressionCostSum);
+
         double clickCostSum = query.select(DSL.sum(CLICK.COST)).from(CLICK).where(CLICK.CID.eq(campaignID)).fetchOneInto(double.class);
-        System.out.println(clickCostSum);
+
         double totalCost = impressionCostSum + clickCostSum;
-        System.out.println(totalCost);
+
 
         query.update(CAMPAIGN).set(CAMPAIGN.IMPRESSIONS, impressions).where(CAMPAIGN.CID.eq(campaignID)).execute();
         query.update(CAMPAIGN).set(CAMPAIGN.CLICKS, clicks).where(CAMPAIGN.CID.eq(campaignID)).execute();
@@ -283,9 +287,16 @@ public class ImportController {
         query.update(CAMPAIGN).set(CAMPAIGN.BOUNCE_RATE, (double) bounces / clicks).where(CAMPAIGN.CID.eq(campaignID)).execute();
         query.update(CAMPAIGN).set(CAMPAIGN.TOTAL_COST, totalCost).where(CAMPAIGN.CID.eq(campaignID)).execute();
 
-        query.update(CAMPAIGN).set(CAMPAIGN.PARSED, true).execute();
+        CampaignRecord result = query.update(CAMPAIGN).set(CAMPAIGN.PARSED, true).where(CAMPAIGN.CID.eq(campaignID)).returning().fetchOne();
         System.out.println((totalCost / (impressions * 1000)));
         DB.commit();
         System.out.println("Metrics calculated successfully.");
+        Platform.runLater(()-> {
+            parentController.loadTab(result);
+            parentController.addCampaign(result.getName());
+        });
+    }
+    public void setParentController(DashboardController dashboardController) {
+        this.parentController = dashboardController;
     }
 }

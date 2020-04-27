@@ -2,6 +2,9 @@ package group18.dashboard.controllers;
 
 import group18.dashboard.App;
 import group18.dashboard.database.tables.Campaign;
+import group18.dashboard.database.tables.records.CampaignRecord;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
@@ -40,48 +43,53 @@ public class DashboardController {
     public Label bounceRate;
     public TabPane tabs;
     public FlowPane dashboardArea;
+    ObservableList<String> campaigns;
 
     @FXML
     public void initialize() {
         dashboardArea.prefWrapLengthProperty().bind(dashboardArea.widthProperty());
         loadTabs();
+        campaigns = FXCollections.observableArrayList(
+                query.select(CAMPAIGN.NAME).from(CAMPAIGN).where(CAMPAIGN.PARSED).fetch(CAMPAIGN.NAME));
     }
 
     private void loadTabs() {
-        query.selectFrom(CAMPAIGN).where(CAMPAIGN.PARSED).fetch().forEach(campaignRecord -> {
-            Tab tab = new Tab(campaignRecord.getName());
-            GridPane content = new GridPane();
-            content.setPadding(new Insets(10,10,10,10));
-            content.setVgap(10);
-            content.setHgap(10);
-            content.addColumn(0
-                    , new Label("Impressions")
-                    , new Label("Clicks")
-                    , new Label("Uniques")
-                    , new Label("Bounces")
-                    , new Label("Conversions")
-                    , new Label("Total Cost")
-                    , new Label("Click-through-rate")
-                    , new Label("Cost-per-acquisition")
-                    , new Label("Cost-per-click")
-                    , new Label("Cost-per-mille")
-                    , new Label("Bounce Rate"));
-            content.addColumn(1
-                    , new Label(String.format("%,d", campaignRecord.getImpressions()))
-                    , new Label(String.format("%,d", campaignRecord.getClicks()))
-                    , new Label(String.format("%,d", campaignRecord.getUniques()))
-                    , new Label(String.format("%,d", campaignRecord.getBounces()))
-                    , new Label(String.format("%,d", campaignRecord.getConversions()))
-                    , new Label(String.format("\u00A3%.2f", campaignRecord.getTotalCost()))
-                    , new Label(String.format("%.2f%%", campaignRecord.getCtr()))
-                    , new Label(String.format("\u00A3%.2f", campaignRecord.getCpa()))
-                    , new Label(String.format("\u00A3%.2f", campaignRecord.getCpc()))
-                    , new Label(String.format("\u00A3%.5f", campaignRecord.getCpm()))
-                    , new Label(String.format("%.2f%%",campaignRecord.getBounceRate()*100)));
-            tab.setClosable(false);
-            tab.setContent(content);
-            tabs.getTabs().add(tab);
-        });
+        query.selectFrom(CAMPAIGN).where(CAMPAIGN.PARSED).fetch().forEach(this::loadTab);
+    }
+
+    public void loadTab(CampaignRecord campaignRecord){
+        Tab tab = new Tab(campaignRecord.getName());
+        GridPane content = new GridPane();
+        content.setPadding(new Insets(10,10,10,10));
+        content.setVgap(10);
+        content.setHgap(10);
+        content.addColumn(0
+                , new Label("Impressions")
+                , new Label("Clicks")
+                , new Label("Uniques")
+                , new Label("Bounces")
+                , new Label("Conversions")
+                , new Label("Total Cost")
+                , new Label("Click-through-rate")
+                , new Label("Cost-per-acquisition")
+                , new Label("Cost-per-click")
+                , new Label("Cost-per-mille")
+                , new Label("Bounce Rate"));
+        content.addColumn(1
+                , new Label(String.format("%,d", campaignRecord.getImpressions()))
+                , new Label(String.format("%,d", campaignRecord.getClicks()))
+                , new Label(String.format("%,d", campaignRecord.getUniques()))
+                , new Label(String.format("%,d", campaignRecord.getBounces()))
+                , new Label(String.format("%,d", campaignRecord.getConversions()))
+                , new Label(String.format("\u00A3%.2f", campaignRecord.getTotalCost()))
+                , new Label(String.format("%.2f%%", campaignRecord.getCtr()))
+                , new Label(String.format("\u00A3%.2f", campaignRecord.getCpa()))
+                , new Label(String.format("\u00A3%.2f", campaignRecord.getCpc()))
+                , new Label(String.format("\u00A3%.5f", campaignRecord.getCpm()))
+                , new Label(String.format("%.2f%%",campaignRecord.getBounceRate()*100)));
+        tab.setClosable(false);
+        tab.setContent(content);
+        tabs.getTabs().add(tab);
     }
 
 
@@ -90,7 +98,8 @@ public class DashboardController {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource("import.fxml"));
             Parent importForm = fxmlLoader.load();
-            //ImportController importController = fxmlLoader.getController();
+            ImportController importController = fxmlLoader.getController();
+            importController.setParentController(this);
 
             Stage stage = new Stage();
             stage.initModality(Modality.APPLICATION_MODAL);
@@ -104,8 +113,6 @@ public class DashboardController {
         }
     }
 
-
-
     public void newChartButtonAction() {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource("newchart.fxml"));
@@ -113,6 +120,7 @@ public class DashboardController {
             ChartFactory chartController = fxmlLoader.getController();
 
             chartController.setChartPane(dashboardArea);
+            chartController.setCampaigns(campaigns);
 
             Stage stage = new Stage();
             stage.initModality(Modality.APPLICATION_MODAL);
@@ -124,5 +132,8 @@ public class DashboardController {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+    public void addCampaign(String name){
+        campaigns.add(name);
     }
 }
