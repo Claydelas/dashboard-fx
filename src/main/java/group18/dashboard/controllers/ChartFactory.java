@@ -177,8 +177,7 @@ public class ChartFactory {
                 case "Histogram":
                     chart = new BarChart<>(new CategoryAxis(), new NumberAxis());
                     // this doesnt fix hours not showing
-                    ((BarChart<String, Number>) chart).barGapProperty().setValue(0);
-
+                    ((BarChart<String, Number>) chart).setBarGap(0);
                     System.out.println("Debug : HISTOGRAM");
                     break;
                 default:

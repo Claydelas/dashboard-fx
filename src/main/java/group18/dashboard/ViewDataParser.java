@@ -19,8 +19,8 @@ public class ViewDataParser {
     private static final DateTimeFormatter weeklyFormatter = DateTimeFormatter.ofPattern("yyyy LLLL, 'Week' w");
 
     private static XYChart.Series<String, Number> getClickCostsHistogram(String divisionName, List<ClickRecord> clicks, Function<ClickRecord, Integer> getClickTime, int timeDivisions, Function<Integer, String> showDivision) {
-        int[] clicksPerTime = new int[timeDivisions+1];
-        double[] costsPerTime = new double[timeDivisions+1];
+        int[] clicksPerTime = new int[timeDivisions + 1];
+        double[] costsPerTime = new double[timeDivisions + 1];
 
         for (ClickRecord click : clicks) {
             final int time = getClickTime.apply(click);
@@ -31,7 +31,12 @@ public class ViewDataParser {
 
         XYChart.Series<String, Number> clickCosts = new XYChart.Series<>();
         clickCosts.setName(divisionName);
-        for (int i = 1; i <= timeDivisions; i++) {
+        int index;
+
+        if (timeDivisions == 23) index = 0;
+        else index = 1;
+
+        for (int i = index; i <= timeDivisions; i++) {
             clickCosts.getData().add(new XYChart.Data<>(
                     showDivision.apply(i), costsPerTime[i] / clicksPerTime[i]
             ));
@@ -55,7 +60,7 @@ public class ViewDataParser {
                 "Hour of Day",
                 clicks,
                 c -> c.getDate().getHour(),
-                24,
+                23,
                 Object::toString
         );
     }
