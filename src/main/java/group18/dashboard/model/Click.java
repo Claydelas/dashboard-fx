@@ -4,6 +4,9 @@ import group18.dashboard.exceptions.ParsingException;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.DateTimeException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.Objects;
 import java.util.function.Function;
@@ -14,7 +17,7 @@ public class Click {
         String[] columns = line.split(",");
         Click item = new Click();
         try {
-            item.date = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss").parse(columns[0]);
+            item.date = LocalDateTime.parse(columns[0], DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss"));
             item.ID = Long.parseLong(columns[1]);
             item.cost = Double.parseDouble(columns[2]);
         } catch (Exception e) {
@@ -23,7 +26,7 @@ public class Click {
         return item;
     };
 
-    private Date date;
+    private LocalDateTime date;
     private long ID;
     private double cost;
 
@@ -41,9 +44,10 @@ public class Click {
 
         //Getting the date
         try {
-            date = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").parse(columns[0]);
-        } catch (ParseException e) {
-            throw new ParsingException("Date could not be parsed for a click.");
+            date = LocalDateTime.parse(columns[0], DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss"));
+        } catch (DateTimeException e) {
+            System.out.println(columns[0]);
+            throw new ParsingException("Date could not be parsed for an impression.");
         }
 
         //Getting the ID
@@ -61,7 +65,7 @@ public class Click {
         }
     }
 
-    public Date getDate() {
+    public LocalDateTime getDate() {
         return date;
     }
 

@@ -128,3 +128,4 @@ fabric.properties
 hs_err_pid*
 .idea/
 /dependency-reduced-pom.xml
+ad-auction-dashboard.iml
