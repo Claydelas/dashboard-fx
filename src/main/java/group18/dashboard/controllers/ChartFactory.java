@@ -10,6 +10,9 @@ import group18.dashboard.database.enums.ImpressionAge;
 import group18.dashboard.database.enums.ImpressionContext;
 import group18.dashboard.database.enums.ImpressionGender;
 import group18.dashboard.database.enums.ImpressionIncome;
+import group18.dashboard.database.tables.records.ClickRecord;
+import group18.dashboard.database.tables.records.ImpressionRecord;
+import group18.dashboard.database.tables.records.InteractionRecord;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -30,6 +33,7 @@ import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import org.jooq.Condition;
 import org.jooq.Record;
+import org.jooq.Result;
 import org.jooq.TableField;
 import org.jooq.impl.DSL;
 
@@ -42,6 +46,7 @@ import static group18.dashboard.App.query;
 import static group18.dashboard.database.tables.Campaign.CAMPAIGN;
 import static group18.dashboard.database.tables.Click.CLICK;
 import static group18.dashboard.database.tables.Impression.IMPRESSION;
+import static group18.dashboard.database.tables.Interaction.INTERACTION;
 import static org.jooq.impl.DSL.select;
 
 public class ChartFactory {
@@ -149,35 +154,20 @@ public class ChartFactory {
                                     .where(IMPRESSION.CID.eq(campaignID)
                                             .and(getFilter())
                                             .and(getDateRange(IMPRESSION.DATE)))
-                                    .fetch(IMPRESSION.DATE)));
+                                    .fetch(IMPRESSION.DATE)
+                    ));
                     break;
                 case "Clicks":
                     if (chartType.equals("Histogram")) {
                         if (timeGranularity.equals(TimeGranularity.DAILY)) {
                             chart.getData().add(ViewDataParser.getDailyClickCostsHistogram(
-                                    query
-                                            .selectFrom(CLICK)
-                                            .where(CLICK.CID.eq(campaignID)
-                                                    .and(CLICK.USER.in(
-                                                            select(IMPRESSION.USER)
-                                                                    .from(IMPRESSION)
-                                                                    .where(IMPRESSION.CID.eq(campaignID)
-                                                                            .and(getFilter()))))
-                                                    .and(getDateRange(CLICK.DATE)))
-                                            .fetch()));
+                                    fetchClicks(campaignID)
+                            ));
                         }
                         if (timeGranularity.equals(TimeGranularity.HOURLY)) {
                             chart.getData().add(ViewDataParser.getHourlyClickCostsHistogram(
-                                    query
-                                            .selectFrom(CLICK)
-                                            .where(CLICK.CID.eq(campaignID)
-                                                    .and(CLICK.USER.in(
-                                                            select(IMPRESSION.USER)
-                                                                    .from(IMPRESSION)
-                                                                    .where(IMPRESSION.CID.eq(campaignID)
-                                                                            .and(getFilter()))))
-                                                    .and(getDateRange(CLICK.DATE)))
-                                            .fetch()));
+                                    fetchClicks(campaignID)
+                            ));
                         }
                     } else {
                         chart.getData().add(ViewDataParser.getSeriesOf(
@@ -188,12 +178,10 @@ public class ChartFactory {
                                         .from(CLICK)
                                         .where(CLICK.CID.eq(campaignID)
                                                 .and(CLICK.USER.in(
-                                                        select(IMPRESSION.USER)
-                                                                .from(IMPRESSION)
-                                                                .where(IMPRESSION.CID.eq(campaignID)
-                                                                        .and(getFilter()))))
+                                                        select(IMPRESSION.USER).from(IMPRESSION).where(IMPRESSION.CID.eq(campaignID).and(getFilter()))))
                                                 .and(getDateRange(CLICK.DATE)))
-                                        .fetch(CLICK.DATE)));
+                                        .fetch(CLICK.DATE)
+                        ));
                     }
                     break;
                 case "Uniques":
@@ -207,34 +195,73 @@ public class ChartFactory {
                                             .and(CLICK.USER.in(
                                                     select(IMPRESSION.USER)
                                                             .from(IMPRESSION)
-                                                            .where(IMPRESSION.CID.eq(campaignID)
-                                                                    .and(getFilter()))))
+                                                            .where(IMPRESSION.CID.eq(campaignID).and(getFilter()))))
                                             .and(getDateRange(CLICK.DATE)))
-                                    .fetch(CLICK.DATE)));
+                                    .fetch(CLICK.DATE)
+                    ));
                     break;
                 case "Bounces":
-                    //TODO Bounces Series
+                    chart.getData().add(ViewDataParser.getSeriesOf("Bounces",
+                            timeGranularity,
+                            query.select(INTERACTION.ENTRY_DATE)
+                                    .from(INTERACTION)
+                                    .where(INTERACTION.CID.eq(campaignID)
+                                            .and(INTERACTION.CONVERSION.isFalse())
+                                            .and(INTERACTION.USER.in(
+                                                    select(IMPRESSION.USER).from(IMPRESSION).where(IMPRESSION.CID.eq(campaignID).and(getFilter()))))
+                                            .and(getDateRange(INTERACTION.ENTRY_DATE)))
+                                    .fetch(INTERACTION.ENTRY_DATE)
+                    ));
                     break;
                 case "Conversions":
-                    //TODO Conversions Series
+                    chart.getData().add(ViewDataParser.getSeriesOf("Conversions",
+                            timeGranularity,
+                            query.select(INTERACTION.ENTRY_DATE)
+                                    .from(INTERACTION)
+                                    .where(INTERACTION.CID.eq(campaignID)
+                                            .and(INTERACTION.CONVERSION)
+                                            .and(INTERACTION.USER.in(
+                                                    select(IMPRESSION.USER).from(IMPRESSION).where(IMPRESSION.CID.eq(campaignID).and(getFilter()))))
+                                            .and(getDateRange(INTERACTION.ENTRY_DATE)))
+                                    .fetch(INTERACTION.ENTRY_DATE)
+                    ));
                     break;
                 case "Total Cost":
-                    //TODO Total Cost Series
+                    chart.getData().add(ViewDataParser.getTotalCostSeries(timeGranularity
+                            , fetchImpressions(campaignID)
+                            , fetchClicks(campaignID)
+                    ));
                     break;
                 case "Click-through-rate":
-                    //TODO Click-through-rate Series
+                    chart.getData().add(ViewDataParser.getCTRTimeSeries(timeGranularity,
+                            fetchImpressions(campaignID)
+                            , fetchClicks(campaignID)
+                    ));
                     break;
                 case "Cost-per-acquisition":
-                    //TODO Cost-per-acquisition Series
+                    chart.getData().add(ViewDataParser.getCPATimeSeries(timeGranularity
+                            , fetchImpressions(campaignID)
+                            , fetchClicks(campaignID)
+                            , fetchInteractions(campaignID)
+                    ));
                     break;
                 case "Cost-per-click":
-                    //TODO Cost-per-click Series
+                    chart.getData().add(ViewDataParser.getCPCTimeSeries(timeGranularity
+                            , fetchImpressions(campaignID)
+                            , fetchClicks(campaignID)
+                    ));
                     break;
                 case "Cost-per-mille":
-                    //TODO Cost-per-mille Series
+                    chart.getData().add(ViewDataParser.getCPMTimeSeries(timeGranularity
+                            , fetchImpressions(campaignID)
+                            , fetchClicks(campaignID)
+                    ));
                     break;
                 case "Bounce Rate":
-                    //TODO Bounce Rate Series
+                    chart.getData().add(ViewDataParser.getBounceRateTimeSeries(timeGranularity
+                            , fetchClicks(campaignID)
+                            , fetchInteractions(campaignID)
+                    ));
                     break;
             }
             final JFXButton close = new JFXButton();
@@ -255,6 +282,41 @@ public class ChartFactory {
         executor.shutdown();
         //implicit closing of stage after a chart is added
         cancelAction();
+    }
+
+    private Result<ImpressionRecord> fetchImpressions(int campaignID) {
+        return query
+                .selectFrom(IMPRESSION)
+                .where(IMPRESSION.CID.eq(campaignID)
+                        .and(getFilter())
+                        .and(getDateRange(IMPRESSION.DATE)))
+                .fetch();
+    }
+
+    private Result<InteractionRecord> fetchInteractions(int campaignID) {
+        return query
+                .selectFrom(INTERACTION)
+                .where(INTERACTION.CID.eq(campaignID)
+                        .and(INTERACTION.USER.in(
+                                select(IMPRESSION.USER)
+                                        .from(IMPRESSION)
+                                        .where(IMPRESSION.CID.eq(campaignID)
+                                                .and(getFilter()))))
+                        .and(getDateRange(INTERACTION.ENTRY_DATE)))
+                .fetch();
+    }
+
+    private Result<ClickRecord> fetchClicks(int campaignID) {
+        return query
+                .selectFrom(CLICK)
+                .where(CLICK.CID.eq(campaignID)
+                        .and(CLICK.USER.in(
+                                select(IMPRESSION.USER)
+                                        .from(IMPRESSION)
+                                        .where(IMPRESSION.CID.eq(campaignID)
+                                                .and(getFilter()))))
+                        .and(getDateRange(CLICK.DATE)))
+                .fetch();
     }
 
     public void cancelAction() {
