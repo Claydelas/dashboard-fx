@@ -8,192 +8,17 @@ import javafx.scene.chart.XYChart;
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.TextStyle;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class ViewDataParser {
-    private static final DateTimeFormatter hourlyFormatter = DateTimeFormatter.ofPattern("HH:00, dd/MM/yy");
-    private static final DateTimeFormatter dailyFormatter = DateTimeFormatter.ofPattern("dd/MM/yy");
-    private static final DateTimeFormatter weeklyFormatter = DateTimeFormatter.ofPattern("'Week' W, LLLL yyyy");
+    private static final DateTimeFormatter hourlyFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd, HH:00");
+    private static final DateTimeFormatter dailyFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    private static final DateTimeFormatter weeklyFormatter = DateTimeFormatter.ofPattern("yyyy LLLL, 'Week' w");
 
-//    public static XYChart.Series<String, Number> getClickCostFilteredHistogram(List<ClickRecord> clicks) {
-//        //final HashMap<Click, Double> clickCosts
-//
-//        final List<ImpressionRecord> allImpressions = new ArrayList<>(/*impressions*/);
-//        final List<ClickRecord> allClicks = new ArrayList<>(clicks);
-//
-//        final List<ImpressionRecord> genderMaleImpressions = new ArrayList<>();
-//        final List<ClickRecord> genderMaleClicks = new ArrayList<>();
-//        final List<ImpressionRecord> genderFemaleImpressions = new ArrayList<>();
-//        final List<ClickRecord> genderFemaleClicks = new ArrayList<>();
-//
-//        final List<ImpressionRecord> ageUnder25Impressions = new ArrayList<>();
-//        final List<ClickRecord> ageUnder25Clicks = new ArrayList<>();
-//        final List<ImpressionRecord> age25to34Impressions = new ArrayList<>();
-//        final List<ClickRecord> age25to34Clicks = new ArrayList<>();
-//        final List<ImpressionRecord> age35to44Impressions = new ArrayList<>();
-//        final List<ClickRecord> age35to44Clicks = new ArrayList<>();
-//        final List<ImpressionRecord> age45to54Impressions = new ArrayList<>();
-//        final List<ClickRecord> age45to54Clicks = new ArrayList<>();
-//        final List<ImpressionRecord> ageOver54Impressions = new ArrayList<>();
-//        final List<ClickRecord> ageOver54Clicks = new ArrayList<>();
-//
-//        final List<ImpressionRecord> incomeLowImpressions = new ArrayList<>();
-//        final List<ClickRecord> incomeLowClicks = new ArrayList<>();
-//        final List<ImpressionRecord> incomeMediumImpressions = new ArrayList<>();
-//        final List<ClickRecord> incomeMediumClicks = new ArrayList<>();
-//        final List<ImpressionRecord> incomeHighImpressions = new ArrayList<>();
-//        final List<ClickRecord> incomeHighClicks = new ArrayList<>();
-//
-//        final List<ImpressionRecord> contextNewsImpressions = new ArrayList<>();
-//        final List<ClickRecord> contextNewsClicks = new ArrayList<>();
-//        final List<ImpressionRecord> contextShoppingImpressions = new ArrayList<>();
-//        final List<ClickRecord> contextShoppingClicks = new ArrayList<>();
-//        final List<ImpressionRecord> contextSocialMediaImpressions = new ArrayList<>();
-//        final List<ClickRecord> contextSocialMediaClicks = new ArrayList<>();
-//        final List<ImpressionRecord> contextBlogImpressions = new ArrayList<>();
-//        final List<ClickRecord> contextBlogClicks = new ArrayList<>();
-//        final List<ImpressionRecord> contextHobbiesImpressions = new ArrayList<>();
-//        final List<ClickRecord> contextHobbiesClicks = new ArrayList<>();
-//        final List<ImpressionRecord> contextTravelImpressions = new ArrayList<>();
-//        final List<ClickRecord> contextTravelClicks = new ArrayList<>();
-//
-//        for (Impression impression : allImpressions) {
-//            switch (impression.gender) {
-//                case MALE:
-//                    genderMaleImpressions.add(impression);
-//                    break;
-//                case FEMALE:
-//                    genderFemaleImpressions.add(impression);
-//                    break;
-//            }
-//
-//            if (impression.upperBound == 25) {
-//                ageUnder25Impressions.add(impression);
-//            } else if (impression.lowerBound == 25) {
-//                age25to34Impressions.add(impression);
-//            } else if (impression.lowerBound == 35) {
-//                age35to44Impressions.add(impression);
-//            } else if (impression.lowerBound == 45) {
-//                age45to54Impressions.add(impression);
-//            } else if (impression.lowerBound == 54) {
-//                ageOver54Impressions.add(impression);
-//            } else {
-//                System.err.printf("Unrecognised impression with age lowerbound %d%n", impression.lowerBound);
-//            }
-//
-//            switch (impression.income) {
-//                case LOW:
-//                    incomeLowImpressions.add(impression);
-//                    break;
-//                case MEDIUM:
-//                    incomeMediumImpressions.add(impression);
-//                    break;
-//                case HIGH:
-//                    incomeHighImpressions.add(impression);
-//                    break;
-//            }
-//
-//            switch (impression.context) {
-//                case NEWS:
-//                    contextNewsImpressions.add(impression);
-//                    break;
-//                case SHOPPING:
-//                    contextShoppingImpressions.add(impression);
-//                    break;
-//                case SOCIAL_MEDIA:
-//                    contextSocialMediaImpressions.add(impression);
-//                    break;
-//                case BLOG:
-//                    contextBlogImpressions.add(impression);
-//                    break;
-//                case HOBBIES:
-//                    contextHobbiesImpressions.add(impression);
-//                    break;
-//                case TRAVEL:
-//                    contextTravelImpressions.add(impression);
-//                    break;
-//            }
-//        }
-
-//        for (Click click : allClicks) {
-//            switch (click.gender) {
-//                case MALE:
-//                    genderMaleImpressions.add(click);
-//                    break;
-//                case FEMALE:
-//                    genderFemaleImpressions.add(click);
-//                    break;
-//            }
-//
-//            if (click.upperBound == 25) {
-//                ageUnder25Impressions.add(click);
-//            } else if (click.lowerBound == 25) {
-//                age25to34Impressions.add(click);
-//            } else if (click.lowerBound == 35) {
-//                age35to44Impressions.add(click);
-//            } else if (click.lowerBound == 45) {
-//                age45to54Impressions.add(click);
-//            } else if (click.lowerBound == 54) {
-//                ageOver54Impressions.add(click);
-//            } else {
-//                System.err.printf("Unrecognised click with age lowerbound %d%n", click.lowerBound);
-//            }
-//
-//            switch (click.income) {
-//                case LOW:
-//                    incomeLowImpressions.add(click);
-//                    break;
-//                case MEDIUM:
-//                    incomeMediumImpressions.add(click);
-//                    break;
-//                case HIGH:
-//                    incomeHighImpressions.add(click);
-//                    break;
-//            }
-//
-//            switch (click.context) {
-//                case NEWS:
-//                    contextNewsImpressions.add(click);
-//                    break;
-//                case SHOPPING:
-//                    contextShoppingImpressions.add(click);
-//                    break;
-//                case SOCIAL_MEDIA:
-//                    contextSocialMediaImpressions.add(click);
-//                    break;
-//                case BLOG:
-//                    contextBlogImpressions.add(click);
-//                    break;
-//                case HOBBIES:
-//                    contextHobbiesImpressions.add(click);
-//                    break;
-//                case TRAVEL:
-//                    contextTravelImpressions.add(click);
-//                    break;
-//            }
-//        }
-//
-//        return null;
-//    }
-
-    // timeResolution parameter filled by Calendar.MONTH, Calendar.MINUTE, etc.
-    // Fills all 'Number of X' metrics charts
-//    public static XYChart.Series<String, Number> getCumulativeTimeSeries(String dataName, TimeGranularity granularity, List<Date> times) {
-//        final Map<Date, Number> quantities = new HashMap<>();
-//
-//        for (Date time : times) {
-//            final Date roundedTime = DateUtils.round(time, timeResolution);
-//            quantities.putIfAbsent(roundedTime, 0);
-//            quantities.computeIfPresent(roundedTime, (key, value) -> value.intValue() + 1);
-//        }
-//
-//        return mapToSeries(dataName, quantities);
-//    }
-
-
-    private static XYChart.Series<String, Number> getClickCostsHistogram(List<ClickRecord> clicks, Function<ClickRecord, Integer> getClickTime, int timeDivisions, Function<Integer, String> showDivision) {
+    private static XYChart.Series<String, Number> getClickCostsHistogram(String divisionName, List<ClickRecord> clicks, Function<ClickRecord, Integer> getClickTime, int timeDivisions, Function<Integer, String> showDivision) {
         int[] clicksPerTime = new int[timeDivisions+1];
         double[] costsPerTime = new double[timeDivisions+1];
 
@@ -205,6 +30,7 @@ public class ViewDataParser {
         }
 
         XYChart.Series<String, Number> clickCosts = new XYChart.Series<>();
+        clickCosts.setName(divisionName);
         for (int i = 1; i <= timeDivisions; i++) {
             clickCosts.getData().add(new XYChart.Data<>(
                     showDivision.apply(i), costsPerTime[i] / clicksPerTime[i]
@@ -216,15 +42,17 @@ public class ViewDataParser {
 
     public static XYChart.Series<String, Number> getDailyClickCostsHistogram(List<ClickRecord> clicks) {
         return getClickCostsHistogram(
+                "Day of Week",
                 clicks,
                 c -> c.getDate().getDayOfWeek().getValue(),
                 7,
-                d -> DayOfWeek.of(d).toString()
+                d -> DayOfWeek.of(d).getDisplayName(TextStyle.FULL, Locale.getDefault())
         );
     }
 
     public static XYChart.Series<String, Number> getHourlyClickCostsHistogram(List<ClickRecord> clicks) {
         return getClickCostsHistogram(
+                "Hour of Day",
                 clicks,
                 c -> c.getDate().getHour(),
                 24,
