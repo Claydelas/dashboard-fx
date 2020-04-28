@@ -38,6 +38,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.util.StringConverter;
 import org.jooq.Condition;
 import org.jooq.Record;
 import org.jooq.Result;
@@ -50,6 +51,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.chrono.Chronology;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
+import java.util.Locale;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -62,6 +67,27 @@ import static org.jooq.impl.DSL.select;
 
 public class ChartFactory {
 
+    public static final StringConverter<LocalDate> dateConverter = new StringConverter<>() {
+        final DateTimeFormatter dateFormatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM);
+
+        @Override
+        public String toString(LocalDate date) {
+            if (date != null) {
+                return dateFormatter.format(date);
+            } else {
+                return "";
+            }
+        }
+
+        @Override
+        public LocalDate fromString(String string) {
+            if (string != null && !string.isEmpty()) {
+                return LocalDate.parse(string, dateFormatter);
+            } else {
+                return null;
+            }
+        }
+    };
     public Button cancel;
     public CheckBox filterLow;
     public CheckBox filterMedium;
@@ -108,6 +134,9 @@ public class ChartFactory {
             }
         });
 
+        fromDate.setConverter(dateConverter);
+        toDate.setConverter(dateConverter);
+
         chartTypeComboBox.getSelectionModel().select(0);
         granularity.getSelectionModel().select(1);
 
@@ -147,6 +176,9 @@ public class ChartFactory {
                     break;
                 case "Histogram":
                     chart = new BarChart<>(new CategoryAxis(), new NumberAxis());
+                    // this doesnt fix hours not showing
+                    ((BarChart<String, Number>) chart).barGapProperty().setValue(0);
+
                     System.out.println("Debug : HISTOGRAM");
                     break;
                 default:
@@ -170,6 +202,7 @@ public class ChartFactory {
                     break;
                 case "Clicks":
                     if (chartType.equals("Histogram")) {
+                        chart.getYAxis().setLabel("Click cost (£)");
                         if (timeGranularity.equals(TimeGranularity.DAILY)) {
                             chart.getData().add(ViewDataParser.getDailyClickCostsHistogram(
                                     fetchClicks(campaignID)
