@@ -16,22 +16,22 @@ import javafx.stage.Stage;
 import org.jooq.SQLDialect;
 import org.jooq.impl.DSL;
 
-import java.io.*;
+import java.io.File;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.function.Consumer;
 
 import static group18.dashboard.App.query;
 import static group18.dashboard.database.tables.Campaign.CAMPAIGN;
 import static group18.dashboard.database.tables.Click.CLICK;
 import static group18.dashboard.database.tables.Impression.IMPRESSION;
 import static group18.dashboard.database.tables.Interaction.INTERACTION;
-import static group18.dashboard.util.Parsing.*;
 
 public class ImportController {
 
@@ -51,25 +51,27 @@ public class ImportController {
     public TextField campaignNameField;
     ExecutorService executor;
     File folder;
-    private int campaignID;
     private DashboardController parentController;
 
-    boolean isValidFolder(File dir) {
-        if (dir == null) return false;
-        if (dir.isDirectory()) {
-            File[] files = dir.listFiles();
-            if (files != null && Arrays.stream(files).noneMatch(file -> file.getName().equals("click_log.csv")
-                    || file.getName().equals("impression_log.csv") || file.getName().equals("server_log.csv"))) {
-                Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setTitle("Missing files");
-                alert.setHeaderText(null);
-                alert.setContentText("Couldn't find all campaign files in the selected directory!\nPlease try again.");
-                alert.showAndWait();
-                return false;
+    boolean isValidFolder(String path) {
+        Path folder = Paths.get(path);
+        if (!path.isBlank() && Files.isDirectory(folder)) {
+            if (Files.isReadable(Paths.get(path + "\\click_log.csv"))
+                    && Files.isReadable(Paths.get(path + "\\impression_log.csv"))
+                    && Files.isReadable(Paths.get(path + "\\server_log.csv"))) {
+                return true;
             }
-            return true;
         }
+        alert("Missing files", "Couldn't find all campaign files in the selected directory!\nPlease try again.");
         return false;
+    }
+
+    public void alert(String title, String content) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(content);
+        alert.showAndWait();
     }
 
     // returns the text of the name textfield or generates a name (Campaign ID) if the textfield is empty
@@ -78,41 +80,41 @@ public class ImportController {
         return name.isBlank() ? "Campaign " + (query.selectCount().from(CAMPAIGN).fetchOneInto(int.class) + 1) : name;
     }
 
-    // inserts a new entry to the Campaign table and sets the uniquely generated id as a member variable
-    private void insertCampaign() {
+    // inserts a new entry to the Campaign table
+    private int insertCampaign() {
         String campaignName = generateCampaignName();
-        campaignID = query
+        int campaignID = query
                 .insertInto(CAMPAIGN, CAMPAIGN.NAME)
                 .values(campaignName)
                 .returningResult(CAMPAIGN.CID)
                 .fetchOne().value1();
         System.out.println("Added new campaign \"" + campaignName + "\" with id: " + campaignID);
+        return campaignID;
     }
 
     public void importFolder() {
-        if (isValidFolder(folder)) {
-
-            insertCampaign();
+        String folderDir = folderPath.getText();
+        if (isValidFolder(folderDir)) {
+            int campaignID = insertCampaign();
             CountDownLatch latch = new CountDownLatch(3);
-
-            Arrays.stream(Objects.requireNonNull(folder.listFiles())).forEach(file -> {
+            Arrays.stream(Objects.requireNonNull(Paths.get(folderDir).toFile().listFiles())).forEach(file -> {
                 try {
                     String name = file.getName();
                     if (name.equals("impression_log.csv"))
                         executor.execute(() -> {
-                            parse(file.getAbsolutePath(), toImpression(query, campaignID));
+                            parseImpressions(file.getAbsolutePath(), campaignID);
                             DB.commit();
                             latch.countDown();
                         });
                     if (name.equals("click_log.csv"))
                         executor.execute(() -> {
-                            parse(file.getAbsolutePath(), toClick(query, campaignID));
+                            parseClicks(file.getAbsolutePath(), campaignID);
                             DB.commit();
                             latch.countDown();
                         });
                     if (name.equals("server_log.csv"))
                         executor.execute(() -> {
-                            parse(file.getAbsolutePath(), toInteraction(query, campaignID));
+                            parseInteractions(file.getAbsolutePath(), campaignID);
                             DB.commit();
                             latch.countDown();
                         });
@@ -123,7 +125,7 @@ public class ImportController {
             executor.execute(() -> {
                 try {
                     latch.await();
-                    calculateMetrics();
+                    calculateMetrics(campaignID);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -142,28 +144,27 @@ public class ImportController {
                     && Files.isReadable(Paths.get(clicks))
                     && Files.isReadable(Paths.get(interactions))) {
 
-                insertCampaign();
+                int campaignID = insertCampaign();
                 CountDownLatch latch = new CountDownLatch(3);
-
                 executor.execute(() -> {
-                    parse(impressions, toImpression(query, campaignID));
+                    parseImpressions(impressions, campaignID);
                     DB.commit();
                     latch.countDown();
                 });
                 executor.execute(() -> {
-                    parse(clicks, toClick(query, campaignID));
+                    parseClicks(clicks, campaignID);
                     DB.commit();
                     latch.countDown();
                 });
                 executor.execute(() -> {
-                    parse(interactions, toInteraction(query, campaignID));
+                    parseInteractions(interactions, campaignID);
                     DB.commit();
                     latch.countDown();
                 });
                 executor.execute(() -> {
                     try {
                         latch.await();
-                        calculateMetrics();
+                        calculateMetrics(campaignID);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -211,6 +212,59 @@ public class ImportController {
         pathField.setText(log.getAbsolutePath());
     }
 
+    public void parseImpressions(String path, int campaignID) {
+        String sql = "insert into IMPRESSION (DATE, USER, GENDER, AGE, INCOME, CONTEXT, COST, CID) " +
+                "select \"DATE\",\"ID\",\"GENDER\",\"AGE\",\"INCOME\",\"CONTEXT\",\"Impression Cost\", " + campaignID +
+                " from CSVREAD('" + path + "', null);";
+
+        long startTime = System.currentTimeMillis();
+        try {
+            DB.connection().prepareStatement(sql).execute();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        long endTime = System.currentTimeMillis();
+        System.out.println("Done parsing " + path + " in " + (endTime - startTime) + "ms");
+
+    }
+
+    public void parseClicks(String path, int campaignID) {
+        String sql = "insert into CLICK (DATE, USER, COST, CID) " +
+                "select \"DATE\", \"ID\", \"Click Cost\", " + campaignID +
+                " from CSVREAD('" + path + "', null);";
+
+        long startTime = System.currentTimeMillis();
+        try {
+            DB.connection().prepareStatement(sql).execute();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        long endTime = System.currentTimeMillis();
+        System.out.println("Done parsing " + path + " in " + (endTime - startTime) + "ms");
+
+    }
+
+    public void parseInteractions(String path, int campaignID) {
+        String sql = "insert into INTERACTION (ENTRY_DATE, USER, EXIT_DATE, VIEWS, CONVERSION, CID) " +
+                "select \"Entry Date\", \"ID\", " +
+                "(case when \"Exit Date\" = 'n/a' then null else \"Exit Date\" end), " +
+                "\"Pages Viewed\", " +
+                "(case when \"CONVERSION\" = 'Yes' then true else false end), " +
+                campaignID +
+                " from CSVREAD('" + path + "', null);";
+
+        long startTime = System.currentTimeMillis();
+        try {
+            DB.connection().prepareStatement(sql).execute();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        long endTime = System.currentTimeMillis();
+        System.out.println("Done parsing " + path + " in " + (endTime - startTime) + "ms");
+    }
+
     @FXML
     public void initialize() {
         query = DSL.using(DB.connection(), SQLDialect.H2);
@@ -230,24 +284,6 @@ public class ImportController {
 
     }
 
-    public void parse(String path, Consumer<String> consumer) {
-        File file = new File(path);
-
-        System.out.println("Parsing " + file.getAbsolutePath());
-        long startTime = System.currentTimeMillis();
-
-        try {
-            BufferedReader input = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
-            input.lines().skip(1).forEach(consumer);
-            input.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        long endTime = System.currentTimeMillis();
-        System.out.println("Done parsing " + file.getAbsolutePath() + " in " + (endTime - startTime) + "ms");
-    }
-
     public void selectZip() {
         //TODO
     }
@@ -256,7 +292,7 @@ public class ImportController {
         //TODO
     }
 
-    void calculateMetrics() {
+    void calculateMetrics(int campaignID) {
 
         System.out.println("Calculating metrics.");
 
@@ -290,7 +326,6 @@ public class ImportController {
         query.update(CAMPAIGN).set(CAMPAIGN.TOTAL_COST, totalCost).where(CAMPAIGN.CID.eq(campaignID)).execute();
 
         CampaignRecord result = query.update(CAMPAIGN).set(CAMPAIGN.PARSED, true).where(CAMPAIGN.CID.eq(campaignID)).returning().fetchOne();
-        System.out.println((totalCost / (impressions * 1000)));
         DB.commit();
         System.out.println("Metrics calculated successfully.");
         Platform.runLater(() -> {
