@@ -1,30 +1,26 @@
 package group18.dashboard.controllers;
 
 import group18.dashboard.App;
-import group18.dashboard.database.tables.Campaign;
 import group18.dashboard.database.tables.records.CampaignRecord;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.chart.CategoryAxis;
-import javafx.scene.chart.NumberAxis;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
-import javafx.scene.layout.*;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.StackPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import org.jooq.impl.DSL;
 
-import static group18.dashboard.App.*;
-import static group18.dashboard.database.tables.Campaign.*;
-import static group18.dashboard.database.tables.Click.CLICK;
+import static group18.dashboard.App.query;
+import static group18.dashboard.database.tables.Campaign.CAMPAIGN;
 
 public class DashboardController {
 
@@ -59,10 +55,10 @@ public class DashboardController {
     }
 
     //generates a tab and its contents and adds it to the TabPane
-    public void loadTab(CampaignRecord campaignRecord){
+    public void loadTab(CampaignRecord campaignRecord) {
         Tab tab = new Tab(campaignRecord.getName());
         GridPane content = new GridPane();
-        content.setPadding(new Insets(10,10,10,10));
+        content.setPadding(new Insets(10, 10, 10, 10));
         content.setVgap(10);
         content.setHgap(10);
         content.addColumn(0
@@ -88,7 +84,7 @@ public class DashboardController {
                 , new Label(String.format("\u00A3%.2f", campaignRecord.getCpa()))
                 , new Label(String.format("\u00A3%.2f", campaignRecord.getCpc()))
                 , new Label(String.format("\u00A3%.5f", campaignRecord.getCpm()))
-                , new Label(String.format("%.2f%%",campaignRecord.getBounceRate()*100)));
+                , new Label(String.format("%.2f%%", campaignRecord.getBounceRate() * 100)));
         tab.setClosable(false);
         tab.setContent(content);
         tabs.getTabs().add(tab);
@@ -135,7 +131,8 @@ public class DashboardController {
             e.printStackTrace();
         }
     }
-    public void addCampaign(String name){
+
+    public void addCampaign(String name) {
         campaigns.add(name);
     }
 }

@@ -14,8 +14,8 @@ import java.util.stream.Collectors;
 
 public class ViewDataParser {
     private static final DateTimeFormatter hourlyFormatter = DateTimeFormatter.ofPattern("HH:00, dd/MM/yy");
-    private static final DateTimeFormatter dailyFormatter = DateTimeFormatter.ofPattern("EEEE, dd/MM/yy");
-    private static final DateTimeFormatter weeklyFormatter = DateTimeFormatter.ofPattern("'Week' w, LLLL yyyy");
+    private static final DateTimeFormatter dailyFormatter = DateTimeFormatter.ofPattern("dd/MM/yy");
+    private static final DateTimeFormatter weeklyFormatter = DateTimeFormatter.ofPattern("'Week' W, LLLL yyyy");
 
 //    public static XYChart.Series<String, Number> getClickCostFilteredHistogram(List<ClickRecord> clicks) {
 //        //final HashMap<Click, Double> clickCosts

@@ -13,16 +13,19 @@ import group18.dashboard.database.enums.ImpressionIncome;
 import group18.dashboard.database.tables.records.ClickRecord;
 import group18.dashboard.database.tables.records.ImpressionRecord;
 import group18.dashboard.database.tables.records.InteractionRecord;
+import group18.dashboard.util.PngEncoderFX;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.SnapshotParameters;
 import javafx.scene.chart.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.DatePicker;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.Dragboard;
@@ -30,6 +33,10 @@ import javafx.scene.input.TransferMode;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.jooq.Condition;
 import org.jooq.Record;
@@ -37,6 +44,10 @@ import org.jooq.Result;
 import org.jooq.TableField;
 import org.jooq.impl.DSL;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.concurrent.ExecutorService;
@@ -271,13 +282,20 @@ public class ChartFactory {
             image.setPreserveRatio(true);
             close.setGraphic(image);
 
-            final StackPane pane = new StackPane(chart, close);
+            final JFXButton png = new JFXButton("PNG");
 
-            StackPane.setAlignment(close, Pos.TOP_RIGHT);
+            final VBox buttons = new VBox(close,png);
+            buttons.setSpacing(5);
+            buttons.setAlignment(Pos.TOP_RIGHT);
+
+            final StackPane pane = new StackPane(chart, buttons);
+
+            StackPane.setAlignment(buttons, Pos.TOP_RIGHT);
 
             close.setOnMouseClicked(e -> dashboardArea.getChildren().remove(pane));
             makeDraggable(pane);
             Platform.runLater(() -> dashboardArea.getChildren().add(pane));
+            png.setOnMouseClicked(e -> saveAsPng(chart));
         });
         executor.shutdown();
         //implicit closing of stage after a chart is added
@@ -426,5 +444,24 @@ public class ChartFactory {
 
     public void setCampaigns(ObservableList<String> campaigns) {
         campaignComboBox.setItems(campaigns);
+    }
+    private void saveAsPng(Chart chart) {
+        File file = new FileChooser().showSaveDialog(dashboardArea.getScene().getWindow());
+        if (file != null) {
+            try {
+                exportPngSnapshot(chart, file.toPath(), Color.WHITE);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void exportPngSnapshot(Node node, Path path, Paint backgroundFill) throws IOException {
+        SnapshotParameters params = new SnapshotParameters();
+        params.setFill(backgroundFill);
+        Image chartSnapshot = node.snapshot(params, null);
+        PngEncoderFX encoder = new PngEncoderFX(chartSnapshot, true);
+        byte[] bytes = encoder.pngEncode();
+        Files.write(path, bytes);
     }
 }
