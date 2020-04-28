@@ -4,6 +4,9 @@ import group18.dashboard.exceptions.ParsingException;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.DateTimeException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.function.Function;
 
@@ -14,12 +17,12 @@ public class Interaction {
         String[] columns = line.split(",");
         Interaction item = new Interaction();
         try {
-            item.entryDate = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").parse(columns[0]);
+            item.entryDate = LocalDateTime.parse(columns[0], DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss"));
             item.ID = Long.parseLong(columns[1]);
             if (columns[2].equals("n/a")) {
                 item.exitDate = null;
             } else {
-                item.exitDate = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").parse(columns[2]);
+                item.exitDate = LocalDateTime.parse(columns[2], DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss"));
             }
 
             item.pageViews = Integer.parseInt(columns[3]);
@@ -34,8 +37,8 @@ public class Interaction {
         }
         return item;
     };
-    public Date entryDate;
-    public Date exitDate;
+    public LocalDateTime entryDate;
+    public LocalDateTime exitDate;
     public long ID;
     public int pageViews;
     public boolean conversion;
@@ -54,9 +57,11 @@ public class Interaction {
 
         //Getting the entry date
         try {
-            entryDate = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss").parse(columns[0]);
-        } catch (ParseException e) {
-            throw new ParsingException("Entry date could not be parsed for an interaction.");
+            entryDate = LocalDateTime.parse(columns[0], DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss"));
+
+        } catch (DateTimeException e) {
+            System.out.println(columns[0]);
+            throw new ParsingException("Date could not be parsed for an impression.");
         }
 
         //Getting the ID
@@ -71,9 +76,9 @@ public class Interaction {
             if (columns[2].equals("n/a")) {
                 exitDate = null;
             } else {
-                exitDate = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss").parse(columns[2]);
+                exitDate = LocalDateTime.parse(columns[2], DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss"));
             }
-        } catch (ParseException e) {
+        } catch (DateTimeException e) {
             throw new ParsingException("Exit date could not be parsed for an interaction.");
         }
 
@@ -98,11 +103,11 @@ public class Interaction {
         }
     }
 
-    public Date getEntryDate() {
+    public LocalDateTime getEntryDate() {
         return entryDate;
     }
 
-    public Date getExitDate() {
+    public LocalDateTime getExitDate() {
         return exitDate;
     }
 

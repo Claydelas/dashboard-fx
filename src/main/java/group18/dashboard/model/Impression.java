@@ -4,6 +4,9 @@ import group18.dashboard.exceptions.ParsingException;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.DateTimeException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.function.Function;
 
@@ -14,7 +17,8 @@ public class Impression {
         String[] p = line.split(",");
         Impression item = new Impression();
         try {
-            item.date = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss").parse(p[0]);
+            item.date = LocalDateTime.parse(p[0], DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss"));
+
             item.ID = Long.parseLong(p[1]);
             item.gender = Enum.valueOf(Gender.class, p[2].toUpperCase());
 
@@ -32,12 +36,12 @@ public class Impression {
             item.income = Enum.valueOf(Income.class, p[4].toUpperCase());
             item.context = Enum.valueOf(Context.class, p[5].replace(" ", "_").toUpperCase());
             item.cost = Double.parseDouble(p[6]);
-        } catch (ParseException e) {
+        } catch (DateTimeException e) {
             e.printStackTrace();
         }
         return item;
     };
-    public Date date;
+    public LocalDateTime date;
     public long ID;
     public Gender gender;
     public int lowerBound = -1;
@@ -56,9 +60,9 @@ public class Impression {
 
         //Getting the date
         try {
-            date = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").parse(columns[0]);
+            date = LocalDateTime.parse(columns[0], DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss"));
 
-        } catch (ParseException e) {
+        } catch (DateTimeException e) {
             System.out.println(columns[0]);
             throw new ParsingException("Date could not be parsed for an impression.");
         }
@@ -115,7 +119,7 @@ public class Impression {
 
     }
 
-    public Date getDate() {
+    public LocalDateTime getDate() {
         return date;
     }
 
