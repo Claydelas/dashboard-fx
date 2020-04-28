@@ -6,9 +6,13 @@ import group18.dashboard.model.Interaction;
 import javafx.scene.chart.XYChart;
 
 
+import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.TextStyle;
 import java.util.*;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class ViewDataParser {
@@ -190,6 +194,51 @@ public class ViewDataParser {
 //
 //        return mapToSeries(dataName, quantities);
 //    }
+
+
+    private static XYChart.Series<String, Double> getClickCostsHistogram(List<Click> clicks, Function<Click, Integer> getClickTime, int timeDivisions, Function<Integer, String> showDivision) {
+        int[] clicksPerTime = new int[timeDivisions];
+        double[] costsPerTime = new double[timeDivisions];
+
+        for (Click click : clicks) {
+            final int time = getClickTime.apply(click);
+
+            clicksPerTime[time] += 1;
+            costsPerTime[time] += click.getCost();
+        }
+
+        XYChart.Series<String, Double> clickCosts = new XYChart.Series<>();
+        for (int i = 0; i < timeDivisions; i++) {
+            clickCosts.getData().add(new XYChart.Data<>(
+                    showDivision.apply(i), costsPerTime[i] / clicksPerTime[i]
+            ));
+        }
+
+        return clickCosts;
+    }
+
+    public static XYChart.Series<String, Double> getDailyClickCostsHistogram(List<Click> clicks) {
+        return getClickCostsHistogram(
+                clicks,
+                c -> c.getDate().getDayOfWeek().getValue(),
+                7,
+                d -> DayOfWeek.of(d).toString()
+        );
+    }
+
+    public static XYChart.Series<String, Double> getHourlyClickCostsHistogram(List<Click> clicks) {
+        return getClickCostsHistogram(
+                clicks,
+                c -> c.getDate().getHour(),
+                24,
+                Object::toString
+        );
+    }
+
+    private static List<XYChart.Series<Integer, Double>> getFilteredClickCostsHistogram() {
+        // TODO, will likely have to make a db merging impression and click data.
+        return null;
+    }
     
     private static String roundDate(LocalDateTime dateTime, TimeGranularity granularity) {
         String roundedDate = null;
