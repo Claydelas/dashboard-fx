@@ -1,7 +1,6 @@
 module group18.dashboard {
     requires javafx.controls;
     requires javafx.fxml;
-    requires commons.lang;
     requires com.jfoenix;
     requires java.sql;
     requires com.h2database;

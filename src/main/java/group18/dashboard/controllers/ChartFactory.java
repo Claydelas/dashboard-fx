@@ -49,6 +49,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.chrono.Chronology;
@@ -480,6 +481,8 @@ public class ChartFactory {
     }
     private void saveAsPng(Chart chart) {
         FileChooser fileChooser = new FileChooser();
+        fileChooser.setInitialDirectory(new File(Paths.get(".").toAbsolutePath().normalize().toString()));
+        fileChooser.setInitialFileName("Untitled");
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PNG", "*.png"));
         File file = fileChooser.showSaveDialog(dashboardArea.getScene().getWindow());
         if (file != null) {

@@ -184,6 +184,7 @@ public class ImportController {
 
     public void selectFolder() {
         DirectoryChooser directoryChooser = new DirectoryChooser();
+        directoryChooser.setInitialDirectory(new File(Paths.get(".").toAbsolutePath().normalize().toString()));
         directoryChooser.setTitle("Select Campaign Folder");
         folder = directoryChooser.showDialog(importForm.getScene().getWindow());
         if (folder == null) return;
@@ -204,6 +205,7 @@ public class ImportController {
 
     public void selectLog(String fileType, TextField pathField) {
         FileChooser fileChooser = new FileChooser();
+        fileChooser.setInitialDirectory(new File(Paths.get(".").toAbsolutePath().normalize().toString()));
         fileChooser.setTitle("Select " + fileType);
         fileChooser.getExtensionFilters().add(
                 new FileChooser.ExtensionFilter(fileType, "*.csv"));
