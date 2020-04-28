@@ -283,9 +283,7 @@ public class ChartFactory {
             close.setGraphic(image);
 
             final JFXButton png = new JFXButton("PNG");
-
             final VBox buttons = new VBox(close,png);
-            buttons.setSpacing(5);
             buttons.setAlignment(Pos.TOP_RIGHT);
 
             final StackPane pane = new StackPane(chart, buttons);
@@ -293,9 +291,12 @@ public class ChartFactory {
             StackPane.setAlignment(buttons, Pos.TOP_RIGHT);
 
             close.setOnMouseClicked(e -> dashboardArea.getChildren().remove(pane));
+            png.setOnMouseClicked(e -> {
+                saveAsPng(chart);
+                dashboardArea.requestFocus();
+            });
             makeDraggable(pane);
             Platform.runLater(() -> dashboardArea.getChildren().add(pane));
-            png.setOnMouseClicked(e -> saveAsPng(chart));
         });
         executor.shutdown();
         //implicit closing of stage after a chart is added
@@ -446,7 +447,9 @@ public class ChartFactory {
         campaignComboBox.setItems(campaigns);
     }
     private void saveAsPng(Chart chart) {
-        File file = new FileChooser().showSaveDialog(dashboardArea.getScene().getWindow());
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PNG", "*.png"));
+        File file = fileChooser.showSaveDialog(dashboardArea.getScene().getWindow());
         if (file != null) {
             try {
                 exportPngSnapshot(chart, file.toPath(), Color.WHITE);
