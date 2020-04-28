@@ -10,7 +10,6 @@ import group18.dashboard.database.enums.ImpressionContext;
 import group18.dashboard.database.enums.ImpressionGender;
 import group18.dashboard.database.enums.ImpressionIncome;
 import javafx.application.Platform;
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;

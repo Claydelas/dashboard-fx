@@ -312,7 +312,6 @@ public class ImportController {
 
         double totalCost = impressionCostSum + clickCostSum;
 
-
         query.update(CAMPAIGN).set(CAMPAIGN.IMPRESSIONS, impressions).where(CAMPAIGN.CID.eq(campaignID)).execute();
         query.update(CAMPAIGN).set(CAMPAIGN.CLICKS, clicks).where(CAMPAIGN.CID.eq(campaignID)).execute();
         query.update(CAMPAIGN).set(CAMPAIGN.UNIQUES, uniques).where(CAMPAIGN.CID.eq(campaignID)).execute();
@@ -336,5 +335,9 @@ public class ImportController {
 
     public void setParentController(DashboardController dashboardController) {
         this.parentController = dashboardController;
+    }
+
+    public boolean validateName(String name) {
+        return !query.fetchExists(CAMPAIGN, CAMPAIGN.NAME.eq(name));
     }
 }

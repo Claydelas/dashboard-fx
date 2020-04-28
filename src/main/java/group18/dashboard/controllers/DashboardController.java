@@ -53,10 +53,12 @@ public class DashboardController {
                 query.select(CAMPAIGN.NAME).from(CAMPAIGN).where(CAMPAIGN.PARSED).fetch(CAMPAIGN.NAME));
     }
 
+    //for each complete campaign generate a tab
     private void loadTabs() {
         query.selectFrom(CAMPAIGN).where(CAMPAIGN.PARSED).fetch().forEach(this::loadTab);
     }
 
+    //generates a tab and its contents and adds it to the TabPane
     public void loadTab(CampaignRecord campaignRecord){
         Tab tab = new Tab(campaignRecord.getName());
         GridPane content = new GridPane();
