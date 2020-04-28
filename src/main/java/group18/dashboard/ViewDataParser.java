@@ -1,17 +1,14 @@
 package group18.dashboard;
 
-import group18.dashboard.model.Click;
-import group18.dashboard.model.Impression;
-import group18.dashboard.model.Interaction;
+import group18.dashboard.database.tables.records.ClickRecord;
+import group18.dashboard.database.tables.records.ImpressionRecord;
+import group18.dashboard.database.tables.records.InteractionRecord;
 import javafx.scene.chart.XYChart;
-
 
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.format.TextStyle;
 import java.util.*;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -19,48 +16,48 @@ public class ViewDataParser {
     private static final DateTimeFormatter hourlyFormatter = DateTimeFormatter.ofPattern("HH:00, dd/MM/yy");
     private static final DateTimeFormatter dailyFormatter = DateTimeFormatter.ofPattern("EEEE, dd/MM/yy");
     private static final DateTimeFormatter weeklyFormatter = DateTimeFormatter.ofPattern("'Week' w, LLLL yyyy");
-    
-//    public static XYChart.Series<String, Number> getClickCostFilteredHistogram(List<Click> clicks) {
+
+//    public static XYChart.Series<String, Number> getClickCostFilteredHistogram(List<ClickRecord> clicks) {
 //        //final HashMap<Click, Double> clickCosts
 //
-//        final List<Impression> allImpressions = new ArrayList<>(/*impressions*/);
-//        final List<Click> allClicks = new ArrayList<>(clicks);
+//        final List<ImpressionRecord> allImpressions = new ArrayList<>(/*impressions*/);
+//        final List<ClickRecord> allClicks = new ArrayList<>(clicks);
 //
-//        final List<Impression> genderMaleImpressions = new ArrayList<>();
-//        final List<Click> genderMaleClicks = new ArrayList<>();
-//        final List<Impression> genderFemaleImpressions = new ArrayList<>();
-//        final List<Click> genderFemaleClicks = new ArrayList<>();
+//        final List<ImpressionRecord> genderMaleImpressions = new ArrayList<>();
+//        final List<ClickRecord> genderMaleClicks = new ArrayList<>();
+//        final List<ImpressionRecord> genderFemaleImpressions = new ArrayList<>();
+//        final List<ClickRecord> genderFemaleClicks = new ArrayList<>();
 //
-//        final List<Impression> ageUnder25Impressions = new ArrayList<>();
-//        final List<Click> ageUnder25Clicks = new ArrayList<>();
-//        final List<Impression> age25to34Impressions = new ArrayList<>();
-//        final List<Click> age25to34Clicks = new ArrayList<>();
-//        final List<Impression> age35to44Impressions = new ArrayList<>();
-//        final List<Click> age35to44Clicks = new ArrayList<>();
-//        final List<Impression> age45to54Impressions = new ArrayList<>();
-//        final List<Click> age45to54Clicks = new ArrayList<>();
-//        final List<Impression> ageOver54Impressions = new ArrayList<>();
-//        final List<Click> ageOver54Clicks = new ArrayList<>();
+//        final List<ImpressionRecord> ageUnder25Impressions = new ArrayList<>();
+//        final List<ClickRecord> ageUnder25Clicks = new ArrayList<>();
+//        final List<ImpressionRecord> age25to34Impressions = new ArrayList<>();
+//        final List<ClickRecord> age25to34Clicks = new ArrayList<>();
+//        final List<ImpressionRecord> age35to44Impressions = new ArrayList<>();
+//        final List<ClickRecord> age35to44Clicks = new ArrayList<>();
+//        final List<ImpressionRecord> age45to54Impressions = new ArrayList<>();
+//        final List<ClickRecord> age45to54Clicks = new ArrayList<>();
+//        final List<ImpressionRecord> ageOver54Impressions = new ArrayList<>();
+//        final List<ClickRecord> ageOver54Clicks = new ArrayList<>();
 //
-//        final List<Impression> incomeLowImpressions = new ArrayList<>();
-//        final List<Click> incomeLowClicks = new ArrayList<>();
-//        final List<Impression> incomeMediumImpressions = new ArrayList<>();
-//        final List<Click> incomeMediumClicks = new ArrayList<>();
-//        final List<Impression> incomeHighImpressions = new ArrayList<>();
-//        final List<Click> incomeHighClicks = new ArrayList<>();
+//        final List<ImpressionRecord> incomeLowImpressions = new ArrayList<>();
+//        final List<ClickRecord> incomeLowClicks = new ArrayList<>();
+//        final List<ImpressionRecord> incomeMediumImpressions = new ArrayList<>();
+//        final List<ClickRecord> incomeMediumClicks = new ArrayList<>();
+//        final List<ImpressionRecord> incomeHighImpressions = new ArrayList<>();
+//        final List<ClickRecord> incomeHighClicks = new ArrayList<>();
 //
-//        final List<Impression> contextNewsImpressions = new ArrayList<>();
-//        final List<Click> contextNewsClicks = new ArrayList<>();
-//        final List<Impression> contextShoppingImpressions = new ArrayList<>();
-//        final List<Click> contextShoppingClicks = new ArrayList<>();
-//        final List<Impression> contextSocialMediaImpressions = new ArrayList<>();
-//        final List<Click> contextSocialMediaClicks = new ArrayList<>();
-//        final List<Impression> contextBlogImpressions = new ArrayList<>();
-//        final List<Click> contextBlogClicks = new ArrayList<>();
-//        final List<Impression> contextHobbiesImpressions = new ArrayList<>();
-//        final List<Click> contextHobbiesClicks = new ArrayList<>();
-//        final List<Impression> contextTravelImpressions = new ArrayList<>();
-//        final List<Click> contextTravelClicks = new ArrayList<>();
+//        final List<ImpressionRecord> contextNewsImpressions = new ArrayList<>();
+//        final List<ClickRecord> contextNewsClicks = new ArrayList<>();
+//        final List<ImpressionRecord> contextShoppingImpressions = new ArrayList<>();
+//        final List<ClickRecord> contextShoppingClicks = new ArrayList<>();
+//        final List<ImpressionRecord> contextSocialMediaImpressions = new ArrayList<>();
+//        final List<ClickRecord> contextSocialMediaClicks = new ArrayList<>();
+//        final List<ImpressionRecord> contextBlogImpressions = new ArrayList<>();
+//        final List<ClickRecord> contextBlogClicks = new ArrayList<>();
+//        final List<ImpressionRecord> contextHobbiesImpressions = new ArrayList<>();
+//        final List<ClickRecord> contextHobbiesClicks = new ArrayList<>();
+//        final List<ImpressionRecord> contextTravelImpressions = new ArrayList<>();
+//        final List<ClickRecord> contextTravelClicks = new ArrayList<>();
 //
 //        for (Impression impression : allImpressions) {
 //            switch (impression.gender) {
@@ -196,19 +193,19 @@ public class ViewDataParser {
 //    }
 
 
-    private static XYChart.Series<String, Double> getClickCostsHistogram(List<Click> clicks, Function<Click, Integer> getClickTime, int timeDivisions, Function<Integer, String> showDivision) {
-        int[] clicksPerTime = new int[timeDivisions];
-        double[] costsPerTime = new double[timeDivisions];
+    private static XYChart.Series<String, Number> getClickCostsHistogram(List<ClickRecord> clicks, Function<ClickRecord, Integer> getClickTime, int timeDivisions, Function<Integer, String> showDivision) {
+        int[] clicksPerTime = new int[timeDivisions+1];
+        double[] costsPerTime = new double[timeDivisions+1];
 
-        for (Click click : clicks) {
+        for (ClickRecord click : clicks) {
             final int time = getClickTime.apply(click);
 
             clicksPerTime[time] += 1;
             costsPerTime[time] += click.getCost();
         }
 
-        XYChart.Series<String, Double> clickCosts = new XYChart.Series<>();
-        for (int i = 0; i < timeDivisions; i++) {
+        XYChart.Series<String, Number> clickCosts = new XYChart.Series<>();
+        for (int i = 1; i <= timeDivisions; i++) {
             clickCosts.getData().add(new XYChart.Data<>(
                     showDivision.apply(i), costsPerTime[i] / clicksPerTime[i]
             ));
@@ -217,7 +214,7 @@ public class ViewDataParser {
         return clickCosts;
     }
 
-    public static XYChart.Series<String, Double> getDailyClickCostsHistogram(List<Click> clicks) {
+    public static XYChart.Series<String, Number> getDailyClickCostsHistogram(List<ClickRecord> clicks) {
         return getClickCostsHistogram(
                 clicks,
                 c -> c.getDate().getDayOfWeek().getValue(),
@@ -226,7 +223,7 @@ public class ViewDataParser {
         );
     }
 
-    public static XYChart.Series<String, Double> getHourlyClickCostsHistogram(List<Click> clicks) {
+    public static XYChart.Series<String, Number> getHourlyClickCostsHistogram(List<ClickRecord> clicks) {
         return getClickCostsHistogram(
                 clicks,
                 c -> c.getDate().getHour(),
@@ -239,7 +236,7 @@ public class ViewDataParser {
         // TODO, will likely have to make a db merging impression and click data.
         return null;
     }
-    
+
     private static String roundDate(LocalDateTime dateTime, TimeGranularity granularity) {
         String roundedDate = null;
 
@@ -274,37 +271,37 @@ public class ViewDataParser {
 //        return DateFormatUtils.format(date, "yyy-MM-dd HH:mm:ss");
 //    }
 
-    public static long getUniques(List<Click> clicks) {
+    public static long getUniques(List<ClickRecord> clicks) {
         return clicks
                 .parallelStream()
-                .map(Click::getID)
+                .map(ClickRecord::getUser)
                 .distinct()
                 .count();
     }
 
-    public static long getBounces(List<Interaction> interactions) {
+    public static long getBounces(List<InteractionRecord> interactions) {
         return interactions
                 .parallelStream()
-                .filter(interaction -> !interaction.isConversion())
+                .filter(interaction -> !interaction.getConversion())
                 .count();
     }
 
-    public static long getConversions(List<Interaction> interactions) {
+    public static long getConversions(List<InteractionRecord> interactions) {
         return interactions
                 .parallelStream()
-                .filter(Interaction::isConversion)
+                .filter(InteractionRecord::getConversion)
                 .count();
     }
 
     // Every 1000 impressions calculate the (impressions + click) cost sum and plot them
-    public static XYChart.Series<String, Number> getCPMTimeSeries(TimeGranularity granularity, List<Impression> impressions, List<Click> clicks) {
+    public static XYChart.Series<String, Number> getCPMTimeSeries(TimeGranularity granularity, List<ImpressionRecord> impressions, List<ClickRecord> clicks) {
         final Map<String, Number> cpms = new HashMap<>();
         final Map<String, Number> cpmDatesNumber = new HashMap<>();
         final Map<String, Number> cpmDatesCost = new HashMap<>();
 
-        final List<Impression> sortedImpressions = impressions
+        final List<ImpressionRecord> sortedImpressions = impressions
                 .stream()
-                .sorted(Comparator.comparing(Impression::getDate))
+                .sorted(Comparator.comparing(ImpressionRecord::getDate))
                 .limit(impressions.size() - impressions.size() % 1000) // Throw away last n < 1000 impressions
                 .collect(Collectors.toList());
 
@@ -313,18 +310,18 @@ public class ViewDataParser {
                     .stream()
                     .skip(i)
                     .limit(1000)
-                    .mapToDouble(Impression::getCost)
+                    .mapToDouble(ImpressionRecord::getCost)
                     .sum();
 
-            final Impression firstImpression = sortedImpressions.get(i);
-            final Impression lastImpression = sortedImpressions.get(i + 999);
+            final ImpressionRecord firstImpression = sortedImpressions.get(i);
+            final ImpressionRecord lastImpression = sortedImpressions.get(i + 999);
 
             cpm += clicks
                     .parallelStream()
                     .filter(click ->
                             click.getDate().isAfter(firstImpression.getDate()) &&
                                     click.getDate().isBefore(lastImpression.getDate()))
-                    .mapToDouble(Click::getCost)
+                    .mapToDouble(ClickRecord::getCost)
                     .sum();
 
             final String roundedDate = roundDate(sortedImpressions.get(i + 999).getDate(), granularity);
@@ -343,20 +340,20 @@ public class ViewDataParser {
         return mapToSeries("Cost-per-mille", cpms);
     }
 
-    public static double getCPM(List<Impression> impressions, List<Click> clicks) {
+    public static double getCPM(List<ImpressionRecord> impressions, List<ClickRecord> clicks) {
         return getTotalCost(impressions, clicks) / (impressions.size() * 1000);
     }
 
-    public static XYChart.Series<String, Number> getTotalCostSeries(TimeGranularity granularity, List<Impression> impressions, List<Click> clicks) {
+    public static XYChart.Series<String, Number> getTotalCostSeries(TimeGranularity granularity, List<ImpressionRecord> impressions, List<ClickRecord> clicks) {
         final Map<String, Number> totalCosts = new HashMap<>();
 
-        for (Impression impression : impressions) {
+        for (ImpressionRecord impression : impressions) {
             final String roundedTime = roundDate(impression.getDate(), granularity);
             totalCosts.putIfAbsent(roundedTime, 0.0);
             totalCosts.computeIfPresent(roundedTime, (key, val) -> val.doubleValue() + impression.getCost());
         }
 
-        for (Click click : clicks) {
+        for (ClickRecord click : clicks) {
             final String roundedTime = roundDate(click.getDate(), granularity);
             totalCosts.putIfAbsent(roundedTime, 0.0);
             totalCosts.computeIfPresent(roundedTime, (key, val) -> val.doubleValue() + click.getCost());
@@ -365,32 +362,32 @@ public class ViewDataParser {
         return mapToSeries("Total cost", totalCosts);
     }
 
-    public static double getTotalCost(List<Impression> impressions, List<Click> clicks) {
+    public static double getTotalCost(List<ImpressionRecord> impressions, List<ClickRecord> clicks) {
         double cost = 0;
 
         cost += impressions
                 .parallelStream()
-                .mapToDouble(Impression::getCost)
+                .mapToDouble(ImpressionRecord::getCost)
                 .sum();
         cost += clicks
                 .parallelStream()
-                .mapToDouble(Click::getCost)
+                .mapToDouble(ClickRecord::getCost)
                 .sum();
 
         return cost;
     }
 
-    public static XYChart.Series<String, Number> getCTRTimeSeries(TimeGranularity granularity, List<Impression> impressions, List<Click> clicks) {
+    public static XYChart.Series<String, Number> getCTRTimeSeries(TimeGranularity granularity, List<ImpressionRecord> impressions, List<ClickRecord> clicks) {
         final Map<String, Integer> totalImpressions = new HashMap<>();
         final Map<String, Integer> totalClicks = new HashMap<>();
 
-        for (Impression impression : impressions) {
+        for (ImpressionRecord impression : impressions) {
             final String roundedTime = roundDate(impression.getDate(), granularity);
             totalImpressions.putIfAbsent(roundedTime, 0);
             totalImpressions.computeIfPresent(roundedTime, (key, val) -> val + 1);
         }
 
-        for (Click click : clicks) {
+        for (ClickRecord click : clicks) {
             final String roundedTime = roundDate(click.getDate(), granularity);
             totalClicks.putIfAbsent(roundedTime, 0);
             totalClicks.computeIfPresent(roundedTime, (key, val) -> val + 1);
@@ -404,11 +401,11 @@ public class ViewDataParser {
         return mapToSeries("Click-through-rate", ctrs);
     }
 
-    public static double getCTR(List<Impression> impressions, List<Click> clicks) {
+    public static double getCTR(List<ImpressionRecord> impressions, List<ClickRecord> clicks) {
         return (double) clicks.size() / impressions.size();
     }
 
-    public static XYChart.Series<String, Number> getCPATimeSeries(TimeGranularity granularity, List<Impression> impressions, List<Click> clicks, List<Interaction> interactions) {
+    public static XYChart.Series<String, Number> getCPATimeSeries(TimeGranularity granularity, List<ImpressionRecord> impressions, List<ClickRecord> clicks, List<InteractionRecord> interactions) {
         final Map<String, Number> cpas = new HashMap<>();
         final List<String> clickSeenDates = new ArrayList<>();
         final List<String> impressionSeenDates = new ArrayList<>();
@@ -418,7 +415,7 @@ public class ViewDataParser {
         final Map<String, Number> distinctImpressionCosts = new HashMap<>();
         final Map<String, Number> acquisitionsAtDate = new HashMap<>();
 
-        for (Click click : clicks) {
+        for (ClickRecord click : clicks) {
             final String roundedDate = roundDate(click.getDate(), granularity);
             if (!clickSeenDates.contains(roundedDate)) {
                 distinctClicksCosts.putIfAbsent(roundedDate, click.getCost());
@@ -429,7 +426,7 @@ public class ViewDataParser {
             }
         }
 
-        for (Impression impression : impressions) {
+        for (ImpressionRecord impression : impressions) {
             final String roundedDate = roundDate(impression.getDate(), granularity);
             if (!impressionSeenDates.contains(roundedDate)) {
                 distinctImpressionCosts.putIfAbsent(roundedDate, impression.getCost());
@@ -440,12 +437,12 @@ public class ViewDataParser {
             }
         }
 
-        final List<Interaction> conversions = interactions
+        final List<InteractionRecord> conversions = interactions
                 .parallelStream()
-                .filter(Interaction::isConversion)
+                .filter(InteractionRecord::getConversion)
                 .collect(Collectors.toList());
 
-        for (Interaction conversion : conversions) {
+        for (InteractionRecord conversion : conversions) {
             final String roundedDate = roundDate(conversion.getEntryDate(), granularity);
             if (!interactionSeenDates.contains(roundedDate)) {
                 acquisitionsAtDate.putIfAbsent(roundedDate, 0);
@@ -468,11 +465,11 @@ public class ViewDataParser {
         return mapToSeries("Cost-per-acquisition", cpas);
     }
 
-    public static double getCPA(List<Impression> impressions, List<Click> clicks, List<Interaction> interactions) {
+    public static double getCPA(List<ImpressionRecord> impressions, List<ClickRecord> clicks, List<InteractionRecord> interactions) {
         return getTotalCost(impressions, clicks) / getConversions(interactions);
     }
 
-    public static XYChart.Series<String, Number> getCPCTimeSeries(TimeGranularity granularity, List<Impression> impressions, List<Click> clicks) {
+    public static XYChart.Series<String, Number> getCPCTimeSeries(TimeGranularity granularity, List<ImpressionRecord> impressions, List<ClickRecord> clicks) {
         final Map<String, Number> cpcs = new HashMap<>();
         final List<String> clickSeenDates = new ArrayList<>();
         final List<String> impressionSeenDates = new ArrayList<>();
@@ -481,7 +478,7 @@ public class ViewDataParser {
         final Map<String, Number> distinctImpressionCosts = new HashMap<>();
         final Map<String, Number> clicksAtDate = new HashMap<>();
 
-        for (Click click : clicks) {
+        for (ClickRecord click : clicks) {
             final String roundedDate = roundDate(click.getDate(), granularity);
             if (!clickSeenDates.contains(roundedDate)) {
                 distinctClicksCosts.putIfAbsent(roundedDate, click.getCost());
@@ -495,7 +492,7 @@ public class ViewDataParser {
             }
         }
 
-        for (Impression impression : impressions) {
+        for (ImpressionRecord impression : impressions) {
             final String roundedDate = roundDate(impression.getDate(), granularity);
             if (!impressionSeenDates.contains(roundedDate)) {
                 distinctImpressionCosts.putIfAbsent(roundedDate, impression.getCost());
@@ -518,25 +515,25 @@ public class ViewDataParser {
         return mapToSeries("Cost-per-click", cpcs);
     }
 
-    public static double getCPC(List<Impression> impressions, List<Click> clicks) {
+    public static double getCPC(List<ImpressionRecord> impressions, List<ClickRecord> clicks) {
         return getTotalCost(impressions, clicks) / clicks.size();
     }
 
     // TODO
-    public static XYChart.Series<String, Number> getBounceRateTimeSeries(TimeGranularity granularity, List<Click> clicks, List<Interaction> interactions) {
+    public static XYChart.Series<String, Number> getBounceRateTimeSeries(TimeGranularity granularity, List<ClickRecord> clicks, List<InteractionRecord> interactions) {
         final Map<String, Integer> totalClicks = new HashMap<>();
         final Map<String, Integer> totalInteractions = new HashMap<>();
 
-        for (Click click : clicks) {
+        for (ClickRecord click : clicks) {
             final String roundedTime = roundDate(click.getDate(), granularity);
             totalClicks.putIfAbsent(roundedTime, 0);
             totalClicks.computeIfPresent(roundedTime, (key, val) -> val + 1);
         }
 
-        for (Interaction interaction : interactions) {
+        for (InteractionRecord interaction : interactions) {
             final String roundedTime = roundDate(interaction.getEntryDate(), granularity);
             totalInteractions.putIfAbsent(roundedTime, 0);
-            if (interaction.isConversion()) {
+            if (interaction.getConversion()) {
                 totalInteractions.computeIfPresent(roundedTime, (key, val) -> val + 1);
             }
         }
@@ -549,11 +546,11 @@ public class ViewDataParser {
         return mapToSeries("Bounce rate", bounceRates);
     }
 
-    public static double getBounceRate(List<Click> clicks, List<Interaction> interactions) {
+    public static double getBounceRate(List<ClickRecord> clicks, List<InteractionRecord> interactions) {
         return (double) getBounces(interactions) / clicks.size();
     }
 
-//    private static <U> XYChart.Series<String, U> mapToSeries(String seriesName, Map<Date, U> map) {
+    //    private static <U> XYChart.Series<String, U> mapToSeries(String seriesName, Map<Date, U> map) {
 //        final XYChart.Series<String, U> series = new XYChart.Series<>();
 //        series.setName(seriesName);
 //

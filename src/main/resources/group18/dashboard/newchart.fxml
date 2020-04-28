@@ -82,30 +82,8 @@
       </VBox>
       <JFXComboBox fx:id="campaignComboBox" maxWidth="1.7976931348623157E308" promptText="Campaign" GridPane.rowIndex="2" GridPane.valignment="TOP" />
       <JFXComboBox fx:id="metricComboBox" maxWidth="1.7976931348623157E308" promptText="Metric" GridPane.columnIndex="1" GridPane.rowIndex="2" GridPane.valignment="TOP">
-         <items>
-            <FXCollections fx:factory="observableArrayList">
-               <String fx:value="Impressions" />
-               <String fx:value="Clicks" />
-               <String fx:value="Uniques" />
-               <String fx:value="Bounces" />
-               <String fx:value="Conversions" />
-               <String fx:value="Total Cost" />
-               <String fx:value="Click-through-rate" />
-               <String fx:value="Cost-per-acquisition" />
-               <String fx:value="Cost-per-click" />
-               <String fx:value="Cost-per-mille" />
-               <String fx:value="Bounce Rate" />
-            </FXCollections>
-         </items>
       </JFXComboBox>
       <JFXComboBox fx:id="granularity" GridPane.columnIndex="2" GridPane.rowIndex="2" GridPane.valignment="TOP">
-         <items>
-            <FXCollections fx:factory="observableArrayList">
-               <String fx:value="Hourly" />
-               <String fx:value="Daily" />
-               <String fx:value="Weekly" />
-            </FXCollections>
-         </items>
       </JFXComboBox>
       <HBox spacing="5.0" GridPane.columnIndex="3" GridPane.rowIndex="2">
          <children>
@@ -122,6 +100,7 @@
                <items>
                   <FXCollections fx:factory="observableArrayList">
                      <String fx:value="Line Chart" />
+                     <String fx:value="Histogram" />
                   </FXCollections>
                </items>
             </JFXComboBox>

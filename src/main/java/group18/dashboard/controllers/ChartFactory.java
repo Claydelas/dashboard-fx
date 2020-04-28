@@ -4,20 +4,19 @@ import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.validation.RequiredFieldValidator;
 import group18.dashboard.App;
+import group18.dashboard.TimeGranularity;
 import group18.dashboard.ViewDataParser;
 import group18.dashboard.database.enums.ImpressionAge;
 import group18.dashboard.database.enums.ImpressionContext;
 import group18.dashboard.database.enums.ImpressionGender;
 import group18.dashboard.database.enums.ImpressionIncome;
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.chart.CategoryAxis;
-import javafx.scene.chart.LineChart;
-import javafx.scene.chart.NumberAxis;
-import javafx.scene.chart.XYChart;
+import javafx.scene.chart.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.DatePicker;
@@ -73,12 +72,30 @@ public class ChartFactory {
     public JFXComboBox<String> granularity;
     ExecutorService executor;
     private FlowPane dashboardArea;
+    private ObservableList<String> metrics;
+    private ObservableList<String> granularities;
 
     @FXML
     public void initialize() {
-        executor = Executors.newWorkStealingPool();
+        metrics = FXCollections.observableArrayList("Impressions",
+                "Clicks", "Uniques", "Bounces", "Conversions", "Total Cost", "Click-through-rate",
+                "Cost-per-acquisition", "Cost-per-click", "Cost-per-mille", "Bounce Rate");
+        granularities = FXCollections.observableArrayList("Hourly", "Daily", "Weekly");
 
+        chartTypeComboBox.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
+            if (newSelection.equals("Histogram")) {
+                metricComboBox.setItems(FXCollections.observableArrayList("Clicks"));
+                granularity.setItems(FXCollections.observableArrayList("Hourly", "Daily"));
+            } else {
+                metricComboBox.setItems(metrics);
+                granularity.setItems(granularities);
+            }
+        });
+
+        chartTypeComboBox.getSelectionModel().select(0);
         granularity.getSelectionModel().select(1);
+
+        executor = Executors.newWorkStealingPool();
 
         metricComboBox.setValidators(new RequiredFieldValidator());
         campaignComboBox.setValidators(new RequiredFieldValidator());
@@ -105,21 +122,27 @@ public class ChartFactory {
 
             final XYChart<String, Number> chart;
 
+            String chartType = chartTypeComboBox.getSelectionModel().getSelectedItem();
             // CHART TYPE SELECTION LOGIC
-            switch (chartTypeComboBox.getSelectionModel().getSelectedItem()) {
+            switch (chartType) {
                 case "Line Chart":
                     chart = new LineChart<>(new CategoryAxis(), new NumberAxis());
                     System.out.println("Debug : LINE CHART");
                     break;
+                case "Histogram":
+                    chart = new BarChart<>(new CategoryAxis(), new NumberAxis());
+                    System.out.println("Debug : HISTOGRAM");
+                    break;
                 default:
                     chart = new LineChart<>(new CategoryAxis(), new NumberAxis());
             }
-
+            TimeGranularity timeGranularity = Enum.valueOf(TimeGranularity.class, granularity.getSelectionModel().getSelectedItem().toUpperCase());
             // METRIC SELECTION LOGIC
             switch (metricComboBox.getSelectionModel().getSelectedItem()) {
                 case "Impressions":
                     chart.getData().add(ViewDataParser.getSeriesOf(
                             "Impressions",
+                            timeGranularity,
                             query
                                     .select(IMPRESSION.DATE)
                                     .from(IMPRESSION)
@@ -129,22 +152,53 @@ public class ChartFactory {
                                     .fetch(IMPRESSION.DATE)));
                     break;
                 case "Clicks":
-                    chart.getData().add(ViewDataParser.getSeriesOf(
-                            "Clicks",
-                            query
-                                    .select(CLICK.DATE)
-                                    .from(CLICK)
-                                    .where(CLICK.CID.eq(campaignID)
-                                            .and(CLICK.USER.in(
-                                                    select(IMPRESSION.USER)
-                                                            .from(IMPRESSION)
-                                                            .where(IMPRESSION.CID.eq(campaignID)
-                                                                    .and(getFilter()))))
-                                            .and(getDateRange(CLICK.DATE)))
-                                    .fetch(CLICK.DATE)));
+                    if (chartType.equals("Histogram")) {
+                        if (timeGranularity.equals(TimeGranularity.DAILY)) {
+                            chart.getData().add(ViewDataParser.getDailyClickCostsHistogram(
+                                    query
+                                            .selectFrom(CLICK)
+                                            .where(CLICK.CID.eq(campaignID)
+                                                    .and(CLICK.USER.in(
+                                                            select(IMPRESSION.USER)
+                                                                    .from(IMPRESSION)
+                                                                    .where(IMPRESSION.CID.eq(campaignID)
+                                                                            .and(getFilter()))))
+                                                    .and(getDateRange(CLICK.DATE)))
+                                            .fetch()));
+                        }
+                        if (timeGranularity.equals(TimeGranularity.HOURLY)) {
+                            chart.getData().add(ViewDataParser.getHourlyClickCostsHistogram(
+                                    query
+                                            .selectFrom(CLICK)
+                                            .where(CLICK.CID.eq(campaignID)
+                                                    .and(CLICK.USER.in(
+                                                            select(IMPRESSION.USER)
+                                                                    .from(IMPRESSION)
+                                                                    .where(IMPRESSION.CID.eq(campaignID)
+                                                                            .and(getFilter()))))
+                                                    .and(getDateRange(CLICK.DATE)))
+                                            .fetch()));
+                        }
+                    } else {
+                        chart.getData().add(ViewDataParser.getSeriesOf(
+                                "Clicks",
+                                timeGranularity,
+                                query
+                                        .select(CLICK.DATE)
+                                        .from(CLICK)
+                                        .where(CLICK.CID.eq(campaignID)
+                                                .and(CLICK.USER.in(
+                                                        select(IMPRESSION.USER)
+                                                                .from(IMPRESSION)
+                                                                .where(IMPRESSION.CID.eq(campaignID)
+                                                                        .and(getFilter()))))
+                                                .and(getDateRange(CLICK.DATE)))
+                                        .fetch(CLICK.DATE)));
+                    }
                     break;
                 case "Uniques":
                     chart.getData().add(ViewDataParser.getSeriesOf("Uniques",
+                            timeGranularity,
                             query
                                     .select(CLICK.DATE)
                                     .distinctOn(CLICK.USER)

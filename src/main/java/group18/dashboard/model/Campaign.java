@@ -20,7 +20,7 @@ public class Campaign {
     private ObservableList<Interaction> interactions = FXCollections.observableArrayList();
 
 
-    public static void benchmarks(String path) throws Exception {
+    /*public static void benchmarks(String path) throws Exception {
         System.out.println("----- TIMINGS ------\n");
 
         long t = System.currentTimeMillis();
@@ -119,7 +119,7 @@ public class Campaign {
         t = System.currentTimeMillis();
         ViewDataParser.getCPCTimeSeries(Calendar.DAY_OF_MONTH, c.getImpressions(), c.getClicks());
         System.out.printf("getCPCTimeSeries: %.02fs%n", (System.currentTimeMillis() - t) / 1000f);
-    }
+    }*/
 
     public static <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {
         Set<Object> seen = ConcurrentHashMap.newKeySet();
