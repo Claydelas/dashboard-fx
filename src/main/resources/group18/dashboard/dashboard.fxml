@@ -14,7 +14,7 @@
                 <TabPane fx:id="tabs" side="LEFT" />
             </left>
          <center>
-            <ScrollPane fitToHeight="true" fitToWidth="true" focusTraversable="false">
+            <ScrollPane fx:id="scrollPane" fitToHeight="true" fitToWidth="true" focusTraversable="false">
                <content>
                   <FlowPane fx:id="dashboardArea" alignment="CENTER" columnHalignment="CENTER" hgap="5.0" vgap="5.0" />
                </content>

@@ -52,10 +52,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.chrono.Chronology;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
-import java.util.Locale;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -173,6 +171,7 @@ public class ChartFactory {
             switch (chartType) {
                 case "Line Chart":
                     chart = new LineChart<>(new CategoryAxis(), new NumberAxis());
+                    //((LineChart<String, Number>) chart).setCreateSymbols(false);
                     System.out.println("Debug : LINE CHART");
                     break;
                 case "Histogram":
@@ -316,7 +315,7 @@ public class ChartFactory {
             close.setGraphic(image);
 
             final JFXButton png = new JFXButton("PNG");
-            final VBox buttons = new VBox(close,png);
+            final VBox buttons = new VBox(close, png);
             buttons.setAlignment(Pos.TOP_RIGHT);
 
             final StackPane pane = new StackPane(chart, buttons);
@@ -479,6 +478,7 @@ public class ChartFactory {
     public void setCampaigns(ObservableList<String> campaigns) {
         campaignComboBox.setItems(campaigns);
     }
+
     private void saveAsPng(Chart chart) {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setInitialDirectory(new File(Paths.get(".").toAbsolutePath().normalize().toString()));

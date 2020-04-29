@@ -119,7 +119,7 @@
                     <!-- JDBC connection parameters -->
                     <jdbc>
                         <driver>org.h2.Driver</driver>
-                        <url>jdbc:h2:./temp</url>
+                        <url>jdbc:h2:./campaigns</url>
                         <user></user>
                         <password></password>
                     </jdbc>

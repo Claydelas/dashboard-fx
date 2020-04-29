@@ -11,6 +11,7 @@ import org.jooq.SQLDialect;
 import org.jooq.impl.DSL;
 
 import java.io.IOException;
+import java.sql.SQLException;
 
 public class App extends Application {
     public static DSLContext query;
@@ -35,6 +36,8 @@ public class App extends Application {
         System.getProperties().setProperty("org.jooq.no-logo", "true");
         query = DSL.using(DB.connection(), SQLDialect.H2);
 
+        setupDB();
+
         scene = new Scene(loadFXML("app"), 1024, 600);
         stage.setTitle("Ad Auction Dashboard alpha");
         stage.sizeToScene();
@@ -44,4 +47,71 @@ public class App extends Application {
         stage.show();
     }
 
+    private void setupDB() {
+        try {
+            DB.connection().prepareStatement(
+                    "create table if not exists CAMPAIGN (\n" +
+                            "    CID         INT auto_increment,\n" +
+                            "    NAME        VARCHAR,\n" +
+                            "    IMPRESSIONS INT,\n" +
+                            "    CLICKS      INT,\n" +
+                            "    UNIQUES     INT,\n" +
+                            "    BOUNCES     INT,\n" +
+                            "    CONVERSIONS INT,\n" +
+                            "    CTR         DOUBLE,\n" +
+                            "    CPA         DOUBLE,\n" +
+                            "    CPC         DOUBLE,\n" +
+                            "    CPM         DOUBLE,\n" +
+                            "    BOUNCE_RATE DOUBLE,\n" +
+                            "    TOTAL_COST  DOUBLE,\n" +
+                            "    PARSED      BOOLEAN default FALSE not null,\n" +
+                            "    constraint CAMPAIGN_PK\n" +
+                            "        primary key (CID));").execute();
+            DB.connection().prepareStatement(
+                    "create table if not exists IMPRESSION(\n" +
+                            "    DATE         DATETIME                                                               not null,\n" +
+                            "    USER         LONG                                                                   not null,\n" +
+                            "    GENDER       ENUM ('Male', 'Female')                                                not null,\n" +
+                            "    AGE          ENUM ('<25', '25-34', '35-44', '45-54', '>54')                         not null,\n" +
+                            "    INCOME       ENUM ('Low', 'Medium', 'High')                                         not null,\n" +
+                            "    CONTEXT      ENUM ('News', 'Shopping', 'Social Media', 'Blog', 'Hobbies', 'Travel') not null,\n" +
+                            "    COST         DOUBLE                                                                 not null,\n" +
+                            "    CID          INT                                                                    not null,\n" +
+                            "    IMPRESSIONID INT auto_increment,\n" +
+                            "    constraint IMPRESSION_PK\n" +
+                            "        primary key (IMPRESSIONID),\n" +
+                            "    constraint IMPRESSION_CAMPAIGN_CID_FK\n" +
+                            "        foreign key (CID) references CAMPAIGN (CID)\n" +
+                            "            on update cascade on delete cascade);").execute();
+            DB.connection().prepareStatement(
+                    "create table if not exists CLICK(\n" +
+                            "    DATE    DATETIME not null,\n" +
+                            "    USER    LONG     not null,\n" +
+                            "    COST    DOUBLE   not null,\n" +
+                            "    CID     INT      not null,\n" +
+                            "    CLICKID INT auto_increment,\n" +
+                            "    constraint CLICK_PK\n" +
+                            "        primary key (CLICKID),\n" +
+                            "    constraint CLICK_CAMPAIGN_CID_FK\n" +
+                            "        foreign key (CID) references CAMPAIGN (CID)\n" +
+                            "            on update cascade on delete cascade);").execute();
+            DB.connection().prepareStatement(
+                    "create table if not exists INTERACTION(\n" +
+                            "    ENTRY_DATE    DATETIME not null,\n" +
+                            "    USER          LONG     not null,\n" +
+                            "    EXIT_DATE     DATETIME,\n" +
+                            "    VIEWS         INT      not null,\n" +
+                            "    CONVERSION    BOOLEAN  not null,\n" +
+                            "    CID           INT      not null,\n" +
+                            "    INTERACTIONID INT auto_increment,\n" +
+                            "    constraint INTERACTION_PK\n" +
+                            "        primary key (INTERACTIONID),\n" +
+                            "    constraint INTERACTION_CAMPAIGN_CID_FK\n" +
+                            "        foreign key (CID) references CAMPAIGN (CID)\n" +
+                            "            on update cascade on delete cascade);").execute();
+            DB.commit();
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+    }
 }

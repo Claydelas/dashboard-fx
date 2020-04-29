@@ -4,12 +4,14 @@ import group18.dashboard.App;
 import group18.dashboard.database.tables.records.CampaignRecord;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.layout.BorderPane;
@@ -39,10 +41,12 @@ public class DashboardController {
     public Label bounceRate;
     public TabPane tabs;
     public FlowPane dashboardArea;
+    public ScrollPane scrollPane;
     ObservableList<String> campaigns;
 
     @FXML
     public void initialize() {
+        scrollPane.getContent().setOnMousePressed(Event::consume);
         dashboardArea.prefWrapLengthProperty().bind(dashboardArea.widthProperty());
         loadTabs();
         campaigns = FXCollections.observableArrayList(
