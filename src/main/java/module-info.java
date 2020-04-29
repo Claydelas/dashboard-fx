@@ -12,4 +12,7 @@ module group18.dashboard {
     exports group18.dashboard.controllers;
     exports group18.dashboard.exceptions;
     exports group18.dashboard.database.tables.records;
+
+    // for JUnit tests
+    exports group18.dashboard.database.enums;
 }

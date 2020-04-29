@@ -17,7 +17,7 @@ public class Click {
         String[] columns = line.split(",");
         Click item = new Click();
         try {
-            item.date = LocalDateTime.parse(columns[0], DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss"));
+            item.date = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").parse(columns[0]);
             item.ID = Long.parseLong(columns[1]);
             item.cost = Double.parseDouble(columns[2]);
         } catch (Exception e) {
@@ -26,7 +26,7 @@ public class Click {
         return item;
     };
 
-    private LocalDateTime date;
+    private Date date;
     private long ID;
     private double cost;
 
@@ -44,8 +44,8 @@ public class Click {
 
         //Getting the date
         try {
-            date = LocalDateTime.parse(columns[0], DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss"));
-        } catch (DateTimeException e) {
+            date = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").parse(columns[0]);
+        } catch (DateTimeException | ParseException e) {
             System.out.println(columns[0]);
             throw new ParsingException("Date could not be parsed for an impression.");
         }
@@ -65,7 +65,7 @@ public class Click {
         }
     }
 
-    public LocalDateTime getDate() {
+    public Date getDate() {
         return date;
     }
 

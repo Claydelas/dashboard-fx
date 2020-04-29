@@ -17,7 +17,7 @@ public class Impression {
         String[] p = line.split(",");
         Impression item = new Impression();
         try {
-            item.date = LocalDateTime.parse(p[0], DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss"));
+            item.date = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").parse(p[0]);
 
             item.ID = Long.parseLong(p[1]);
             item.gender = Enum.valueOf(Gender.class, p[2].toUpperCase());
@@ -36,12 +36,12 @@ public class Impression {
             item.income = Enum.valueOf(Income.class, p[4].toUpperCase());
             item.context = Enum.valueOf(Context.class, p[5].replace(" ", "_").toUpperCase());
             item.cost = Double.parseDouble(p[6]);
-        } catch (DateTimeException e) {
+        } catch (DateTimeException | ParseException e) {
             e.printStackTrace();
         }
         return item;
     };
-    public LocalDateTime date;
+    public Date date;
     public long ID;
     public Gender gender;
     public int lowerBound = -1;
@@ -54,15 +54,15 @@ public class Impression {
         //Takes in a single line of the csv and parses it
         //Checks for validity as the file is parsed, throwing an exception
         String[] columns = lineIn.split(",");
-//        if (columns.length!=7){
-//            throw new ParsingException("Incorrect number of columns were given for an impression");
-//        }
+        if (columns.length!=7){
+            throw new ParsingException("Incorrect number of columns were given for an impression");
+        }
 
         //Getting the date
         try {
-            date = LocalDateTime.parse(columns[0], DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss"));
+            date = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").parse(columns[0]);
 
-        } catch (DateTimeException e) {
+        } catch (DateTimeException | ParseException e) {
             System.out.println(columns[0]);
             throw new ParsingException("Date could not be parsed for an impression.");
         }
@@ -119,7 +119,7 @@ public class Impression {
 
     }
 
-    public LocalDateTime getDate() {
+    public Date getDate() {
         return date;
     }
 
