@@ -56,9 +56,9 @@ public class ImportController {
     boolean isValidFolder(String path) {
         Path folder = Paths.get(path);
         if (!path.isBlank() && Files.isDirectory(folder)) {
-            if (Files.isReadable(Paths.get(path + "\\click_log.csv"))
-                    && Files.isReadable(Paths.get(path + "\\impression_log.csv"))
-                    && Files.isReadable(Paths.get(path + "\\server_log.csv"))) {
+            if (Files.isReadable(Paths.get(path, "click_log.csv"))
+                    && Files.isReadable(Paths.get(path, "impression_log.csv"))
+                    && Files.isReadable(Paths.get(path, "server_log.csv"))) {
                 return true;
             }
         }
