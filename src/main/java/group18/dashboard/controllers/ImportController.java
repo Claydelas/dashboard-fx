@@ -63,9 +63,9 @@ public class ImportController {
     boolean isValidFolder(String path) {
         Path folder = Paths.get(path);
         if (!path.isBlank() && Files.isDirectory(folder)) {
-            if (Files.isReadable(Paths.get(path + "\\click_log.csv"))
-                    && Files.isReadable(Paths.get(path + "\\impression_log.csv"))
-                    && Files.isReadable(Paths.get(path + "\\server_log.csv"))) {
+            if (Files.isReadable(Paths.get(path, "click_log.csv"))
+                    && Files.isReadable(Paths.get(path, "impression_log.csv"))
+                    && Files.isReadable(Paths.get(path, "server_log.csv"))) {
                 return true;
             }
         }
@@ -338,7 +338,7 @@ public class ImportController {
         query.update(CAMPAIGN).set(CAMPAIGN.CTR, (double) clicks / impressions).where(CAMPAIGN.CID.eq(campaignID)).execute();
         query.update(CAMPAIGN).set(CAMPAIGN.CPA, totalCost / conversions).where(CAMPAIGN.CID.eq(campaignID)).execute();
         query.update(CAMPAIGN).set(CAMPAIGN.CPC, totalCost / clicks).where(CAMPAIGN.CID.eq(campaignID)).execute();
-        query.update(CAMPAIGN).set(CAMPAIGN.CPM, (totalCost / (impressions * 1000))).where(CAMPAIGN.CID.eq(campaignID)).execute();
+        query.update(CAMPAIGN).set(CAMPAIGN.CPM, ((impressionCostSum / impressions) * 1000)).where(CAMPAIGN.CID.eq(campaignID)).execute();
         query.update(CAMPAIGN).set(CAMPAIGN.BOUNCE_RATE, (double) bounces / clicks).where(CAMPAIGN.CID.eq(campaignID)).execute();
         query.update(CAMPAIGN).set(CAMPAIGN.TOTAL_COST, totalCost).where(CAMPAIGN.CID.eq(campaignID)).execute();
 

@@ -110,10 +110,10 @@ public class DashboardController {
                 , new Label(String.format("%,d", campaignRecord.getBounces()))
                 , new Label(String.format("%,d", campaignRecord.getConversions()))
                 , new Label(String.format("\u00A3%.2f", campaignRecord.getTotalCost()))
-                , new Label(String.format("%.2f%%", campaignRecord.getCtr()))
+                , new Label(String.format("%.2f%%", campaignRecord.getCtr() * 100))
                 , new Label(String.format("\u00A3%.2f", campaignRecord.getCpa()))
                 , new Label(String.format("\u00A3%.2f", campaignRecord.getCpc()))
-                , new Label(String.format("\u00A3%.5f", campaignRecord.getCpm()))
+                , new Label(String.format("\u00A3%.3f", campaignRecord.getCpm()))
                 , new Label(String.format("%.2f%%", campaignRecord.getBounceRate() * 100)));
         tab.setClosable(false);
         tab.setContent(content);
