@@ -1,10 +1,14 @@
 package group18.dashboard.controllers;
 
 import com.jfoenix.controls.JFXComboBox;
+import group18.dashboard.App;
 import group18.dashboard.database.tables.records.CampaignRecord;
 import group18.dashboard.util.DB;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
@@ -126,13 +130,31 @@ public class ImportController {
                 try {
                     latch.await();
                     calculateMetrics(campaignID);
+                    if (parentController == null) Platform.runLater(this::loadDashboard);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             });
             //TODO update progress indicator
         } else return;
-        exit();
+        if (parentController != null) exit();
+    }
+
+    private void loadDashboard() {
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource("dashboard.fxml"));
+            Parent app = fxmlLoader.load();
+
+            Stage stage = new Stage();
+            stage.setScene(new Scene(app, 1024, 600));
+            stage.setTitle("Ad Auction Dashboard alpha");
+            stage.setMinHeight(500);
+            stage.setMinWidth(800);
+            stage.show();
+            exit();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public void importFiles() {
@@ -165,13 +187,14 @@ public class ImportController {
                     try {
                         latch.await();
                         calculateMetrics(campaignID);
+                        if (parentController == null) Platform.runLater(this::loadDashboard);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
                 });
 
                 //TODO update progress indicator
-                exit();
+                if (parentController != null) exit();
             }
         }
     }
@@ -329,10 +352,12 @@ public class ImportController {
         CampaignRecord result = query.update(CAMPAIGN).set(CAMPAIGN.PARSED, true).where(CAMPAIGN.CID.eq(campaignID)).returning().fetchOne();
         DB.commit();
         System.out.println("Metrics calculated successfully.");
-        Platform.runLater(() -> {
-            parentController.loadTab(result);
-            parentController.addCampaign(result.getName());
-        });
+        if (parentController != null) {
+            Platform.runLater(() -> {
+                parentController.loadTab(result);
+                parentController.addCampaign(result.getName());
+            });
+        }
     }
 
     public void setParentController(DashboardController dashboardController) {
