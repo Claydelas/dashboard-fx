@@ -47,7 +47,7 @@ public class ViewDataParser {
 
     public static XYChart.Series<String, Number> getDailyClickCostsHistogram(String addedInfo, List<ClickRecord> clicks, boolean perClick) {
         return getClickCostsHistogram(
-                "Day of Week" + addedInfo,
+                "Day of Week\n" + addedInfo,
                 perClick,
                 clicks,
                 c -> c.getDate().getDayOfWeek().getValue(),
@@ -58,7 +58,7 @@ public class ViewDataParser {
 
     public static XYChart.Series<String, Number> getHourlyClickCostsHistogram(String addedInfo, List<ClickRecord> clicks, boolean perClick) {
         return getClickCostsHistogram(
-                "Hour of Day" + addedInfo,
+                "Hour of Day\n" + addedInfo,
                 perClick,
                 clicks,
                 c -> c.getDate().getHour(),
@@ -172,7 +172,7 @@ public class ViewDataParser {
                     entry.getValue().doubleValue() / cpmDatesNumber.get(entry.getKey()).intValue());
         }
 
-        return mapToSeries("Cost-per-mille" + addedInfo, cpms);
+        return mapToSeries("Cost-per-mille\n" + addedInfo, cpms);
     }
 
     public static double getCPM(List<ImpressionRecord> impressions, List<ClickRecord> clicks) {
@@ -194,7 +194,7 @@ public class ViewDataParser {
             totalCosts.computeIfPresent(roundedTime, (key, val) -> val.doubleValue() + click.getCost());
         }
 
-        return mapToSeries("Total cost" + addedInfo, totalCosts);
+        return mapToSeries("Total cost\n" + addedInfo, totalCosts);
     }
 
     public static double getTotalCost(List<ImpressionRecord> impressions, List<ClickRecord> clicks) {
@@ -233,7 +233,7 @@ public class ViewDataParser {
             ctrs.put(entry.getKey(), (double) totalClicks.get(entry.getKey()) / entry.getValue());
         }
 
-        return mapToSeries("Click-through-rate" + addedInfo, ctrs);
+        return mapToSeries("Click-through-rate\n" + addedInfo, ctrs);
     }
 
     public static double getCTR(List<ImpressionRecord> impressions, List<ClickRecord> clicks) {
@@ -297,7 +297,7 @@ public class ViewDataParser {
             cpas.put(acquisitions.getKey(), cost / acquisitions.getValue().doubleValue());
         }
 
-        return mapToSeries("Cost-per-acquisition" + addedInfo, cpas);
+        return mapToSeries("Cost-per-acquisition\n" + addedInfo, cpas);
     }
 
     public static double getCPA(List<ImpressionRecord> impressions, List<ClickRecord> clicks, List<InteractionRecord> interactions) {
@@ -347,7 +347,7 @@ public class ViewDataParser {
             cpcs.put(click.getKey(), cost / click.getValue().doubleValue());
         }
 
-        return mapToSeries("Cost-per-click" + addedInfo, cpcs);
+        return mapToSeries("Cost-per-click\n" + addedInfo, cpcs);
     }
 
     public static double getCPC(List<ImpressionRecord> impressions, List<ClickRecord> clicks) {
@@ -378,7 +378,7 @@ public class ViewDataParser {
             bounceRates.put(entry.getKey(), (double) totalInteractions.get(entry.getKey()) / entry.getValue());
         }
 
-        return mapToSeries("Bounce rate" + addedInfo, bounceRates);
+        return mapToSeries("Bounce rate\n" + addedInfo, bounceRates);
     }
 
     public static double getBounceRate(List<ClickRecord> clicks, List<InteractionRecord> interactions) {
