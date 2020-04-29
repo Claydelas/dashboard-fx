@@ -22,9 +22,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.chart.*;
-import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.DatePicker;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.ClipboardContent;
@@ -183,6 +181,13 @@ public class ChartFactory {
                 default:
                     chart = new LineChart<>(new CategoryAxis(), new NumberAxis());
             }
+
+            ProgressIndicator progress = new ProgressIndicator();
+            progress.setProgress(ProgressBar.INDETERMINATE_PROGRESS);
+            final StackPane pane = new StackPane(progress);
+            StackPane.setAlignment(pane, Pos.CENTER);
+            Platform.runLater(() -> dashboardArea.getChildren().add(pane));
+
             TimeGranularity timeGranularity = Enum.valueOf(TimeGranularity.class, granularity.getSelectionModel().getSelectedItem().toUpperCase());
             // METRIC SELECTION LOGIC
             switch (metricComboBox.getSelectionModel().getSelectedItem()) {
@@ -318,8 +323,10 @@ public class ChartFactory {
             final VBox buttons = new VBox(close, png);
             buttons.setAlignment(Pos.TOP_RIGHT);
 
-            final StackPane pane = new StackPane(chart, buttons);
-
+            Platform.runLater(() -> {
+                pane.getChildren().clear();
+                pane.getChildren().addAll(chart, buttons);
+            });
             StackPane.setAlignment(buttons, Pos.TOP_RIGHT);
 
             close.setOnMouseClicked(e -> dashboardArea.getChildren().remove(pane));
@@ -328,7 +335,6 @@ public class ChartFactory {
                 dashboardArea.requestFocus();
             });
             makeDraggable(pane);
-            Platform.runLater(() -> dashboardArea.getChildren().add(pane));
         });
         executor.shutdown();
         //implicit closing of stage after a chart is added
