@@ -22,7 +22,6 @@
                         <FXCollections fx:factory="observableArrayList">
                             <String fx:value="folder" />
                             <String fx:value="files" />
-                            <String fx:value="zip?" />
                         </FXCollections>
                     </items>
                 </JFXComboBox>
@@ -42,7 +41,7 @@
                   </HBox>
                   <HBox alignment="CENTER_LEFT" spacing="5.0">
                      <children>
-                        <Button mnemonicParsing="false" onAction="#importFolder" text="Import Folder" />
+                        <Button fx:id="folderButton" mnemonicParsing="false" onAction="#importFolder" text="Import Folder" />
                         <ProgressBar fx:id="folderImportProgress" prefWidth="250.0" visible="false" />
                      </children>
                   </HBox>
@@ -70,7 +69,7 @@
                   </HBox>
                   <HBox alignment="CENTER_LEFT" spacing="5.0">
                      <children>
-                        <Button mnemonicParsing="false" onAction="#importFiles" text="Import Files" />
+                        <Button fx:id="filesButton" mnemonicParsing="false" onAction="#importFiles" text="Import Files" />
                         <ProgressBar fx:id="filesImportProgress" prefWidth="260.0" visible="false" />
                      </children>
                   </HBox>

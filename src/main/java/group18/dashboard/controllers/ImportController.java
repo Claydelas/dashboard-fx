@@ -54,6 +54,8 @@ public class ImportController {
     public TextField campaignNameField;
     public ProgressBar filesImportProgress;
     public ProgressBar folderImportProgress;
+    public Button folderButton;
+    public Button filesButton;
     ExecutorService executor;
     File folder;
     private DashboardController parentController;
@@ -100,7 +102,7 @@ public class ImportController {
     public void importFolder() {
         String folderDir = folderPath.getText();
         if (isValidFolder(folderDir)) {
-
+            folderButton.setDisable(true);
             folderImportProgress.setVisible(true);
             int campaignID = insertCampaign();
             CountDownLatch latch = new CountDownLatch(3);
@@ -160,8 +162,8 @@ public class ImportController {
             if (Files.isReadable(Paths.get(impressions))
                     && Files.isReadable(Paths.get(clicks))
                     && Files.isReadable(Paths.get(interactions))) {
+                filesButton.setDisable(true);
                 filesImportProgress.setVisible(true);
-
                 int campaignID = insertCampaign();
                 CountDownLatch latch = new CountDownLatch(3);
                 executor.execute(() -> {
