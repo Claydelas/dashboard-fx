@@ -11,6 +11,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -50,9 +51,9 @@ public class ImportController {
     public VBox importForm;
     public JFXComboBox<String> source;
     public StackPane panes;
-    public TextField zipPath;
-    public Button browseZip;
     public TextField campaignNameField;
+    public ProgressBar filesImportProgress;
+    public ProgressBar folderImportProgress;
     ExecutorService executor;
     File folder;
     private DashboardController parentController;
@@ -99,6 +100,8 @@ public class ImportController {
     public void importFolder() {
         String folderDir = folderPath.getText();
         if (isValidFolder(folderDir)) {
+
+            folderImportProgress.setVisible(true);
             int campaignID = insertCampaign();
             CountDownLatch latch = new CountDownLatch(3);
             Arrays.stream(Objects.requireNonNull(Paths.get(folderDir).toFile().listFiles())).forEach(file -> {
@@ -126,18 +129,10 @@ public class ImportController {
                     e.printStackTrace();
                 }
             });
-            executor.execute(() -> {
-                try {
-                    latch.await();
-                    calculateMetrics(campaignID);
-                    if (parentController == null) Platform.runLater(this::loadDashboard);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            });
+            onParsingFinished(campaignID, latch);
             //TODO update progress indicator
-        } else return;
-        if (parentController != null) exit();
+        }
+
     }
 
     private void loadDashboard() {
@@ -165,6 +160,7 @@ public class ImportController {
             if (Files.isReadable(Paths.get(impressions))
                     && Files.isReadable(Paths.get(clicks))
                     && Files.isReadable(Paths.get(interactions))) {
+                filesImportProgress.setVisible(true);
 
                 int campaignID = insertCampaign();
                 CountDownLatch latch = new CountDownLatch(3);
@@ -183,20 +179,23 @@ public class ImportController {
                     DB.commit();
                     latch.countDown();
                 });
-                executor.execute(() -> {
-                    try {
-                        latch.await();
-                        calculateMetrics(campaignID);
-                        if (parentController == null) Platform.runLater(this::loadDashboard);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                });
-
+                onParsingFinished(campaignID, latch);
                 //TODO update progress indicator
-                if (parentController != null) exit();
             }
         }
+    }
+
+    private void onParsingFinished(int campaignID, CountDownLatch latch) {
+        executor.execute(() -> {
+            try {
+                latch.await();
+                calculateMetrics(campaignID);
+                if (parentController == null) Platform.runLater(this::loadDashboard);
+                else Platform.runLater(this::exit);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        });
     }
 
     private void exit() {
@@ -307,14 +306,6 @@ public class ImportController {
         //initial selection
         source.getSelectionModel().selectFirst();
 
-    }
-
-    public void selectZip() {
-        //TODO
-    }
-
-    public void importZip() {
-        //TODO
     }
 
     void calculateMetrics(int campaignID) {

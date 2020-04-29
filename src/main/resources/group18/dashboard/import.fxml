@@ -6,11 +6,11 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressBar?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
-
 
 <VBox fx:id="importForm" spacing="10.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="group18.dashboard.controllers.ImportController">
    <children>
@@ -40,7 +40,12 @@
                         <Button fx:id="browseFolder" mnemonicParsing="false" onAction="#selectFolder" text="Browse" />
                      </children>
                   </HBox>
-                  <Button mnemonicParsing="false" onAction="#importFolder" text="Import Folder" />
+                  <HBox alignment="CENTER_LEFT" spacing="5.0">
+                     <children>
+                        <Button mnemonicParsing="false" onAction="#importFolder" text="Import Folder" />
+                        <ProgressBar fx:id="folderImportProgress" prefWidth="250.0" visible="false" />
+                     </children>
+                  </HBox>
                </children>
             </VBox>
             <VBox spacing="5.0">
@@ -63,18 +68,12 @@
                         <Button fx:id="browseInteractionLog" mnemonicParsing="false" onAction="#selectInteractionLog" text="Browse" />
                      </children>
                   </HBox>
-                  <Button mnemonicParsing="false" onAction="#importFiles" text="Import Files" />
-               </children>
-            </VBox>
-            <VBox spacing="5.0">
-               <children>
-                  <HBox spacing="5.0">
+                  <HBox alignment="CENTER_LEFT" spacing="5.0">
                      <children>
-                        <TextField fx:id="zipPath" prefWidth="285.0" />
-                        <Button fx:id="browseZip" mnemonicParsing="false" onAction="#selectZip" text="Browse" />
+                        <Button mnemonicParsing="false" onAction="#importFiles" text="Import Files" />
+                        <ProgressBar fx:id="filesImportProgress" prefWidth="260.0" visible="false" />
                      </children>
                   </HBox>
-                  <Button mnemonicParsing="false" onAction="#importZip" text="Import Zip" />
                </children>
             </VBox>
          </children>
