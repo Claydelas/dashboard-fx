@@ -18,7 +18,7 @@ public class ViewDataParser {
     private static final DateTimeFormatter dailyFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     private static final DateTimeFormatter weeklyFormatter = DateTimeFormatter.ofPattern("yyyy LLLL, 'Week' w");
 
-    private static XYChart.Series<String, Number> getClickCostsHistogram(String divisionName, List<ClickRecord> clicks, Function<ClickRecord, Integer> getClickTime, int timeDivisions, Function<Integer, String> showDivision) {
+    private static XYChart.Series<String, Number> getClickCostsHistogram(String divisionName, boolean perClick, List<ClickRecord> clicks, Function<ClickRecord, Integer> getClickTime, int timeDivisions, Function<Integer, String> showDivision) {
         int[] clicksPerTime = new int[timeDivisions + 1];
         double[] costsPerTime = new double[timeDivisions + 1];
 
@@ -38,16 +38,17 @@ public class ViewDataParser {
 
         for (int i = index; i <= timeDivisions; i++) {
             clickCosts.getData().add(new XYChart.Data<>(
-                    showDivision.apply(i), costsPerTime[i] / clicksPerTime[i]
+                    showDivision.apply(i), costsPerTime[i] / (perClick ? clicksPerTime[i] : 1)
             ));
         }
 
         return clickCosts;
     }
 
-    public static XYChart.Series<String, Number> getDailyClickCostsHistogram(List<ClickRecord> clicks) {
+    public static XYChart.Series<String, Number> getDailyClickCostsHistogram(List<ClickRecord> clicks, boolean perClick) {
         return getClickCostsHistogram(
                 "Day of Week",
+                perClick,
                 clicks,
                 c -> c.getDate().getDayOfWeek().getValue(),
                 7,
@@ -55,9 +56,10 @@ public class ViewDataParser {
         );
     }
 
-    public static XYChart.Series<String, Number> getHourlyClickCostsHistogram(List<ClickRecord> clicks) {
+    public static XYChart.Series<String, Number> getHourlyClickCostsHistogram(List<ClickRecord> clicks, boolean perClick) {
         return getClickCostsHistogram(
                 "Hour of Day",
+                perClick,
                 clicks,
                 c -> c.getDate().getHour(),
                 23,
