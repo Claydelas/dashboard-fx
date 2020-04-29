@@ -1,7 +1,11 @@
 package group18.dashboard.controllers;
 
+import com.jfoenix.controls.JFXButton;
 import group18.dashboard.App;
 import group18.dashboard.database.tables.records.CampaignRecord;
+import javafx.application.Platform;
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.Event;
@@ -11,6 +15,7 @@ import javafx.geometry.Insets;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
@@ -48,6 +53,30 @@ public class DashboardController {
         loadTabs();
         campaigns = FXCollections.observableArrayList(
                 query.select(CAMPAIGN.NAME).from(CAMPAIGN).where(CAMPAIGN.PARSED).fetch(CAMPAIGN.NAME));
+
+        setupFirstCampaignButton();
+    }
+
+    void setupFirstCampaignButton() {
+        final JFXButton initChartButton = new JFXButton("You can insert more charts from \"New\"");
+        initChartButton.setStyle("-fx-font-size:30");
+        ImageView image = new ImageView(App.class.getResource("icons/baseline_add_black_48dp.png").toString());
+        image.setFitWidth(80);
+        image.setFitHeight(80);
+        image.setPreserveRatio(true);
+        initChartButton.setGraphic(image);
+        initChartButton.setOnMouseClicked(e -> newChartButtonAction());
+        dashboardArea.getChildren().add(initChartButton);
+        dashboardArea.getChildren().addListener(new InvalidationListener() {
+            @Override
+            public void invalidated(Observable observable) {
+                Platform.runLater(() -> {
+                    dashboardArea.requestFocus();
+                    dashboardArea.getChildren().remove(initChartButton);
+                });
+                observable.removeListener(this);
+            }
+        });
     }
 
     //for each complete campaign generate a tab
