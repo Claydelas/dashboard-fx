@@ -56,6 +56,8 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static group18.dashboard.App.query;
 import static group18.dashboard.database.tables.Campaign.CAMPAIGN;
@@ -125,7 +127,7 @@ public class ChartFactory {
 
         chartTypeComboBox.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
             if (newSelection.equals("Histogram")) {
-                metricComboBox.setItems(FXCollections.observableArrayList("Clicks"));
+                metricComboBox.setItems(FXCollections.observableArrayList("Total click costs", "Cost per click"));
                 granularity.setItems(FXCollections.observableArrayList("Hourly", "Daily"));
             } else {
                 metricComboBox.setItems(metrics);
@@ -176,7 +178,6 @@ public class ChartFactory {
                     break;
                 case "Histogram":
                     chart = new BarChart<>(new CategoryAxis(), new NumberAxis());
-                    // this doesnt fix hours not showing
                     ((BarChart<String, Number>) chart).setBarGap(0);
                     System.out.println("Debug : HISTOGRAM");
                     break;
@@ -185,50 +186,64 @@ public class ChartFactory {
             }
             TimeGranularity timeGranularity = Enum.valueOf(TimeGranularity.class, granularity.getSelectionModel().getSelectedItem().toUpperCase());
             // METRIC SELECTION LOGIC
+            final Condition filter = getFilter();
+            final String filterString = getFilterString(filter);
             switch (metricComboBox.getSelectionModel().getSelectedItem()) {
                 case "Impressions":
                     chart.getData().add(ViewDataParser.getSeriesOf(
-                            "Impressions",
+                            "Impressions\n" + filterString,
                             timeGranularity,
                             query
                                     .select(IMPRESSION.DATE)
                                     .from(IMPRESSION)
                                     .where(IMPRESSION.CID.eq(campaignID)
-                                            .and(getFilter())
+                                            .and(filter)
                                             .and(getDateRange(IMPRESSION.DATE)))
                                     .fetch(IMPRESSION.DATE)
                     ));
                     break;
-                case "Clicks":
-                    if (chartType.equals("Histogram")) {
-                        chart.getYAxis().setLabel("Click cost (£)");
-                        if (timeGranularity.equals(TimeGranularity.DAILY)) {
-                            chart.getData().add(ViewDataParser.getDailyClickCostsHistogram(
-                                    fetchClicks(campaignID)
-                            ));
-                        }
-                        if (timeGranularity.equals(TimeGranularity.HOURLY)) {
-                            chart.getData().add(ViewDataParser.getHourlyClickCostsHistogram(
-                                    fetchClicks(campaignID)
-                            ));
-                        }
-                    } else {
-                        chart.getData().add(ViewDataParser.getSeriesOf(
-                                "Clicks",
-                                timeGranularity,
-                                query
-                                        .select(CLICK.DATE)
-                                        .from(CLICK)
-                                        .where(CLICK.CID.eq(campaignID)
-                                                .and(CLICK.USER.in(
-                                                        select(IMPRESSION.USER).from(IMPRESSION).where(IMPRESSION.CID.eq(campaignID).and(getFilter()))))
-                                                .and(getDateRange(CLICK.DATE)))
-                                        .fetch(CLICK.DATE)
+                case "Total click costs":
+                    chart.getYAxis().setLabel("Total click costs (£)");
+                    if (timeGranularity.equals(TimeGranularity.DAILY)) {
+                        chart.getData().add(ViewDataParser.getDailyClickCostsHistogram(filterString,
+                                fetchClicks(campaignID), false
+                        ));
+                    }
+                    if (timeGranularity.equals(TimeGranularity.HOURLY)) {
+                        chart.getData().add(ViewDataParser.getHourlyClickCostsHistogram(filterString,
+                                fetchClicks(campaignID), false
                         ));
                     }
                     break;
+                case "Cost per click":
+                    chart.getYAxis().setLabel("Cost per click (£)");
+                    if (timeGranularity.equals(TimeGranularity.DAILY)) {
+                        chart.getData().add(ViewDataParser.getDailyClickCostsHistogram(filterString,
+                                fetchClicks(campaignID), true
+                        ));
+                    }
+                    if (timeGranularity.equals(TimeGranularity.HOURLY)) {
+                        chart.getData().add(ViewDataParser.getHourlyClickCostsHistogram(filterString,
+                                fetchClicks(campaignID), true
+                        ));
+                    }
+                    break;
+                case "Clicks":
+                    chart.getData().add(ViewDataParser.getSeriesOf(
+                            "Clicks\n" + filterString,
+                            timeGranularity,
+                            query
+                                    .select(CLICK.DATE)
+                                    .from(CLICK)
+                                    .where(CLICK.CID.eq(campaignID)
+                                            .and(CLICK.USER.in(
+                                                    select(IMPRESSION.USER).from(IMPRESSION).where(IMPRESSION.CID.eq(campaignID).and(filter))))
+                                            .and(getDateRange(CLICK.DATE)))
+                                    .fetch(CLICK.DATE)
+                    ));
+                    break;
                 case "Uniques":
-                    chart.getData().add(ViewDataParser.getSeriesOf("Uniques",
+                    chart.getData().add(ViewDataParser.getSeriesOf("Uniques\n" + filterString,
                             timeGranularity,
                             query
                                     .select(CLICK.DATE)
@@ -238,70 +253,70 @@ public class ChartFactory {
                                             .and(CLICK.USER.in(
                                                     select(IMPRESSION.USER)
                                                             .from(IMPRESSION)
-                                                            .where(IMPRESSION.CID.eq(campaignID).and(getFilter()))))
+                                                            .where(IMPRESSION.CID.eq(campaignID).and(filter))))
                                             .and(getDateRange(CLICK.DATE)))
                                     .fetch(CLICK.DATE)
                     ));
                     break;
                 case "Bounces":
-                    chart.getData().add(ViewDataParser.getSeriesOf("Bounces",
+                    chart.getData().add(ViewDataParser.getSeriesOf("Bounces\n" + filterString,
                             timeGranularity,
                             query.select(INTERACTION.ENTRY_DATE)
                                     .from(INTERACTION)
                                     .where(INTERACTION.CID.eq(campaignID)
                                             .and(INTERACTION.CONVERSION.isFalse())
                                             .and(INTERACTION.USER.in(
-                                                    select(IMPRESSION.USER).from(IMPRESSION).where(IMPRESSION.CID.eq(campaignID).and(getFilter()))))
+                                                    select(IMPRESSION.USER).from(IMPRESSION).where(IMPRESSION.CID.eq(campaignID).and(filter))))
                                             .and(getDateRange(INTERACTION.ENTRY_DATE)))
                                     .fetch(INTERACTION.ENTRY_DATE)
                     ));
                     break;
                 case "Conversions":
-                    chart.getData().add(ViewDataParser.getSeriesOf("Conversions",
+                    chart.getData().add(ViewDataParser.getSeriesOf("Conversions\n" + filterString,
                             timeGranularity,
                             query.select(INTERACTION.ENTRY_DATE)
                                     .from(INTERACTION)
                                     .where(INTERACTION.CID.eq(campaignID)
                                             .and(INTERACTION.CONVERSION)
                                             .and(INTERACTION.USER.in(
-                                                    select(IMPRESSION.USER).from(IMPRESSION).where(IMPRESSION.CID.eq(campaignID).and(getFilter()))))
+                                                    select(IMPRESSION.USER).from(IMPRESSION).where(IMPRESSION.CID.eq(campaignID).and(filter))))
                                             .and(getDateRange(INTERACTION.ENTRY_DATE)))
                                     .fetch(INTERACTION.ENTRY_DATE)
                     ));
                     break;
                 case "Total Cost":
-                    chart.getData().add(ViewDataParser.getTotalCostSeries(timeGranularity
+                    chart.getData().add(ViewDataParser.getTotalCostSeries(filterString, timeGranularity
                             , fetchImpressions(campaignID)
                             , fetchClicks(campaignID)
                     ));
                     break;
                 case "Click-through-rate":
-                    chart.getData().add(ViewDataParser.getCTRTimeSeries(timeGranularity,
+                    chart.getData().add(ViewDataParser.getCTRTimeSeries(filterString, timeGranularity,
                             fetchImpressions(campaignID)
                             , fetchClicks(campaignID)
                     ));
                     break;
                 case "Cost-per-acquisition":
-                    chart.getData().add(ViewDataParser.getCPATimeSeries(timeGranularity
+                    chart.getData().add(ViewDataParser.getCPATimeSeries(filterString, timeGranularity
                             , fetchImpressions(campaignID)
                             , fetchClicks(campaignID)
                             , fetchInteractions(campaignID)
                     ));
                     break;
                 case "Cost-per-click":
-                    chart.getData().add(ViewDataParser.getCPCTimeSeries(timeGranularity
+                    chart.getData().add(ViewDataParser.getCPCTimeSeries(filterString, timeGranularity
                             , fetchImpressions(campaignID)
                             , fetchClicks(campaignID)
                     ));
                     break;
                 case "Cost-per-mille":
-                    chart.getData().add(ViewDataParser.getCPMTimeSeries(timeGranularity
+                    chart.getData().add(ViewDataParser.getCPMTimeSeries(filterString, timeGranularity
                             , fetchImpressions(campaignID)
                             , fetchClicks(campaignID)
                     ));
                     break;
                 case "Bounce Rate":
-                    chart.getData().add(ViewDataParser.getBounceRateTimeSeries(timeGranularity
+                    chart.getData().add(ViewDataParser.getBounceRateTimeSeries(filterString, timeGranularity
                             , fetchClicks(campaignID)
                             , fetchInteractions(campaignID)
                     ));
@@ -458,6 +473,24 @@ public class ChartFactory {
 
         System.out.println("Applied filter: " + filter);
         return filter;
+    }
+
+    private String getFilterString(Condition filterCondition) {
+        final String filter = filterCondition.toString();
+        final StringBuilder filterString = new StringBuilder("\n");
+        filterString.append("Filters: \n");
+
+        final Matcher m = Pattern.compile("(?:\"IMPRESSION\"\\.\")([A-Z]+)(?:\" = ')([^']+)").matcher(filter);
+
+        while (m.find()) {
+            filterString
+                    .append(m.group(1).substring(0, 1).toUpperCase())
+                    .append(m.group(1).substring(1).toLowerCase())
+                    .append(": ");
+            filterString.append(m.group(2)).append("\n");
+        }
+
+        return filterString.toString();
     }
 
     public <R extends Record> Condition getDateRange(TableField<R, LocalDateTime> field) {
