@@ -1,5 +1,6 @@
 package group18.dashboard;
 
+import group18.dashboard.database.tables.Campaign;
 import group18.dashboard.util.DB;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -38,13 +39,21 @@ public class App extends Application {
 
         setupDB();
 
-        scene = new Scene(loadFXML("app"), 1024, 600);
+        if (!hasCampaigns()) {
+            scene = new Scene(loadFXML("import"));
+            stage.sizeToScene();
+        } else {
+            scene = new Scene(loadFXML("dashboard"), 1024, 600);
+            stage.setMinHeight(500);
+            stage.setMinWidth(800);
+        }
         stage.setTitle("Ad Auction Dashboard alpha");
-        stage.sizeToScene();
-        //stage.setMinHeight(550);
-        //stage.setMinWidth(650);
         stage.setScene(scene);
         stage.show();
+    }
+
+    private boolean hasCampaigns() {
+        return query.fetchExists(Campaign.CAMPAIGN);
     }
 
     private void setupDB() {
