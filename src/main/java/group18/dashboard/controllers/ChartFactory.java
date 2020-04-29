@@ -252,6 +252,7 @@ public class ChartFactory {
                                             .and(getDateRange(CLICK.DATE)))
                                     .fetch(CLICK.DATE)
                     );
+                    break;
                 case "Uniques":
                     series = ViewDataParser.getSeriesOf("Uniques\n" + filterString,
                             timeGranularity,
