@@ -52,10 +52,15 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static group18.dashboard.App.query;
 import static group18.dashboard.database.tables.Campaign.CAMPAIGN;
@@ -493,15 +498,24 @@ public class ChartFactory {
     private String getFilterString(Condition filterCondition) {
         final String filter = filterCondition.toString();
         final StringBuilder filterString = new StringBuilder();
+        final Map<String, List<String>> filterMap = new HashMap<>();
 
         final Matcher m = Pattern.compile("(?:\"IMPRESSION\"\\.\")([A-Z]+)(?:\" = ')([^']+)").matcher(filter);
 
         while (m.find()) {
-            filterString
-                    .append(m.group(1).substring(0, 1).toUpperCase())
-                    .append(m.group(1).substring(1).toLowerCase())
-                    .append(": ");
-            filterString.append(m.group(2)).append("\n");
+            final String filterKey = m.group(1).substring(0, 1).toUpperCase() + (m.group(1).substring(1).toLowerCase());
+            filterMap.computeIfAbsent(filterKey,
+                    l -> new ArrayList<>());
+            filterMap.computeIfPresent(filterKey, (key, l) -> {
+                l.add(m.group(2));
+                return l;
+            });
+        }
+
+        for (Map.Entry<String, List<String>> entry : filterMap.entrySet()) {
+            filterString.append(entry.getKey()).append(": ");
+            filterString.append(String.join(", ", entry.getValue()));
+            filterString.append("\n");
         }
 
         return filterString.toString();

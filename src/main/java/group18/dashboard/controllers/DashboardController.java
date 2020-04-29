@@ -60,9 +60,9 @@ public class DashboardController {
     void setupFirstCampaignButton() {
         final JFXButton initChartButton = new JFXButton("You can insert more charts from \"New\"");
         initChartButton.setStyle("-fx-font-size:30");
-        ImageView image = new ImageView(App.class.getResource("icons/baseline_add_black_48dp.png").toString());
-        image.setFitWidth(80);
-        image.setFitHeight(80);
+        ImageView image = new ImageView(App.class.getResource("icons/baseline_add_black.png").toString());
+        image.setFitWidth(45);
+        image.setFitHeight(45);
         image.setPreserveRatio(true);
         initChartButton.setGraphic(image);
         initChartButton.setOnMouseClicked(e -> newChartButtonAction());
