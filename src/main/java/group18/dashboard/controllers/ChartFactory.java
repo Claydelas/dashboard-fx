@@ -492,8 +492,7 @@ public class ChartFactory {
 
     private String getFilterString(Condition filterCondition) {
         final String filter = filterCondition.toString();
-        final StringBuilder filterString = new StringBuilder("\n");
-        filterString.append("Filters: \n");
+        final StringBuilder filterString = new StringBuilder();
 
         final Matcher m = Pattern.compile("(?:\"IMPRESSION\"\\.\")([A-Z]+)(?:\" = ')([^']+)").matcher(filter);
 
