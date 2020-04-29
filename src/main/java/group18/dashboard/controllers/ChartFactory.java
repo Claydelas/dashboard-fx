@@ -174,7 +174,6 @@ public class ChartFactory {
                     break;
                 case "Histogram":
                     chart = new BarChart<>(new CategoryAxis(), new NumberAxis());
-                    // this doesnt fix hours not showing
                     ((BarChart<String, Number>) chart).setBarGap(0);
                     System.out.println("Debug : HISTOGRAM");
                     break;
@@ -185,14 +184,20 @@ public class ChartFactory {
             ProgressIndicator progress = new ProgressIndicator();
             progress.setProgress(ProgressBar.INDETERMINATE_PROGRESS);
             final StackPane pane = new StackPane(progress);
-            StackPane.setAlignment(pane, Pos.CENTER);
+            StackPane.setAlignment(progress, Pos.CENTER);
+
             Platform.runLater(() -> dashboardArea.getChildren().add(pane));
 
             TimeGranularity timeGranularity = Enum.valueOf(TimeGranularity.class, granularity.getSelectionModel().getSelectedItem().toUpperCase());
+            if (timeGranularity.equals(TimeGranularity.HOURLY) && chart instanceof LineChart) {
+                ((LineChart<String, Number>) chart).setCreateSymbols(false);
+                chart.setVerticalGridLinesVisible(false);
+            }
             // METRIC SELECTION LOGIC
+            XYChart.Series<String, Number> series = null;
             switch (metricComboBox.getSelectionModel().getSelectedItem()) {
                 case "Impressions":
-                    chart.getData().add(ViewDataParser.getSeriesOf(
+                    series = ViewDataParser.getSeriesOf(
                             "Impressions",
                             timeGranularity,
                             query
@@ -202,23 +207,23 @@ public class ChartFactory {
                                             .and(getFilter())
                                             .and(getDateRange(IMPRESSION.DATE)))
                                     .fetch(IMPRESSION.DATE)
-                    ));
+                    );
                     break;
                 case "Clicks":
                     if (chartType.equals("Histogram")) {
                         chart.getYAxis().setLabel("Click cost (£)");
                         if (timeGranularity.equals(TimeGranularity.DAILY)) {
-                            chart.getData().add(ViewDataParser.getDailyClickCostsHistogram(
+                            series = ViewDataParser.getDailyClickCostsHistogram(
                                     fetchClicks(campaignID)
-                            ));
+                            );
                         }
                         if (timeGranularity.equals(TimeGranularity.HOURLY)) {
-                            chart.getData().add(ViewDataParser.getHourlyClickCostsHistogram(
+                            series = ViewDataParser.getHourlyClickCostsHistogram(
                                     fetchClicks(campaignID)
-                            ));
+                            );
                         }
                     } else {
-                        chart.getData().add(ViewDataParser.getSeriesOf(
+                        series = ViewDataParser.getSeriesOf(
                                 "Clicks",
                                 timeGranularity,
                                 query
@@ -229,11 +234,11 @@ public class ChartFactory {
                                                         select(IMPRESSION.USER).from(IMPRESSION).where(IMPRESSION.CID.eq(campaignID).and(getFilter()))))
                                                 .and(getDateRange(CLICK.DATE)))
                                         .fetch(CLICK.DATE)
-                        ));
+                        );
                     }
                     break;
                 case "Uniques":
-                    chart.getData().add(ViewDataParser.getSeriesOf("Uniques",
+                    series = ViewDataParser.getSeriesOf("Uniques",
                             timeGranularity,
                             query
                                     .select(CLICK.DATE)
@@ -246,10 +251,10 @@ public class ChartFactory {
                                                             .where(IMPRESSION.CID.eq(campaignID).and(getFilter()))))
                                             .and(getDateRange(CLICK.DATE)))
                                     .fetch(CLICK.DATE)
-                    ));
+                    );
                     break;
                 case "Bounces":
-                    chart.getData().add(ViewDataParser.getSeriesOf("Bounces",
+                    series = ViewDataParser.getSeriesOf("Bounces",
                             timeGranularity,
                             query.select(INTERACTION.ENTRY_DATE)
                                     .from(INTERACTION)
@@ -259,10 +264,10 @@ public class ChartFactory {
                                                     select(IMPRESSION.USER).from(IMPRESSION).where(IMPRESSION.CID.eq(campaignID).and(getFilter()))))
                                             .and(getDateRange(INTERACTION.ENTRY_DATE)))
                                     .fetch(INTERACTION.ENTRY_DATE)
-                    ));
+                    );
                     break;
                 case "Conversions":
-                    chart.getData().add(ViewDataParser.getSeriesOf("Conversions",
+                    series = ViewDataParser.getSeriesOf("Conversions",
                             timeGranularity,
                             query.select(INTERACTION.ENTRY_DATE)
                                     .from(INTERACTION)
@@ -272,46 +277,49 @@ public class ChartFactory {
                                                     select(IMPRESSION.USER).from(IMPRESSION).where(IMPRESSION.CID.eq(campaignID).and(getFilter()))))
                                             .and(getDateRange(INTERACTION.ENTRY_DATE)))
                                     .fetch(INTERACTION.ENTRY_DATE)
-                    ));
+                    );
                     break;
                 case "Total Cost":
-                    chart.getData().add(ViewDataParser.getTotalCostSeries(timeGranularity
+                    series = ViewDataParser.getTotalCostSeries(timeGranularity
                             , fetchImpressions(campaignID)
                             , fetchClicks(campaignID)
-                    ));
+                    );
                     break;
                 case "Click-through-rate":
-                    chart.getData().add(ViewDataParser.getCTRTimeSeries(timeGranularity,
+                    series = ViewDataParser.getCTRTimeSeries(timeGranularity,
                             fetchImpressions(campaignID)
                             , fetchClicks(campaignID)
-                    ));
+                    );
                     break;
                 case "Cost-per-acquisition":
-                    chart.getData().add(ViewDataParser.getCPATimeSeries(timeGranularity
+                    series = ViewDataParser.getCPATimeSeries(timeGranularity
                             , fetchImpressions(campaignID)
                             , fetchClicks(campaignID)
                             , fetchInteractions(campaignID)
-                    ));
+                    );
                     break;
                 case "Cost-per-click":
-                    chart.getData().add(ViewDataParser.getCPCTimeSeries(timeGranularity
+                    series = ViewDataParser.getCPCTimeSeries(timeGranularity
                             , fetchImpressions(campaignID)
                             , fetchClicks(campaignID)
-                    ));
+                    );
                     break;
                 case "Cost-per-mille":
-                    chart.getData().add(ViewDataParser.getCPMTimeSeries(timeGranularity
+                    series = ViewDataParser.getCPMTimeSeries(timeGranularity
                             , fetchImpressions(campaignID)
                             , fetchClicks(campaignID)
-                    ));
+                    );
                     break;
                 case "Bounce Rate":
-                    chart.getData().add(ViewDataParser.getBounceRateTimeSeries(timeGranularity
+                    series = ViewDataParser.getBounceRateTimeSeries(timeGranularity
                             , fetchClicks(campaignID)
                             , fetchInteractions(campaignID)
-                    ));
+                    );
                     break;
             }
+            chart.getData().add(series);
+
+            final JFXButton png = new JFXButton("PNG");
             final JFXButton close = new JFXButton();
             ImageView image = new ImageView(App.class.getResource("icons/baseline_cancel_black_18dp.png").toString());
             image.setFitWidth(20);
@@ -319,21 +327,21 @@ public class ChartFactory {
             image.setPreserveRatio(true);
             close.setGraphic(image);
 
-            final JFXButton png = new JFXButton("PNG");
             final VBox buttons = new VBox(close, png);
             buttons.setAlignment(Pos.TOP_RIGHT);
+            StackPane.setAlignment(buttons, Pos.TOP_RIGHT);
 
             Platform.runLater(() -> {
                 pane.getChildren().clear();
                 pane.getChildren().addAll(chart, buttons);
             });
-            StackPane.setAlignment(buttons, Pos.TOP_RIGHT);
 
-            close.setOnMouseClicked(e -> dashboardArea.getChildren().remove(pane));
             png.setOnMouseClicked(e -> {
                 saveAsPng(chart);
                 dashboardArea.requestFocus();
             });
+            close.setOnMouseClicked(e -> dashboardArea.getChildren().remove(pane));
+
             makeDraggable(pane);
         });
         executor.shutdown();
