@@ -1,3 +1,5 @@
+create schema if not exists PUBLIC;
+
 create table if not exists CAMPAIGN (
     CID         INT auto_increment,
     NAME        VARCHAR,

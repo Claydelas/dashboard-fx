@@ -8,6 +8,9 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
+        <skip.db.creation>false</skip.db.creation>
+        <db.username></db.username>
+        <db.password></db.password>
     </properties>
     <dependencies>
         <dependency>
@@ -92,7 +95,53 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>sql-maven-plugin</artifactId>
+                <version>1.5</version>
 
+                <!-- Skip DB creation if the value of the skip.db.creation property is true -->
+                <configuration>
+                    <skip>${skip.db.creation}</skip>
+                </configuration>
+
+                <executions>
+                    <!-- Execute SQL statements to the configured database -->
+                    <execution>
+                        <id>create-database-h2</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>execute</goal>
+                        </goals>
+                        <configuration>
+                            <!-- Configure the database connection -->
+                            <driver>org.h2.Driver</driver>
+                            <url>jdbc:h2:./campaigns</url>
+                            <username>${db.username}</username>
+                            <password>${db.password}</password>
+
+                            <!-- Ensure that our changes are committed automatically -->
+                            <autocommit>true</autocommit>
+                            <!-- Configure the location of the invoked SQL script -->
+                            <srcFiles>
+                                <srcFile>./src/main/resources/group18/dashboard/config/db-h2.sql</srcFile>
+                            </srcFiles>
+                        </configuration>
+                    </execution>
+                </executions>
+
+                <dependencies>
+                    <!--
+                        Because we use the H2 database, we have to add it as the dependency
+                        of this plugin.
+                    -->
+                    <dependency>
+                        <groupId>com.h2database</groupId>
+                        <artifactId>h2</artifactId>
+                        <version>1.4.200</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
             <plugin>
 
                 <groupId>org.jooq</groupId>
@@ -126,8 +175,8 @@
                     <jdbc>
                         <driver>org.h2.Driver</driver>
                         <url>jdbc:h2:./campaigns</url>
-                        <user></user>
-                        <password></password>
+                        <user>${db.username}</user>
+                        <password>${db.password}</password>
                     </jdbc>
 
                     <!-- Generator parameters -->
