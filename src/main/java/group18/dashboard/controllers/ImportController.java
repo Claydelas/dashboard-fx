@@ -82,8 +82,8 @@ public class ImportController {
     private int insertCampaign() {
         String campaignName = generateCampaignName();
         int campaignID = query
-                .insertInto(CAMPAIGN, CAMPAIGN.NAME)
-                .values(campaignName)
+                .insertInto(CAMPAIGN, CAMPAIGN.NAME, CAMPAIGN.UID)
+                .values(campaignName, LoginController.getLoggedUserID())
                 .returningResult(CAMPAIGN.CID)
                 .fetchOne().value1();
         System.out.println("Added new campaign \"" + campaignName + "\" with id: " + campaignID);

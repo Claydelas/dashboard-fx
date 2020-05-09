@@ -53,6 +53,7 @@ public class Keys {
     // FOREIGN KEY definitions
     // -------------------------------------------------------------------------
 
+    public static final ForeignKey<CampaignRecord, UserRecord> CAMPAIGN_USER_UID_FK = ForeignKeys0.CAMPAIGN_USER_UID_FK;
     public static final ForeignKey<ClickRecord, CampaignRecord> CLICK_CAMPAIGN_CID_FK = ForeignKeys0.CLICK_CAMPAIGN_CID_FK;
     public static final ForeignKey<ImpressionRecord, CampaignRecord> IMPRESSION_CAMPAIGN_CID_FK = ForeignKeys0.IMPRESSION_CAMPAIGN_CID_FK;
     public static final ForeignKey<InteractionRecord, CampaignRecord> INTERACTION_CAMPAIGN_CID_FK = ForeignKeys0.INTERACTION_CAMPAIGN_CID_FK;
@@ -78,6 +79,7 @@ public class Keys {
     }
 
     private static class ForeignKeys0 {
+        public static final ForeignKey<CampaignRecord, UserRecord> CAMPAIGN_USER_UID_FK = Internal.createForeignKey(Keys.USER_PK, Campaign.CAMPAIGN, "CAMPAIGN_USER_UID_FK", new TableField[] { Campaign.CAMPAIGN.UID }, true);
         public static final ForeignKey<ClickRecord, CampaignRecord> CLICK_CAMPAIGN_CID_FK = Internal.createForeignKey(Keys.CAMPAIGN_PK, Click.CLICK, "CLICK_CAMPAIGN_CID_FK", new TableField[] { Click.CLICK.CID }, true);
         public static final ForeignKey<ImpressionRecord, CampaignRecord> IMPRESSION_CAMPAIGN_CID_FK = Internal.createForeignKey(Keys.CAMPAIGN_PK, Impression.IMPRESSION, "IMPRESSION_CAMPAIGN_CID_FK", new TableField[] { Impression.IMPRESSION.CID }, true);
         public static final ForeignKey<InteractionRecord, CampaignRecord> INTERACTION_CAMPAIGN_CID_FK = Internal.createForeignKey(Keys.CAMPAIGN_PK, Interaction.INTERACTION, "INTERACTION_CAMPAIGN_CID_FK", new TableField[] { Interaction.INTERACTION.CID }, true);

@@ -30,17 +30,6 @@ public class DashboardController {
 
     public StackPane mainView;
     public BorderPane chartPane;
-    public Label impressions;
-    public Label clicks;
-    public Label uniques;
-    public Label bounces;
-    public Label conversions;
-    public Label totalCost;
-    public Label ctr;
-    public Label cpa;
-    public Label cpc;
-    public Label cpm;
-    public Label bounceRate;
     public TabPane tabs;
     public FlowPane dashboardArea;
     public ScrollPane scrollPane;
@@ -52,7 +41,7 @@ public class DashboardController {
         dashboardArea.prefWrapLengthProperty().bind(dashboardArea.widthProperty());
         loadTabs();
         campaigns = FXCollections.observableArrayList(
-                query.select(CAMPAIGN.NAME).from(CAMPAIGN).where(CAMPAIGN.PARSED).fetch(CAMPAIGN.NAME));
+                query.select(CAMPAIGN.NAME).from(CAMPAIGN).where(CAMPAIGN.UID.eq(LoginController.getLoggedUserID()).and(CAMPAIGN.PARSED)).fetch(CAMPAIGN.NAME));
 
         setupFirstCampaignButton();
     }
@@ -81,7 +70,7 @@ public class DashboardController {
 
     //for each complete campaign generate a tab
     private void loadTabs() {
-        query.selectFrom(CAMPAIGN).where(CAMPAIGN.PARSED).fetch().forEach(this::loadTab);
+        query.selectFrom(CAMPAIGN).where(CAMPAIGN.UID.eq(LoginController.getLoggedUserID()).and(CAMPAIGN.PARSED)).fetch().forEach(this::loadTab);
     }
 
     //generates a tab and its contents and adds it to the TabPane

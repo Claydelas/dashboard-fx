@@ -16,7 +16,7 @@ import org.jooq.ForeignKey;
 import org.jooq.Identity;
 import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Row14;
+import org.jooq.Row15;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
@@ -32,7 +32,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Campaign extends TableImpl<CampaignRecord> {
 
-    private static final long serialVersionUID = -593769277;
+    private static final long serialVersionUID = -1014337273;
 
     /**
      * The reference instance of <code>PUBLIC.CAMPAIGN</code>
@@ -51,6 +51,11 @@ public class Campaign extends TableImpl<CampaignRecord> {
      * The column <code>PUBLIC.CAMPAIGN.CID</code>.
      */
     public final TableField<CampaignRecord, Integer> CID = createField(DSL.name("CID"), org.jooq.impl.SQLDataType.INTEGER.nullable(false).identity(true), this, "");
+
+    /**
+     * The column <code>PUBLIC.CAMPAIGN.UID</code>.
+     */
+    public final TableField<CampaignRecord, Integer> UID = createField(DSL.name("UID"), org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
 
     /**
      * The column <code>PUBLIC.CAMPAIGN.NAME</code>.
@@ -171,6 +176,15 @@ public class Campaign extends TableImpl<CampaignRecord> {
     }
 
     @Override
+    public List<ForeignKey<CampaignRecord, ?>> getReferences() {
+        return Arrays.<ForeignKey<CampaignRecord, ?>>asList(Keys.CAMPAIGN_USER_UID_FK);
+    }
+
+    public User user() {
+        return new User(this, Keys.CAMPAIGN_USER_UID_FK);
+    }
+
+    @Override
     public Campaign as(String alias) {
         return new Campaign(DSL.name(alias), this);
     }
@@ -197,11 +211,11 @@ public class Campaign extends TableImpl<CampaignRecord> {
     }
 
     // -------------------------------------------------------------------------
-    // Row14 type methods
+    // Row15 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row14<Integer, String, Integer, Integer, Integer, Integer, Integer, Double, Double, Double, Double, Double, Double, Boolean> fieldsRow() {
-        return (Row14) super.fieldsRow();
+    public Row15<Integer, Integer, String, Integer, Integer, Integer, Integer, Integer, Double, Double, Double, Double, Double, Double, Boolean> fieldsRow() {
+        return (Row15) super.fieldsRow();
     }
 }

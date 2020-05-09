@@ -25,12 +25,16 @@ import static group18.dashboard.database.tables.Campaign.CAMPAIGN;
 import static group18.dashboard.database.tables.User.USER;
 
 public class LoginController {
-    public static int loggedUserID;
+    private static int loggedUserID;
     public Button login;
     public Button register;
     public TextField username;
     public PasswordField password;
     public GridPane loginForm;
+
+    public static int getLoggedUserID() {
+        return loggedUserID;
+    }
 
     public void login(ActionEvent actionEvent) throws IOException {
         String username = this.username.getText();
@@ -48,9 +52,10 @@ public class LoginController {
                 .fetchOptional()
                 .ifPresentOrElse(userRecord -> {
                     try {
-                        if (validatePassword(password, userRecord.getPassword(), userRecord.getSalt()))
+                        if (validatePassword(password, userRecord.getPassword(), userRecord.getSalt())) {
+                            loggedUserID = userRecord.getUid();
                             onLoginSuccess();
-                        else App.alert("Password incorrect", "Password doesn't match the one of " + username + ".");
+                        } else App.alert("Password incorrect", "Password doesn't match the one of " + username + ".");
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -99,7 +104,7 @@ public class LoginController {
     }
 
     private boolean hasCampaigns() {
-        return query.fetchExists(CAMPAIGN);
+        return query.fetchExists(CAMPAIGN.where(CAMPAIGN.UID.eq(loggedUserID)));
     }
 
     private boolean nameTaken(String username) {

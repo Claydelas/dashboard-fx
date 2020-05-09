@@ -57,8 +57,19 @@ public class App extends Application {
     private void setupDB() {
         try {
             DB.connection().prepareStatement(
+                    "create table if not exists USER(\n" +
+                            "    UID      INT auto_increment,\n" +
+                            "    USERNAME VARCHAR    not null,\n" +
+                            "    PASSWORD BINARY(32) not null,\n" +
+                            "    SALT BINARY(16) not null,\n" +
+                            "    constraint USER_PK\n" +
+                            "        primary key (UID));").execute();
+            DB.connection().prepareStatement(
+                    "create unique index if not exists USER_USERNAME_UINDEX on USER (USERNAME);").execute();
+            DB.connection().prepareStatement(
                     "create table if not exists CAMPAIGN (\n" +
                             "    CID         INT auto_increment,\n" +
+                            "    UID         INT                   not null,\n" +
                             "    NAME        VARCHAR,\n" +
                             "    IMPRESSIONS INT,\n" +
                             "    CLICKS      INT,\n" +
@@ -73,7 +84,10 @@ public class App extends Application {
                             "    TOTAL_COST  DOUBLE,\n" +
                             "    PARSED      BOOLEAN default FALSE not null,\n" +
                             "    constraint CAMPAIGN_PK\n" +
-                            "        primary key (CID));").execute();
+                            "        primary key (CID),\n" +
+                            "    constraint CAMPAIGN_USER_UID_FK\n" +
+                            "        foreign key (UID) references USER (UID)\n" +
+                            "            on update cascade on delete cascade);").execute();
             DB.connection().prepareStatement(
                     "create table if not exists IMPRESSION(\n" +
                             "    DATE         DATETIME                                                               not null,\n" +
@@ -116,16 +130,6 @@ public class App extends Application {
                             "    constraint INTERACTION_CAMPAIGN_CID_FK\n" +
                             "        foreign key (CID) references CAMPAIGN (CID)\n" +
                             "            on update cascade on delete cascade);").execute();
-            DB.connection().prepareStatement(
-                    "create table if not exists USER(\n" +
-                            "    UID      INT auto_increment,\n" +
-                            "    USERNAME VARCHAR    not null,\n" +
-                            "    PASSWORD BINARY(32) not null,\n" +
-                            "    SALT BINARY(16) not null,\n" +
-                            "    constraint USER_PK\n" +
-                            "        primary key (UID));").execute();
-            DB.connection().prepareStatement(
-                    "create unique index if not exists USER_USERNAME_UINDEX on USER (USERNAME);").execute();
             DB.commit();
         } catch (SQLException throwables) {
             throwables.printStackTrace();
