@@ -8,6 +8,7 @@ import group18.dashboard.database.tables.Campaign;
 import group18.dashboard.database.tables.Click;
 import group18.dashboard.database.tables.Impression;
 import group18.dashboard.database.tables.Interaction;
+import group18.dashboard.database.tables.User;
 
 import java.util.Arrays;
 import java.util.List;
@@ -23,7 +24,7 @@ import org.jooq.impl.SchemaImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Public extends SchemaImpl {
 
-    private static final long serialVersionUID = 335249810;
+    private static final long serialVersionUID = 849291230;
 
     /**
      * The reference instance of <code>PUBLIC</code>
@@ -51,6 +52,11 @@ public class Public extends SchemaImpl {
     public final Interaction INTERACTION = Interaction.INTERACTION;
 
     /**
+     * The table <code>PUBLIC.USER</code>.
+     */
+    public final User USER = User.USER;
+
+    /**
      * No further instances allowed
      */
     private Public() {
@@ -69,6 +75,7 @@ public class Public extends SchemaImpl {
             Campaign.CAMPAIGN,
             Click.CLICK,
             Impression.IMPRESSION,
-            Interaction.INTERACTION);
+            Interaction.INTERACTION,
+            User.USER);
     }
 }

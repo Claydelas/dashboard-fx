@@ -1,11 +1,11 @@
 package group18.dashboard;
 
-import group18.dashboard.database.tables.Campaign;
 import group18.dashboard.util.DB;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.stage.Stage;
 import org.jooq.DSLContext;
 import org.jooq.SQLDialect;
@@ -31,6 +31,14 @@ public class App extends Application {
         launch(args);
     }
 
+    public static void alert(String title, String content) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(content);
+        alert.showAndWait();
+    }
+
     @Override
     public void start(Stage stage) throws IOException {
 
@@ -39,21 +47,11 @@ public class App extends Application {
 
         setupDB();
 
-        if (!hasCampaigns()) {
-            scene = new Scene(loadFXML("import"));
-            stage.sizeToScene();
-        } else {
-            scene = new Scene(loadFXML("dashboard"), 1024, 600);
-            stage.setMinHeight(500);
-            stage.setMinWidth(800);
-        }
-        stage.setTitle("Ad Auction Dashboard alpha");
+        scene = new Scene(loadFXML("login"));
+        stage.sizeToScene();
+        stage.setTitle("Login");
         stage.setScene(scene);
         stage.show();
-    }
-
-    private boolean hasCampaigns() {
-        return query.fetchExists(Campaign.CAMPAIGN);
     }
 
     private void setupDB() {
@@ -118,6 +116,16 @@ public class App extends Application {
                             "    constraint INTERACTION_CAMPAIGN_CID_FK\n" +
                             "        foreign key (CID) references CAMPAIGN (CID)\n" +
                             "            on update cascade on delete cascade);").execute();
+            DB.connection().prepareStatement(
+                    "create table if not exists USER(\n" +
+                            "    UID      INT auto_increment,\n" +
+                            "    USERNAME VARCHAR    not null,\n" +
+                            "    PASSWORD BINARY(32) not null,\n" +
+                            "    SALT BINARY(16) not null,\n" +
+                            "    constraint USER_PK\n" +
+                            "        primary key (UID));").execute();
+            DB.connection().prepareStatement(
+                    "create unique index if not exists USER_USERNAME_UINDEX on USER (USERNAME);").execute();
             DB.commit();
         } catch (SQLException throwables) {
             throwables.printStackTrace();

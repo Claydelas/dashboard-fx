@@ -8,10 +8,12 @@ import group18.dashboard.database.tables.Campaign;
 import group18.dashboard.database.tables.Click;
 import group18.dashboard.database.tables.Impression;
 import group18.dashboard.database.tables.Interaction;
+import group18.dashboard.database.tables.User;
 import group18.dashboard.database.tables.records.CampaignRecord;
 import group18.dashboard.database.tables.records.ClickRecord;
 import group18.dashboard.database.tables.records.ImpressionRecord;
 import group18.dashboard.database.tables.records.InteractionRecord;
+import group18.dashboard.database.tables.records.UserRecord;
 
 import org.jooq.ForeignKey;
 import org.jooq.Identity;
@@ -35,6 +37,7 @@ public class Keys {
     public static final Identity<ClickRecord, Integer> IDENTITY_CLICK = Identities0.IDENTITY_CLICK;
     public static final Identity<ImpressionRecord, Integer> IDENTITY_IMPRESSION = Identities0.IDENTITY_IMPRESSION;
     public static final Identity<InteractionRecord, Integer> IDENTITY_INTERACTION = Identities0.IDENTITY_INTERACTION;
+    public static final Identity<UserRecord, Integer> IDENTITY_USER = Identities0.IDENTITY_USER;
 
     // -------------------------------------------------------------------------
     // UNIQUE and PRIMARY KEY definitions
@@ -44,6 +47,7 @@ public class Keys {
     public static final UniqueKey<ClickRecord> CLICK_PK = UniqueKeys0.CLICK_PK;
     public static final UniqueKey<ImpressionRecord> IMPRESSION_PK = UniqueKeys0.IMPRESSION_PK;
     public static final UniqueKey<InteractionRecord> INTERACTION_PK = UniqueKeys0.INTERACTION_PK;
+    public static final UniqueKey<UserRecord> USER_PK = UniqueKeys0.USER_PK;
 
     // -------------------------------------------------------------------------
     // FOREIGN KEY definitions
@@ -62,6 +66,7 @@ public class Keys {
         public static Identity<ClickRecord, Integer> IDENTITY_CLICK = Internal.createIdentity(Click.CLICK, Click.CLICK.CLICKID);
         public static Identity<ImpressionRecord, Integer> IDENTITY_IMPRESSION = Internal.createIdentity(Impression.IMPRESSION, Impression.IMPRESSION.IMPRESSIONID);
         public static Identity<InteractionRecord, Integer> IDENTITY_INTERACTION = Internal.createIdentity(Interaction.INTERACTION, Interaction.INTERACTION.INTERACTIONID);
+        public static Identity<UserRecord, Integer> IDENTITY_USER = Internal.createIdentity(User.USER, User.USER.UID);
     }
 
     private static class UniqueKeys0 {
@@ -69,6 +74,7 @@ public class Keys {
         public static final UniqueKey<ClickRecord> CLICK_PK = Internal.createUniqueKey(Click.CLICK, "CLICK_PK", new TableField[] { Click.CLICK.CLICKID }, true);
         public static final UniqueKey<ImpressionRecord> IMPRESSION_PK = Internal.createUniqueKey(Impression.IMPRESSION, "IMPRESSION_PK", new TableField[] { Impression.IMPRESSION.IMPRESSIONID }, true);
         public static final UniqueKey<InteractionRecord> INTERACTION_PK = Internal.createUniqueKey(Interaction.INTERACTION, "INTERACTION_PK", new TableField[] { Interaction.INTERACTION.INTERACTIONID }, true);
+        public static final UniqueKey<UserRecord> USER_PK = Internal.createUniqueKey(User.USER, "USER_PK", new TableField[] { User.USER.UID }, true);
     }
 
     private static class ForeignKeys0 {

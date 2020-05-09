@@ -9,7 +9,6 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TextField;
@@ -69,16 +68,8 @@ public class ImportController {
                 return true;
             }
         }
-        alert("Missing files", "Couldn't find all campaign files in the selected directory!\nPlease try again.");
+        App.alert("Missing files", "Couldn't find all campaign files in the selected directory!\nPlease try again.");
         return false;
-    }
-
-    public void alert(String title, String content) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(content);
-        alert.showAndWait();
     }
 
     // returns the text of the name textfield or generates a name (Campaign ID) if the textfield is empty
@@ -158,33 +149,44 @@ public class ImportController {
         String impressions = impressionLogPath.getText();
         String clicks = clickLogPath.getText();
         String interactions = interactionLogPath.getText();
-        if (!impressions.isBlank() && !clicks.isBlank() && !interactions.isBlank()) {
-            if (Files.isReadable(Paths.get(impressions))
-                    && Files.isReadable(Paths.get(clicks))
-                    && Files.isReadable(Paths.get(interactions))) {
-                filesButton.setDisable(true);
-                filesImportProgress.setVisible(true);
-                int campaignID = insertCampaign();
-                CountDownLatch latch = new CountDownLatch(3);
-                executor.execute(() -> {
-                    parseImpressions(impressions, campaignID);
-                    DB.commit();
-                    latch.countDown();
-                });
-                executor.execute(() -> {
-                    parseClicks(clicks, campaignID);
-                    DB.commit();
-                    latch.countDown();
-                });
-                executor.execute(() -> {
-                    parseInteractions(interactions, campaignID);
-                    DB.commit();
-                    latch.countDown();
-                });
-                onParsingFinished(campaignID, latch);
-                //TODO update progress indicator
-            }
+
+        if (impressions.isBlank() || !Files.isReadable(Paths.get(impressions))) {
+            App.alert("Missing file", "Impression log wasn't found at the selected location.\nPlease try again.");
+            return;
         }
+        if (clicks.isBlank() || !Files.isReadable(Paths.get(clicks))) {
+            App.alert("Missing file", "Click log wasn't found at the selected location.\nPlease try again.");
+            return;
+        }
+        if (interactions.isBlank() || !Files.isReadable(Paths.get(interactions))) {
+            App.alert("Missing file", "Server log wasn't found at the selected location.\nPlease try again.");
+            return;
+        }
+
+        filesButton.setDisable(true);
+        filesImportProgress.setVisible(true);
+        int campaignID = insertCampaign();
+        CountDownLatch latch = new CountDownLatch(3);
+
+        executor.execute(() -> {
+            parseImpressions(impressions, campaignID);
+            DB.commit();
+            latch.countDown();
+        });
+
+        executor.execute(() -> {
+            parseClicks(clicks, campaignID);
+            DB.commit();
+            latch.countDown();
+        });
+
+        executor.execute(() -> {
+            parseInteractions(interactions, campaignID);
+            DB.commit();
+            latch.countDown();
+        });
+        onParsingFinished(campaignID, latch);
+        //TODO update progress indicator
     }
 
     private void onParsingFinished(int campaignID, CountDownLatch latch) {

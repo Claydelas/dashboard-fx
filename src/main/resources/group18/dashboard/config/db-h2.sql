@@ -59,3 +59,13 @@ create table if not exists INTERACTION(
     constraint INTERACTION_CAMPAIGN_CID_FK
         foreign key (CID) references CAMPAIGN (CID)
             on update cascade on delete cascade);
+
+create table if not exists USER(
+    UID      INT auto_increment,
+    USERNAME VARCHAR    not null,
+    PASSWORD BINARY(32) not null,
+    SALT     BINARY(16) not null,
+    constraint USER_PK
+        primary key (UID));
+
+create unique index if not exists USER_USERNAME_UINDEX on USER (USERNAME);

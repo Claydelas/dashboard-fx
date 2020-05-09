@@ -8,6 +8,7 @@ import group18.dashboard.database.tables.Campaign;
 import group18.dashboard.database.tables.Click;
 import group18.dashboard.database.tables.Impression;
 import group18.dashboard.database.tables.Interaction;
+import group18.dashboard.database.tables.User;
 
 
 /**
@@ -35,4 +36,9 @@ public class Tables {
      * The table <code>PUBLIC.INTERACTION</code>.
      */
     public static final Interaction INTERACTION = Interaction.INTERACTION;
+
+    /**
+     * The table <code>PUBLIC.USER</code>.
+     */
+    public static final User USER = User.USER;
 }
