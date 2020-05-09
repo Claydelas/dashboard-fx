@@ -22,6 +22,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import org.jooq.Result;
 
 import static group18.dashboard.App.query;
 import static group18.dashboard.database.tables.Campaign.CAMPAIGN;
@@ -33,15 +34,18 @@ public class DashboardController {
     public TabPane tabs;
     public FlowPane dashboardArea;
     public ScrollPane scrollPane;
-    ObservableList<String> campaigns;
+    ObservableList<String> campaignNames;
 
     @FXML
     public void initialize() {
         scrollPane.getContent().setOnMousePressed(Event::consume);
         dashboardArea.prefWrapLengthProperty().bind(dashboardArea.widthProperty());
-        loadTabs();
-        campaigns = FXCollections.observableArrayList(
-                query.select(CAMPAIGN.NAME).from(CAMPAIGN).where(CAMPAIGN.UID.eq(LoginController.getLoggedUserID()).and(CAMPAIGN.PARSED)).fetch(CAMPAIGN.NAME));
+
+        Result<CampaignRecord> campaigns
+                = query.fetch(CAMPAIGN, CAMPAIGN.UID.eq(LoginController.getLoggedUserID()).and(CAMPAIGN.PARSED));
+
+        loadTabs(campaigns);
+        campaignNames = FXCollections.observableArrayList(campaigns.getValues(CAMPAIGN.NAME));
 
         setupFirstCampaignButton();
     }
@@ -69,8 +73,8 @@ public class DashboardController {
     }
 
     //for each complete campaign generate a tab
-    private void loadTabs() {
-        query.selectFrom(CAMPAIGN).where(CAMPAIGN.UID.eq(LoginController.getLoggedUserID()).and(CAMPAIGN.PARSED)).fetch().forEach(this::loadTab);
+    private void loadTabs(Result<CampaignRecord> campaigns) {
+        campaigns.forEach(this::loadTab);
     }
 
     //generates a tab and its contents and adds it to the TabPane
@@ -137,7 +141,7 @@ public class DashboardController {
             ChartFactory chartController = fxmlLoader.getController();
 
             chartController.setChartPane(dashboardArea);
-            chartController.setCampaigns(campaigns);
+            chartController.setCampaigns(campaignNames);
 
             Stage stage = new Stage();
             stage.initModality(Modality.APPLICATION_MODAL);
@@ -152,7 +156,7 @@ public class DashboardController {
     }
 
     public void addCampaign(String name) {
-        campaigns.add(name);
+        campaignNames.add(name);
     }
 
     @FXML
