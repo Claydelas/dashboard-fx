@@ -6,6 +6,9 @@ import group18.dashboard.database.tables.records.CampaignRecord;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
+import javafx.beans.binding.Bindings;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.Event;
@@ -29,17 +32,20 @@ import static group18.dashboard.database.tables.Campaign.CAMPAIGN;
 
 public class DashboardController {
 
-    public StackPane mainView;
     public BorderPane chartPane;
     public TabPane tabs;
     public FlowPane dashboardArea;
     public ScrollPane scrollPane;
+    public BorderPane appView;
+    public Slider uiScalingSlider;
     ObservableList<String> campaignNames;
 
     @FXML
     public void initialize() {
         scrollPane.getContent().setOnMousePressed(Event::consume);
         dashboardArea.prefWrapLengthProperty().bind(dashboardArea.widthProperty());
+
+        appView.styleProperty().bind(Bindings.format("-fx-font-size: %.2fpx;", uiScalingSlider.valueProperty()));
 
         Result<CampaignRecord> campaigns
                 = query.fetch(CAMPAIGN, CAMPAIGN.UID.eq(LoginController.getLoggedUserID()).and(CAMPAIGN.PARSED));

@@ -1,0 +1,11 @@
+.slider .axis {
+    -fx-tick-label-fill: black;
+}
+
+#uiScalingMenu:hover {
+    -fx-background-color: transparent;
+}
+
+#uiScalingMenu:focused {
+    -fx-background-color: transparent;
+}

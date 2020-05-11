@@ -359,7 +359,7 @@ public class ImportController {
         this.parentController = dashboardController;
     }
 
-    public boolean validateName(String name) {
-        return !query.fetchExists(CAMPAIGN, CAMPAIGN.NAME.eq(name));
+    public boolean nameTaken(String name) {
+        return query.fetchExists(CAMPAIGN, CAMPAIGN.NAME.equalIgnoreCase(name));
     }
 }
