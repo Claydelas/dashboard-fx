@@ -45,7 +45,7 @@ public class DashboardController {
         scrollPane.getContent().setOnMousePressed(Event::consume);
         dashboardArea.prefWrapLengthProperty().bind(dashboardArea.widthProperty());
 
-        appView.styleProperty().bind(Bindings.format("-fx-font-size: %.2fpx;", uiScalingSlider.valueProperty()));
+        chartPane.styleProperty().bind(Bindings.format("-fx-font-size: %.2fpx;", uiScalingSlider.valueProperty()));
 
         Result<CampaignRecord> campaigns
                 = query.fetch(CAMPAIGN, CAMPAIGN.UID.eq(LoginController.getLoggedUserID()).and(CAMPAIGN.PARSED));
