@@ -60,7 +60,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import static group18.dashboard.App.query;
 import static group18.dashboard.database.tables.Campaign.CAMPAIGN;
@@ -176,13 +175,20 @@ public class ChartFactory {
             switch (chartType) {
                 case "Line Chart":
                     chart = new LineChart<>(new CategoryAxis(), new NumberAxis());
-                    //((LineChart<String, Number>) chart).setCreateSymbols(false);
                     System.out.println("Debug : LINE CHART");
                     break;
                 case "Histogram":
                     chart = new BarChart<>(new CategoryAxis(), new NumberAxis());
                     ((BarChart<String, Number>) chart).setBarGap(0);
                     System.out.println("Debug : HISTOGRAM");
+                    break;
+                case "Bar Chart":
+                    chart = new BarChart<>(new CategoryAxis(), new NumberAxis());
+                    System.out.println("Debug : BAR CHART");
+                    break;
+                case "Area Chart":
+                    chart = new AreaChart<>(new CategoryAxis(), new NumberAxis());
+                    System.out.println("Debug : AREA CHART");
                     break;
                 default:
                     chart = new LineChart<>(new CategoryAxis(), new NumberAxis());
@@ -196,8 +202,9 @@ public class ChartFactory {
             Platform.runLater(() -> dashboardArea.getChildren().add(pane));
 
             TimeGranularity timeGranularity = Enum.valueOf(TimeGranularity.class, granularity.getSelectionModel().getSelectedItem().toUpperCase());
-            if (timeGranularity.equals(TimeGranularity.HOURLY) && chart instanceof LineChart) {
-                ((LineChart<String, Number>) chart).setCreateSymbols(false);
+            if (timeGranularity.equals(TimeGranularity.HOURLY)) {
+                if (chart instanceof LineChart) ((LineChart<String, Number>) chart).setCreateSymbols(false);
+                if (chart instanceof AreaChart) ((AreaChart<String, Number>) chart).setCreateSymbols(false);
                 chart.setVerticalGridLinesVisible(false);
             }
             // METRIC SELECTION LOGIC
@@ -342,7 +349,7 @@ public class ChartFactory {
 
             final JFXButton png = new JFXButton("PNG");
             final JFXButton close = new JFXButton();
-            ImageView image = new ImageView(App.class.getResource("icons/baseline_cancel_black_18dp.png").toString());
+            ImageView image = new ImageView(App.class.getResource("icons/baseline_cancel_black.png").toString());
             image.setFitWidth(20);
             image.setFitHeight(20);
             image.setPreserveRatio(true);

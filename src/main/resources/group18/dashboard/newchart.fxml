@@ -101,6 +101,8 @@
                   <FXCollections fx:factory="observableArrayList">
                      <String fx:value="Line Chart" />
                      <String fx:value="Histogram" />
+                     <String fx:value="Bar Chart" />
+                     <String fx:value="Area Chart" />
                   </FXCollections>
                </items>
             </JFXComboBox>
