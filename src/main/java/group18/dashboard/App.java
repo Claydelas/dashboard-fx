@@ -6,6 +6,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import org.jooq.DSLContext;
 import org.jooq.SQLDialect;
@@ -49,6 +50,7 @@ public class App extends Application {
 
         scene = new Scene(loadFXML("login"));
         stage.sizeToScene();
+        stage.getIcons().add(new Image(App.class.getResourceAsStream("icons/app.png")));
         stage.setTitle("Login");
         stage.setScene(scene);
         stage.show();

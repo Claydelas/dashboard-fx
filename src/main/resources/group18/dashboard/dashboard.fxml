@@ -6,19 +6,19 @@
 <BorderPane fx:id="appView" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="group18.dashboard.controllers.DashboardController">
     <top>
-        <MenuBar prefHeight="25.0" prefWidth="914.0" BorderPane.alignment="CENTER" stylesheets="@css/menu.css">
+        <MenuBar BorderPane.alignment="CENTER" stylesheets="@css/menu.css">
             <Menu mnemonicParsing="false" text="New">
-                <MenuItem fx:id="importCampaignButton" mnemonicParsing="false"
-                          onAction="#importCampaignButtonAction" text="Campaign"/>
                 <MenuItem fx:id="newChartButton" mnemonicParsing="false" onAction="#newChartButtonAction"
                           text="Chart"/>
+                <MenuItem fx:id="importCampaignButton" mnemonicParsing="false"
+                          onAction="#importCampaignButtonAction" text="Campaign"/>
             </Menu>
             <Menu mnemonicParsing="false" text="Accessibility">
                 <Menu mnemonicParsing="false" text="Font Size">
                     <CustomMenuItem fx:id="uiScalingMenu" mnemonicParsing="false" hideOnClick="false">
                         <content>
                             <Slider fx:id="uiScalingSlider" blockIncrement="1.0" majorTickUnit="2.0" max="22.0"
-                                    min="12.0" minorTickCount="1" showTickLabels="true" snapToTicks="true"/>
+                                    min="12.0" minorTickCount="1" showTickLabels="true" snapToTicks="true" value="14.0"/>
                         </content>
                     </CustomMenuItem>
                 </Menu>

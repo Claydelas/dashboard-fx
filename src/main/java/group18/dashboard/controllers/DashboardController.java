@@ -7,8 +7,6 @@ import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.SimpleDoubleProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.Event;
@@ -18,8 +16,12 @@ import javafx.geometry.Insets;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.*;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.jooq.Result;
@@ -54,8 +56,8 @@ public class DashboardController {
     }
 
     void setupFirstCampaignButton() {
-        final JFXButton initChartButton = new JFXButton("You can insert more charts from \"New\"");
-        initChartButton.setStyle("-fx-font-size:30");
+        final JFXButton initChartButton = new JFXButton(" You can insert more charts from \"New\"");
+        initChartButton.setStyle("-fx-font-size:26");
         ImageView image = new ImageView(App.class.getResource("icons/baseline_add_black.png").toString());
         image.setFitWidth(45);
         image.setFitHeight(45);
@@ -163,6 +165,7 @@ public class DashboardController {
             Stage stage = new Stage();
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.setScene(new Scene(importForm));
+            stage.getIcons().add(new Image(App.class.getResourceAsStream("icons/app.png")));
             stage.setTitle("Import Campaign Data");
             stage.sizeToScene();
             stage.setResizable(false);
@@ -184,6 +187,7 @@ public class DashboardController {
             Stage stage = new Stage();
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.setScene(new Scene(chartForm));
+            stage.getIcons().add(new Image(App.class.getResourceAsStream("icons/app.png")));
             stage.setTitle("New Chart");
             stage.sizeToScene();
             stage.setResizable(false);

@@ -8,6 +8,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
@@ -71,8 +72,9 @@ public class LoginController {
         } else {
             stage.setScene(new Scene(new FXMLLoader(App.class.getResource("dashboard.fxml")).load(), 1024, 600));
             stage.setMinHeight(500);
-            stage.setMinWidth(800);
+            stage.setMinWidth(810);
         }
+        stage.getIcons().add(new Image(App.class.getResourceAsStream("icons/app.png")));
         stage.setTitle("Ad Auction Dashboard");
         stage.show();
         exit();
