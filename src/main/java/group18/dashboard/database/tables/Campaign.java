@@ -16,7 +16,7 @@ import org.jooq.ForeignKey;
 import org.jooq.Identity;
 import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Row15;
+import org.jooq.Row19;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
@@ -32,7 +32,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Campaign extends TableImpl<CampaignRecord> {
 
-    private static final long serialVersionUID = -1014337273;
+    private static final long serialVersionUID = -1914199281;
 
     /**
      * The reference instance of <code>PUBLIC.CAMPAIGN</code>
@@ -116,6 +116,26 @@ public class Campaign extends TableImpl<CampaignRecord> {
      * The column <code>PUBLIC.CAMPAIGN.TOTAL_COST</code>.
      */
     public final TableField<CampaignRecord, Double> TOTAL_COST = createField(DSL.name("TOTAL_COST"), org.jooq.impl.SQLDataType.DOUBLE, this, "");
+
+    /**
+     * The column <code>PUBLIC.CAMPAIGN.MIN_PAGES_ENABLED</code>.
+     */
+    public final TableField<CampaignRecord, Boolean> MIN_PAGES_ENABLED = createField(DSL.name("MIN_PAGES_ENABLED"), org.jooq.impl.SQLDataType.BOOLEAN, this, "");
+
+    /**
+     * The column <code>PUBLIC.CAMPAIGN.MIN_PAGES</code>.
+     */
+    public final TableField<CampaignRecord, Integer> MIN_PAGES = createField(DSL.name("MIN_PAGES"), org.jooq.impl.SQLDataType.INTEGER, this, "");
+
+    /**
+     * The column <code>PUBLIC.CAMPAIGN.MIN_TIME_ENABLED</code>.
+     */
+    public final TableField<CampaignRecord, Boolean> MIN_TIME_ENABLED = createField(DSL.name("MIN_TIME_ENABLED"), org.jooq.impl.SQLDataType.BOOLEAN, this, "");
+
+    /**
+     * The column <code>PUBLIC.CAMPAIGN.MIN_TIME</code>.
+     */
+    public final TableField<CampaignRecord, Integer> MIN_TIME = createField(DSL.name("MIN_TIME"), org.jooq.impl.SQLDataType.INTEGER, this, "");
 
     /**
      * The column <code>PUBLIC.CAMPAIGN.PARSED</code>.
@@ -211,11 +231,11 @@ public class Campaign extends TableImpl<CampaignRecord> {
     }
 
     // -------------------------------------------------------------------------
-    // Row15 type methods
+    // Row19 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row15<Integer, Integer, String, Integer, Integer, Integer, Integer, Integer, Double, Double, Double, Double, Double, Double, Boolean> fieldsRow() {
-        return (Row15) super.fieldsRow();
+    public Row19<Integer, Integer, String, Integer, Integer, Integer, Integer, Integer, Double, Double, Double, Double, Double, Double, Boolean, Integer, Boolean, Integer, Boolean> fieldsRow() {
+        return (Row19) super.fieldsRow();
     }
 }

@@ -19,10 +19,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.FlowPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.StackPane;
+import javafx.scene.layout.*;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.jooq.Result;
@@ -115,8 +112,41 @@ public class DashboardController {
                 , new Label(String.format("\u00A3%.3f", campaignRecord.getCpc() / 100))
                 , new Label(String.format("\u00A3%.3f", campaignRecord.getCpm() / 100))
                 , new Label(String.format("%.2f%%", campaignRecord.getBounceRate() * 100)));
-        tab.setClosable(false);
         content.setTop(campaignInfo);
+
+        VBox bounceInfo = new VBox();
+        bounceInfo.setPadding(new Insets(7, 7, 7, 7));
+
+        bounceInfo.getChildren().add(new Label("Current bounce definition:"));
+
+        final Label pagesLabel = new Label(
+                "- If less than " + campaignRecord.getMinPages() +
+                        " website pages were visited");
+        pagesLabel.setPadding(new Insets(2, 0, 2, 9));
+
+        final Label timeLabel = new Label(
+                "- If less than " + campaignRecord.getMinTime() +
+                        " minutes were spent on the website");
+        timeLabel.setPadding(new Insets(2, 0, 2, 9));
+
+
+        if (campaignRecord.getMinPagesEnabled()) {
+            bounceInfo.getChildren().add(pagesLabel);
+        }
+        if (campaignRecord.getMinTimeEnabled()) {
+            bounceInfo.getChildren().add(timeLabel);
+        }
+
+        if (!campaignRecord.getMinTimeEnabled() && !campaignRecord.getMinPagesEnabled()) {
+            bounceInfo.getChildren().add(new Label("No bounce definition currently set."));
+        }
+
+        Button changeBounce = new Button("Update bounce definition");
+        bounceInfo.getChildren().add(changeBounce);
+
+        content.setBottom(bounceInfo);
+
+        tab.setClosable(false);
         tab.setContent(content);
         tabs.getTabs().add(tab);
     }

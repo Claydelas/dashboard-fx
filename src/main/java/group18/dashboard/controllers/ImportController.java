@@ -358,20 +358,22 @@ public class ImportController {
 
     public void updateBounceMetrics(int campaignID) {
 
+        //boolean minPages = CAMPAIGN.
+
         int bounces = query.selectCount()
                 .from(INTERACTION)
                 .where(INTERACTION.CID.eq(campaignID)
                         .and(INTERACTION.CONVERSION.isFalse()))
                 .fetchOneInto(int.class);
 
-        query.select(INTERACTION.ENTRY_DATE)
-                .from(INTERACTION)
-                .where(INTERACTION.CID.eq(campaignID)
-                        .and(INTERACTION.CONVERSION.isFalse())
-                        .and(INTERACTION.USER.in(
-                                select(IMPRESSION.USER).from(IMPRESSION).where(IMPRESSION.CID.eq(campaignID).and(filter))))
-                        .and(getDateRange(INTERACTION.ENTRY_DATE)))
-                .fetch(INTERACTION.ENTRY_DATE);
+//        query.select(INTERACTION.ENTRY_DATE)
+//                .from(INTERACTION)
+//                .where(INTERACTION.CID.eq(campaignID)
+//                        .and(INTERACTION.CONVERSION.isFalse())
+//                        .and(INTERACTION.USER.in(
+//                                select(IMPRESSION.USER).from(IMPRESSION).where(IMPRESSION.CID.eq(campaignID).and(filter))))
+//                        .and(getDateRange(INTERACTION.ENTRY_DATE)))
+//                .fetch(INTERACTION.ENTRY_DATE);
     }
 
     public void setParentController(DashboardController dashboardController) {

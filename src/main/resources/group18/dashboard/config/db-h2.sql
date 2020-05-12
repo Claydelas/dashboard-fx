@@ -28,6 +28,10 @@ create table if not exists CAMPAIGN
     CPM         DOUBLE,
     BOUNCE_RATE DOUBLE,
     TOTAL_COST  DOUBLE,
+    MIN_PAGES_ENABLED   BOOLEAN default TRUE not null,
+    MIN_PAGES   INT default 2,
+    MIN_TIME_ENABLED   BOOLEAN default FALSE not null,
+    MIN_TIME    DOUBLE default 3.5,
     PARSED      BOOLEAN default FALSE not null,
     constraint CAMPAIGN_PK
         primary key (CID),
