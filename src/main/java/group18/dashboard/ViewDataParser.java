@@ -45,9 +45,9 @@ public class ViewDataParser {
         return clickCosts;
     }
 
-    public static XYChart.Series<String, Number> getDailyClickCostsHistogram(String addedInfo, List<ClickRecord> clicks, boolean perClick) {
+    public static XYChart.Series<String, Number> getDailyClickCostsHistogram(String campaignName, String addedInfo, List<ClickRecord> clicks, boolean perClick) {
         return getClickCostsHistogram(
-                "Day of Week\n" + addedInfo,
+                campaignName + " Day of Week\n" + addedInfo,
                 perClick,
                 clicks,
                 c -> c.getDate().getDayOfWeek().getValue(),
@@ -56,9 +56,9 @@ public class ViewDataParser {
         );
     }
 
-    public static XYChart.Series<String, Number> getHourlyClickCostsHistogram(String addedInfo, List<ClickRecord> clicks, boolean perClick) {
+    public static XYChart.Series<String, Number> getHourlyClickCostsHistogram(String campaignName, String addedInfo, List<ClickRecord> clicks, boolean perClick) {
         return getClickCostsHistogram(
-                "Hour of Day\n" + addedInfo,
+                campaignName + " Hour of Day\n" + addedInfo,
                 perClick,
                 clicks,
                 c -> c.getDate().getHour(),
@@ -129,7 +129,7 @@ public class ViewDataParser {
     }
 
     // Every 1000 impressions calculate the (impressions + click) cost sum and plot them
-    public static XYChart.Series<String, Number> getCPMTimeSeries(String addedInfo, TimeGranularity granularity, List<ImpressionRecord> impressions, List<ClickRecord> clicks) {
+    public static XYChart.Series<String, Number> getCPMTimeSeries(String campaignName, String addedInfo, TimeGranularity granularity, List<ImpressionRecord> impressions, List<ClickRecord> clicks) {
         final Map<String, Number> cpms = new HashMap<>();
         final Map<String, Number> cpmDatesNumber = new HashMap<>();
         final Map<String, Number> cpmDatesCost = new HashMap<>();
@@ -172,14 +172,14 @@ public class ViewDataParser {
                     entry.getValue().doubleValue() / cpmDatesNumber.get(entry.getKey()).intValue() / 100);
         }
 
-        return mapToSeries("Cost-per-mille\n" + addedInfo, cpms);
+        return mapToSeries(campaignName + " Cost-per-mille\n" + addedInfo, cpms);
     }
 
     public static double getCPM(List<ImpressionRecord> impressions, List<ClickRecord> clicks) {
         return getTotalCost(impressions, clicks) / (impressions.size() * 1000);
     }
 
-    public static XYChart.Series<String, Number> getTotalCostSeries(String addedInfo, TimeGranularity granularity, List<ImpressionRecord> impressions, List<ClickRecord> clicks) {
+    public static XYChart.Series<String, Number> getTotalCostSeries(String campaignName, String addedInfo, TimeGranularity granularity, List<ImpressionRecord> impressions, List<ClickRecord> clicks) {
         final Map<String, Number> totalCosts = new HashMap<>();
 
         for (ImpressionRecord impression : impressions) {
@@ -194,7 +194,7 @@ public class ViewDataParser {
             totalCosts.computeIfPresent(roundedTime, (key, val) -> val.doubleValue() + click.getCost() / 100);
         }
 
-        return mapToSeries("Total cost\n" + addedInfo, totalCosts);
+        return mapToSeries(campaignName + " Total cost\n" + addedInfo, totalCosts);
     }
 
     public static double getTotalCost(List<ImpressionRecord> impressions, List<ClickRecord> clicks) {
@@ -212,7 +212,7 @@ public class ViewDataParser {
         return cost / 100;
     }
 
-    public static XYChart.Series<String, Number> getCTRTimeSeries(String addedInfo, TimeGranularity granularity, List<ImpressionRecord> impressions, List<ClickRecord> clicks) {
+    public static XYChart.Series<String, Number> getCTRTimeSeries(String campaignName, String addedInfo, TimeGranularity granularity, List<ImpressionRecord> impressions, List<ClickRecord> clicks) {
         final Map<String, Integer> totalImpressions = new HashMap<>();
         final Map<String, Integer> totalClicks = new HashMap<>();
 
@@ -233,14 +233,14 @@ public class ViewDataParser {
             ctrs.put(entry.getKey(), (double) totalClicks.get(entry.getKey()) / entry.getValue());
         }
 
-        return mapToSeries("Click-through-rate\n" + addedInfo, ctrs);
+        return mapToSeries(campaignName + " Click-through-rate\n" + addedInfo, ctrs);
     }
 
     public static double getCTR(List<ImpressionRecord> impressions, List<ClickRecord> clicks) {
         return (double) clicks.size() / impressions.size();
     }
 
-    public static XYChart.Series<String, Number> getCPATimeSeries(String addedInfo, TimeGranularity granularity, List<ImpressionRecord> impressions, List<ClickRecord> clicks, List<InteractionRecord> interactions) {
+    public static XYChart.Series<String, Number> getCPATimeSeries(String campaignName, String addedInfo, TimeGranularity granularity, List<ImpressionRecord> impressions, List<ClickRecord> clicks, List<InteractionRecord> interactions) {
         final Map<String, Number> cpas = new HashMap<>();
         final List<String> clickSeenDates = new ArrayList<>();
         final List<String> impressionSeenDates = new ArrayList<>();
@@ -297,14 +297,14 @@ public class ViewDataParser {
             cpas.put(acquisitions.getKey(), cost / acquisitions.getValue().doubleValue() / 100);
         }
 
-        return mapToSeries("Cost-per-acquisition\n" + addedInfo, cpas);
+        return mapToSeries(campaignName + " Cost-per-acquisition\n" + addedInfo, cpas);
     }
 
     public static double getCPA(List<ImpressionRecord> impressions, List<ClickRecord> clicks, List<InteractionRecord> interactions) {
         return getTotalCost(impressions, clicks) / getConversions(interactions);
     }
 
-    public static XYChart.Series<String, Number> getCPCTimeSeries(String addedInfo, TimeGranularity granularity, List<ImpressionRecord> impressions, List<ClickRecord> clicks) {
+    public static XYChart.Series<String, Number> getCPCTimeSeries(String campaignName, String addedInfo, TimeGranularity granularity, List<ImpressionRecord> impressions, List<ClickRecord> clicks) {
         final Map<String, Number> cpcs = new HashMap<>();
         final List<String> clickSeenDates = new ArrayList<>();
         final List<String> impressionSeenDates = new ArrayList<>();
@@ -347,14 +347,14 @@ public class ViewDataParser {
             cpcs.put(click.getKey(), cost / click.getValue().doubleValue() / 100);
         }
 
-        return mapToSeries("Cost-per-click\n" + addedInfo, cpcs);
+        return mapToSeries(campaignName + " Cost-per-click\n" + addedInfo, cpcs);
     }
 
     public static double getCPC(List<ImpressionRecord> impressions, List<ClickRecord> clicks) {
         return getTotalCost(impressions, clicks) / clicks.size();
     }
 
-    public static XYChart.Series<String, Number> getBounceRateTimeSeries(String addedInfo, TimeGranularity granularity, List<ClickRecord> clicks, List<InteractionRecord> interactions) {
+    public static XYChart.Series<String, Number> getBounceRateTimeSeries(String campaignName, String addedInfo, TimeGranularity granularity, List<ClickRecord> clicks, List<InteractionRecord> interactions) {
         final Map<String, Integer> totalClicks = new HashMap<>();
         final Map<String, Integer> totalInteractions = new HashMap<>();
 
@@ -377,7 +377,7 @@ public class ViewDataParser {
             bounceRates.put(entry.getKey(), (double) totalInteractions.get(entry.getKey()) / entry.getValue());
         }
 
-        return mapToSeries("Bounce rate\n" + addedInfo, bounceRates);
+        return mapToSeries(campaignName + " Bounce rate\n" + addedInfo, bounceRates);
     }
 
     public static double getBounceRate(List<ClickRecord> clicks, List<InteractionRecord> interactions) {

@@ -214,7 +214,7 @@ public class ChartFactory {
             switch (metricComboBox.getSelectionModel().getSelectedItem()) {
                 case "Impressions":
                     series = ViewDataParser.getSeriesOf(
-                            "Impressions\n" + filterString,
+                            campaignName + " Impressions\n" + filterString,
                             timeGranularity,
                             query
                                     .select(IMPRESSION.DATE)
@@ -228,12 +228,12 @@ public class ChartFactory {
                 case "Total click costs":
                     chart.getYAxis().setLabel("Total click costs (£)");
                     if (timeGranularity.equals(TimeGranularity.DAILY)) {
-                        series = ViewDataParser.getDailyClickCostsHistogram(filterString,
+                        series = ViewDataParser.getDailyClickCostsHistogram(campaignName, filterString,
                                 fetchClicks(campaignID), false
                         );
                     }
                     if (timeGranularity.equals(TimeGranularity.HOURLY)) {
-                        series = ViewDataParser.getHourlyClickCostsHistogram(filterString,
+                        series = ViewDataParser.getHourlyClickCostsHistogram(campaignName, filterString,
                                 fetchClicks(campaignID), false
                         );
                     }
@@ -241,19 +241,19 @@ public class ChartFactory {
                 case "Cost per click":
                     chart.getYAxis().setLabel("Cost per click (£)");
                     if (timeGranularity.equals(TimeGranularity.DAILY)) {
-                        series = ViewDataParser.getDailyClickCostsHistogram(filterString,
+                        series = ViewDataParser.getDailyClickCostsHistogram(campaignName, filterString,
                                 fetchClicks(campaignID), true
                         );
                     }
                     if (timeGranularity.equals(TimeGranularity.HOURLY)) {
-                        series = ViewDataParser.getHourlyClickCostsHistogram(filterString,
+                        series = ViewDataParser.getHourlyClickCostsHistogram(campaignName, filterString,
                                 fetchClicks(campaignID), true
                         );
                     }
                     break;
                 case "Clicks":
                     series = ViewDataParser.getSeriesOf(
-                            "Clicks\n" + filterString,
+                            campaignName + " Clicks\n" + filterString,
                             timeGranularity,
                             query
                                     .select(CLICK.DATE)
@@ -266,7 +266,7 @@ public class ChartFactory {
                     );
                     break;
                 case "Uniques":
-                    series = ViewDataParser.getSeriesOf("Uniques\n" + filterString,
+                    series = ViewDataParser.getSeriesOf(campaignName + " Uniques\n" + filterString,
                             timeGranularity,
                             query
                                     .select(CLICK.DATE)
@@ -282,7 +282,7 @@ public class ChartFactory {
                     );
                     break;
                 case "Bounces":
-                    series = ViewDataParser.getSeriesOf("Bounces\n" + filterString,
+                    series = ViewDataParser.getSeriesOf(campaignName + " Bounces\n" + filterString,
                             timeGranularity,
                             query.select(INTERACTION.ENTRY_DATE)
                                     .from(INTERACTION)
@@ -295,7 +295,7 @@ public class ChartFactory {
                     );
                     break;
                 case "Conversions":
-                    series = ViewDataParser.getSeriesOf("Conversions\n" + filterString,
+                    series = ViewDataParser.getSeriesOf(campaignName + " Conversions\n" + filterString,
                             timeGranularity,
                             query.select(INTERACTION.ENTRY_DATE)
                                     .from(INTERACTION)
@@ -308,38 +308,38 @@ public class ChartFactory {
                     );
                     break;
                 case "Total Cost":
-                    series = ViewDataParser.getTotalCostSeries(filterString, timeGranularity
+                    series = ViewDataParser.getTotalCostSeries(campaignName, filterString, timeGranularity
                             , fetchImpressions(campaignID)
                             , fetchClicks(campaignID)
                     );
                     break;
                 case "Click-through-rate":
-                    series = ViewDataParser.getCTRTimeSeries(filterString, timeGranularity,
+                    series = ViewDataParser.getCTRTimeSeries(campaignName, filterString, timeGranularity,
                             fetchImpressions(campaignID)
                             , fetchClicks(campaignID)
                     );
                     break;
                 case "Cost-per-acquisition":
-                    series = ViewDataParser.getCPATimeSeries(filterString, timeGranularity
+                    series = ViewDataParser.getCPATimeSeries(campaignName, filterString, timeGranularity
                             , fetchImpressions(campaignID)
                             , fetchClicks(campaignID)
                             , fetchInteractions(campaignID)
                     );
                     break;
                 case "Cost-per-click":
-                    series = ViewDataParser.getCPCTimeSeries(filterString, timeGranularity
+                    series = ViewDataParser.getCPCTimeSeries(campaignName, filterString, timeGranularity
                             , fetchImpressions(campaignID)
                             , fetchClicks(campaignID)
                     );
                     break;
                 case "Cost-per-mille":
-                    series = ViewDataParser.getCPMTimeSeries(filterString, timeGranularity
+                    series = ViewDataParser.getCPMTimeSeries(campaignName, filterString, timeGranularity
                             , fetchImpressions(campaignID)
                             , fetchClicks(campaignID)
                     );
                     break;
                 case "Bounce Rate":
-                    series = ViewDataParser.getBounceRateTimeSeries(filterString, timeGranularity
+                    series = ViewDataParser.getBounceRateTimeSeries(campaignName, filterString, timeGranularity
                             , fetchClicks(campaignID)
                             , fetchInteractions(campaignID)
                     );
