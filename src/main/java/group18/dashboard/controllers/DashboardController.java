@@ -86,11 +86,12 @@ public class DashboardController {
     //generates a tab and its contents and adds it to the TabPane
     public void loadTab(CampaignRecord campaignRecord) {
         Tab tab = new Tab(campaignRecord.getName());
-        GridPane content = new GridPane();
-        content.setPadding(new Insets(10, 10, 10, 10));
-        content.setVgap(10);
-        content.setHgap(10);
-        content.addColumn(0
+        BorderPane content = new BorderPane();
+        GridPane campaignInfo = new GridPane();
+        campaignInfo.setPadding(new Insets(10, 10, 10, 10));
+        campaignInfo.setVgap(10);
+        campaignInfo.setHgap(10);
+        campaignInfo.addColumn(0
                 , new Label("Impressions")
                 , new Label("Clicks")
                 , new Label("Uniques")
@@ -102,7 +103,7 @@ public class DashboardController {
                 , new Label("Cost-per-click")
                 , new Label("Cost-per-mille")
                 , new Label("Bounce Rate"));
-        content.addColumn(1
+        campaignInfo.addColumn(1
                 , new Label(String.format("%,d", campaignRecord.getImpressions()))
                 , new Label(String.format("%,d", campaignRecord.getClicks()))
                 , new Label(String.format("%,d", campaignRecord.getUniques()))
@@ -115,6 +116,7 @@ public class DashboardController {
                 , new Label(String.format("\u00A3%.3f", campaignRecord.getCpm() / 100))
                 , new Label(String.format("%.2f%%", campaignRecord.getBounceRate() * 100)));
         tab.setClosable(false);
+        content.setTop(campaignInfo);
         tab.setContent(content);
         tabs.getTabs().add(tab);
     }

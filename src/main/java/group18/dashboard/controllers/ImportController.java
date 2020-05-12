@@ -36,6 +36,7 @@ import static group18.dashboard.database.tables.Campaign.CAMPAIGN;
 import static group18.dashboard.database.tables.Click.CLICK;
 import static group18.dashboard.database.tables.Impression.IMPRESSION;
 import static group18.dashboard.database.tables.Interaction.INTERACTION;
+import static org.jooq.impl.DSL.select;
 
 public class ImportController {
 
@@ -353,6 +354,24 @@ public class ImportController {
                 parentController.addCampaign(result.getName());
             });
         }
+    }
+
+    public void updateBounceMetrics(int campaignID) {
+
+        int bounces = query.selectCount()
+                .from(INTERACTION)
+                .where(INTERACTION.CID.eq(campaignID)
+                        .and(INTERACTION.CONVERSION.isFalse()))
+                .fetchOneInto(int.class);
+
+        query.select(INTERACTION.ENTRY_DATE)
+                .from(INTERACTION)
+                .where(INTERACTION.CID.eq(campaignID)
+                        .and(INTERACTION.CONVERSION.isFalse())
+                        .and(INTERACTION.USER.in(
+                                select(IMPRESSION.USER).from(IMPRESSION).where(IMPRESSION.CID.eq(campaignID).and(filter))))
+                        .and(getDateRange(INTERACTION.ENTRY_DATE)))
+                .fetch(INTERACTION.ENTRY_DATE);
     }
 
     public void setParentController(DashboardController dashboardController) {

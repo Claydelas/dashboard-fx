@@ -82,6 +82,10 @@ public class App extends Application {
                             "    CPM         DOUBLE,\n" +
                             "    BOUNCE_RATE DOUBLE,\n" +
                             "    TOTAL_COST  DOUBLE,\n" +
+                            "    MIN_PAGES_ENABLED   BOOLEAN default TRUE not null,\n" +
+                            "    MIN_PAGES   INT default 2,\n" +
+                            "    MIN_TIME_ENABLED   BOOLEAN default FALSE not null,\n" +
+                            "    MIN_TIME    DOUBLE default 3.5,\n" +
                             "    PARSED      BOOLEAN default FALSE not null,\n" +
                             "    constraint CAMPAIGN_PK\n" +
                             "        primary key (CID),\n" +
