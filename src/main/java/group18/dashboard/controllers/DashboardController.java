@@ -153,7 +153,6 @@ public class DashboardController {
         tabs.getTabs().add(tab);
     }
 
-
     @FXML
     public void importCampaignButtonAction() {
         try {

@@ -32,7 +32,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Campaign extends TableImpl<CampaignRecord> {
 
-    private static final long serialVersionUID = -1914199281;
+    private static final long serialVersionUID = -227748324;
 
     /**
      * The reference instance of <code>PUBLIC.CAMPAIGN</code>
@@ -120,22 +120,22 @@ public class Campaign extends TableImpl<CampaignRecord> {
     /**
      * The column <code>PUBLIC.CAMPAIGN.MIN_PAGES_ENABLED</code>.
      */
-    public final TableField<CampaignRecord, Boolean> MIN_PAGES_ENABLED = createField(DSL.name("MIN_PAGES_ENABLED"), org.jooq.impl.SQLDataType.BOOLEAN, this, "");
+    public final TableField<CampaignRecord, Boolean> MIN_PAGES_ENABLED = createField(DSL.name("MIN_PAGES_ENABLED"), org.jooq.impl.SQLDataType.BOOLEAN.nullable(false).defaultValue(org.jooq.impl.DSL.field("TRUE", org.jooq.impl.SQLDataType.BOOLEAN)), this, "");
 
     /**
      * The column <code>PUBLIC.CAMPAIGN.MIN_PAGES</code>.
      */
-    public final TableField<CampaignRecord, Integer> MIN_PAGES = createField(DSL.name("MIN_PAGES"), org.jooq.impl.SQLDataType.INTEGER, this, "");
+    public final TableField<CampaignRecord, Integer> MIN_PAGES = createField(DSL.name("MIN_PAGES"), org.jooq.impl.SQLDataType.INTEGER.defaultValue(org.jooq.impl.DSL.field("2", org.jooq.impl.SQLDataType.INTEGER)), this, "");
 
     /**
      * The column <code>PUBLIC.CAMPAIGN.MIN_TIME_ENABLED</code>.
      */
-    public final TableField<CampaignRecord, Boolean> MIN_TIME_ENABLED = createField(DSL.name("MIN_TIME_ENABLED"), org.jooq.impl.SQLDataType.BOOLEAN, this, "");
+    public final TableField<CampaignRecord, Boolean> MIN_TIME_ENABLED = createField(DSL.name("MIN_TIME_ENABLED"), org.jooq.impl.SQLDataType.BOOLEAN.nullable(false).defaultValue(org.jooq.impl.DSL.field("FALSE", org.jooq.impl.SQLDataType.BOOLEAN)), this, "");
 
     /**
      * The column <code>PUBLIC.CAMPAIGN.MIN_TIME</code>.
      */
-    public final TableField<CampaignRecord, Integer> MIN_TIME = createField(DSL.name("MIN_TIME"), org.jooq.impl.SQLDataType.INTEGER, this, "");
+    public final TableField<CampaignRecord, Double> MIN_TIME = createField(DSL.name("MIN_TIME"), org.jooq.impl.SQLDataType.DOUBLE.defaultValue(org.jooq.impl.DSL.field("3.5", org.jooq.impl.SQLDataType.DOUBLE)), this, "");
 
     /**
      * The column <code>PUBLIC.CAMPAIGN.PARSED</code>.
@@ -235,7 +235,7 @@ public class Campaign extends TableImpl<CampaignRecord> {
     // -------------------------------------------------------------------------
 
     @Override
-    public Row19<Integer, Integer, String, Integer, Integer, Integer, Integer, Integer, Double, Double, Double, Double, Double, Double, Boolean, Integer, Boolean, Integer, Boolean> fieldsRow() {
+    public Row19<Integer, Integer, String, Integer, Integer, Integer, Integer, Integer, Double, Double, Double, Double, Double, Double, Boolean, Integer, Boolean, Double, Boolean> fieldsRow() {
         return (Row19) super.fieldsRow();
     }
 }

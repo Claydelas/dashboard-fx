@@ -2,6 +2,7 @@ package group18.dashboard.controllers;
 
 import com.jfoenix.controls.JFXComboBox;
 import group18.dashboard.App;
+import group18.dashboard.database.tables.Interaction;
 import group18.dashboard.database.tables.records.CampaignRecord;
 import group18.dashboard.util.DB;
 import javafx.application.Platform;
@@ -17,15 +18,22 @@ import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import org.jooq.Condition;
+import org.jooq.Record;
 import org.jooq.SQLDialect;
+import org.jooq.TableField;
 import org.jooq.impl.DSL;
+import org.jooq.types.DayToSecond;
 
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -321,7 +329,7 @@ public class ImportController {
 
         int impressions = query.selectCount().from(IMPRESSION).where(IMPRESSION.CID.eq(campaignID)).fetchOneInto(int.class);
 
-        int bounces = query.selectCount().from(INTERACTION).where(INTERACTION.CID.eq(campaignID).and(INTERACTION.CONVERSION.isFalse())).fetchOneInto(int.class);
+        int bounces = getBounces(campaignID);
 
         int uniques = query.select(DSL.countDistinct(CLICK.USER)).from(CLICK).where(CLICK.CID.eq(campaignID)).fetchOneInto(int.class);
 
@@ -356,24 +364,31 @@ public class ImportController {
         }
     }
 
-    public void updateBounceMetrics(int campaignID) {
+    public int getBounces(int campaignID) {
+        boolean isMinTimeEnabled = query.select(CAMPAIGN.MIN_TIME_ENABLED)
+                .where(CAMPAIGN.CID.eq(campaignID))
+                .fetchOne().value1();
 
-        //boolean minPages = CAMPAIGN.
+        boolean isMinPagesEnabled = query.select(CAMPAIGN.MIN_PAGES_ENABLED)
+                .where(CAMPAIGN.CID.eq(campaignID))
+                .fetchOne().value1();
 
-        int bounces = query.selectCount()
+        double minTime = query.select(CAMPAIGN.MIN_TIME)
+                .where(CAMPAIGN.CID.eq(campaignID))
+                .fetchOne().value1();
+
+        int minPages = query.select(CAMPAIGN.MIN_PAGES)
+                .where(CAMPAIGN.CID.eq(campaignID))
+                .fetchOne().value1();
+
+        return query.selectCount()
                 .from(INTERACTION)
-                .where(INTERACTION.CID.eq(campaignID)
-                        .and(INTERACTION.CONVERSION.isFalse()))
-                .fetchOneInto(int.class);
-
-//        query.select(INTERACTION.ENTRY_DATE)
-//                .from(INTERACTION)
-//                .where(INTERACTION.CID.eq(campaignID)
-//                        .and(INTERACTION.CONVERSION.isFalse())
-//                        .and(INTERACTION.USER.in(
-//                                select(IMPRESSION.USER).from(IMPRESSION).where(IMPRESSION.CID.eq(campaignID).and(filter))))
-//                        .and(getDateRange(INTERACTION.ENTRY_DATE)))
-//                .fetch(INTERACTION.ENTRY_DATE);
+                .where(INTERACTION.CID.eq(campaignID))
+                .and(INTERACTION.EXIT_DATE.isNotNull())
+                .and(isMinTimeEnabled ? DSL.localDateTimeDiff(INTERACTION.EXIT_DATE, INTERACTION.ENTRY_DATE)
+                        .ge(DayToSecond.valueOf(minTime * 1000 * 60)) : DSL.trueCondition())
+                .and(isMinPagesEnabled ? INTERACTION.VIEWS.ge(minPages) : DSL.trueCondition())
+                .execute();
     }
 
     public void setParentController(DashboardController dashboardController) {
