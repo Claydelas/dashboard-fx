@@ -18,7 +18,7 @@
                     <CustomMenuItem fx:id="uiScalingMenu" mnemonicParsing="false" hideOnClick="false">
                         <content>
                             <Slider fx:id="uiScalingSlider" blockIncrement="1.0" majorTickUnit="2.0" max="22.0"
-                                    min="12.0" minorTickCount="1" showTickLabels="true" snapToTicks="true"/>
+                                    min="12.0" minorTickCount="1" showTickLabels="true" snapToTicks="true" value="14.0"/>
                         </content>
                     </CustomMenuItem>
                 </Menu>

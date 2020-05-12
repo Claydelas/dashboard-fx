@@ -8,6 +8,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
@@ -73,6 +74,7 @@ public class LoginController {
             stage.setMinHeight(500);
             stage.setMinWidth(800);
         }
+        stage.getIcons().add(new Image(App.class.getResourceAsStream("icons/app.png")));
         stage.setTitle("Ad Auction Dashboard");
         stage.show();
         exit();
