@@ -55,8 +55,8 @@ public class DashboardController {
     }
 
     void setupFirstCampaignButton() {
-        final JFXButton initChartButton = new JFXButton("You can insert more charts from \"New\"");
-        initChartButton.setStyle("-fx-font-size:30");
+        final JFXButton initChartButton = new JFXButton(" You can insert more charts from \"New\"");
+        initChartButton.setStyle("-fx-font-size:26");
         ImageView image = new ImageView(App.class.getResource("icons/baseline_add_black.png").toString());
         image.setFitWidth(45);
         image.setFitHeight(45);

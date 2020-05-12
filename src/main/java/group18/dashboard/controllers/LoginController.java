@@ -72,7 +72,7 @@ public class LoginController {
         } else {
             stage.setScene(new Scene(new FXMLLoader(App.class.getResource("dashboard.fxml")).load(), 1024, 600));
             stage.setMinHeight(500);
-            stage.setMinWidth(800);
+            stage.setMinWidth(810);
         }
         stage.getIcons().add(new Image(App.class.getResourceAsStream("icons/app.png")));
         stage.setTitle("Ad Auction Dashboard");

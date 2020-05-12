@@ -28,10 +28,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
-import javafx.scene.layout.FlowPane;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.stage.FileChooser;
@@ -196,8 +193,7 @@ public class ChartFactory {
 
             ProgressIndicator progress = new ProgressIndicator();
             progress.setProgress(ProgressBar.INDETERMINATE_PROGRESS);
-            final StackPane pane = new StackPane(progress);
-            StackPane.setAlignment(progress, Pos.CENTER);
+            final BorderPane pane = new BorderPane(progress);
 
             Platform.runLater(() -> dashboardArea.getChildren().add(pane));
 
@@ -347,21 +343,24 @@ public class ChartFactory {
             }
             chart.getData().add(series);
 
-            final JFXButton png = new JFXButton("PNG");
+            final JFXButton png = new JFXButton();
+            ImageView image1 = new ImageView(App.class.getResource("icons/baseline_perm_media_black_18dp.png").toString());
+            image1.setFitWidth(20);
+            image1.setFitHeight(20);
+            image1.setPreserveRatio(true);
+            png.setGraphic(image1);
             final JFXButton close = new JFXButton();
-            ImageView image = new ImageView(App.class.getResource("icons/baseline_cancel_black.png").toString());
-            image.setFitWidth(20);
-            image.setFitHeight(20);
-            image.setPreserveRatio(true);
-            close.setGraphic(image);
+            ImageView image2 = new ImageView(App.class.getResource("icons/baseline_cancel_black_18dp.png").toString());
+            image2.setFitWidth(20);
+            image2.setFitHeight(20);
+            image2.setPreserveRatio(true);
+            close.setGraphic(image2);
 
             final VBox buttons = new VBox(close, png);
-            buttons.setAlignment(Pos.TOP_RIGHT);
-            StackPane.setAlignment(buttons, Pos.TOP_RIGHT);
 
             Platform.runLater(() -> {
-                pane.getChildren().clear();
-                pane.getChildren().addAll(chart, buttons);
+                pane.setCenter(chart);
+                pane.setRight(buttons);
             });
 
             png.setOnMouseClicked(e -> {
