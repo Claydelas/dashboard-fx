@@ -9,7 +9,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox fx:id="bounceForm" prefHeight="144.0" prefWidth="412.0" spacing="10.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="group18.dashboard.controllers.ImportController">
+<VBox fx:id="bounceForm" prefHeight="144.0" prefWidth="412.0" spacing="10.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="group18.dashboard.controllers.BounceDefinitionController">
    <children>
       <VBox prefWidth="100.0">
          <children>
@@ -20,7 +20,7 @@
             </HBox>
             <HBox prefWidth="200.0">
                <children>
-                  <CheckBox mnemonicParsing="false" selected="true">
+                  <CheckBox fx:id="minPagesEnabledBox" mnemonicParsing="false" selected="true">
                      <HBox.margin>
                         <Insets />
                      </HBox.margin>
@@ -33,7 +33,7 @@
                         <Insets top="4.0" />
                      </HBox.margin>
                   </Label>
-                  <TextField prefHeight="26.0" prefWidth="33.0" text="2">
+                  <TextField fx:id="minPagesField" prefHeight="26.0" prefWidth="35.0" text="2">
                      <HBox.margin>
                         <Insets left="8.0" right="8.0" />
                      </HBox.margin>
@@ -50,7 +50,7 @@
             </HBox>
             <HBox prefWidth="200.0">
                <children>
-                  <CheckBox mnemonicParsing="false">
+                  <CheckBox fx:id="minTimeEnabledBox" mnemonicParsing="false">
                      <HBox.margin>
                         <Insets />
                      </HBox.margin>
@@ -63,7 +63,7 @@
                         <Insets top="4.0" />
                      </HBox.margin>
                   </Label>
-                  <TextField prefHeight="26.0" prefWidth="42.0" text="3">
+                  <TextField fx:id="minTimeField" prefHeight="26.0" prefWidth="42.0" text="3">
                      <HBox.margin>
                         <Insets left="8.0" right="8.0" />
                      </HBox.margin>
@@ -82,7 +82,12 @@
       </VBox>
       <HBox alignment="CENTER_LEFT" spacing="5.0">
          <children>
-            <Button fx:id="confirmBounceButton" mnemonicParsing="false" onAction="#changeBounce" text="Submit" />
+            <Button fx:id="confirmBounceButton" mnemonicParsing="false" onAction="#changeBounce" prefHeight="26.0" prefWidth="192.0" text="Submit" />
+            <Label fx:id="valueErrorLabel" prefHeight="16.0" prefWidth="310.0" text="Values must be numbers." textFill="RED" visible="false">
+               <padding>
+                  <Insets left="7.0" />
+               </padding>
+            </Label>
             <ProgressBar fx:id="bounceChangeProgress" prefWidth="260.0" visible="false" />
          </children>
       </HBox>
