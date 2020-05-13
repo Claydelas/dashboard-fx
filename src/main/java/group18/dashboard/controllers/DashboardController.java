@@ -35,6 +35,8 @@ import org.jooq.Result;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import java.util.Optional;
+
 import static group18.dashboard.App.query;
 import static group18.dashboard.database.tables.Campaign.CAMPAIGN;
 
@@ -93,7 +95,11 @@ public class DashboardController {
 
     //generates a tab and its contents and adds it to the TabPane
     public void loadTab(CampaignRecord campaignRecord) {
-        Tab tab = new Tab(campaignRecord.getName());
+        Tab tab = tabs.getTabs().parallelStream()
+                .filter(x -> x.getText().equals(campaignRecord.getName()))
+                .findAny()
+                .orElseGet(() -> new Tab(campaignRecord.getName()));
+
         BorderPane content = new BorderPane();
         GridPane campaignInfo = new GridPane();
         campaignInfo.setPadding(new Insets(10, 10, 10, 10));
@@ -153,6 +159,7 @@ public class DashboardController {
         }
 
         Button changeBounce = new Button("Update bounce definition");
+        changeBounce.setOnAction(e -> updateBounceDefinitionButtonAction());
         bounceInfo.getChildren().add(changeBounce);
 
         content.setBottom(bounceInfo);
@@ -163,7 +170,7 @@ public class DashboardController {
     }
 
     @FXML
-    public void importCampaignButtonAction() {
+    public void importCampaignButtonAction() { // TODO give currently selected campaign as default
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource("import.fxml"));
             Parent importForm = fxmlLoader.load();
@@ -175,6 +182,30 @@ public class DashboardController {
             stage.setScene(new Scene(importForm));
             stage.getIcons().add(new Image(App.class.getResourceAsStream("icons/app.png")));
             stage.setTitle("Import Campaign Data");
+            stage.sizeToScene();
+            stage.setResizable(false);
+            stage.show();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
+    public void updateBounceDefinitionButtonAction() {
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource("bounces.fxml"));
+            Parent bounceDefinitionForm = fxmlLoader.load();
+            BounceDefinitionController bounceDefinitionController = fxmlLoader.getController();
+            bounceDefinitionController.campaignName = getCampaignName();
+            bounceDefinitionController.setParentController(this);
+            bounceDefinitionController.setCurrentBounceValues();
+
+
+            Stage stage = new Stage();
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setScene(new Scene(bounceDefinitionForm));
+            stage.getIcons().add(new Image(App.class.getResourceAsStream("icons/app.png")));
+            stage.setTitle("Update bounce definition");
             stage.sizeToScene();
             stage.setResizable(false);
             stage.show();
@@ -203,6 +234,10 @@ public class DashboardController {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public String getCampaignName() {
+        return tabs.getSelectionModel().getSelectedItem().getText();
     }
 
     public void addCampaign(String name) {

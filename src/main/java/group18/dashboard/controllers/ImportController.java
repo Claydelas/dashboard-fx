@@ -17,6 +17,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import org.jooq.*;
 import org.jooq.SQLDialect;
 import org.jooq.impl.DSL;
 import org.jooq.types.DayToSecond;
@@ -322,7 +323,7 @@ public class ImportController {
 
         int impressions = query.selectCount().from(IMPRESSION).where(IMPRESSION.CID.eq(campaignID)).fetchOneInto(int.class);
 
-        int bounces = getBounces(campaignID);
+        int bounces = clicks - getSuccessfulInteractions(campaignID, query);
 
         int uniques = query.select(DSL.countDistinct(CLICK.USER)).from(CLICK).where(CLICK.CID.eq(campaignID)).fetchOneInto(int.class);
 
@@ -357,29 +358,25 @@ public class ImportController {
         }
     }
 
-    public int getBounces(int campaignID) {
-        boolean isMinTimeEnabled = query.select(CAMPAIGN.MIN_TIME_ENABLED).from(CAMPAIGN)
-                .where(CAMPAIGN.CID.eq(campaignID))
-                .fetchOne().value1();
+    public static int getSuccessfulInteractions(int campaignID, DSLContext query) {
+        Record4<Boolean, Boolean, Double, Integer> q = query.select(
+                CAMPAIGN.MIN_TIME_ENABLED,
+                CAMPAIGN.MIN_PAGES_ENABLED,
+                CAMPAIGN.MIN_TIME,
+                CAMPAIGN.MIN_PAGES)
+                .from(CAMPAIGN).where(CAMPAIGN.CID.eq(campaignID)).fetchOne();
 
-        boolean isMinPagesEnabled = query.select(CAMPAIGN.MIN_PAGES_ENABLED).from(CAMPAIGN)
-                .where(CAMPAIGN.CID.eq(campaignID))
-                .fetchOne().value1();
-
-        double minTime = query.select(CAMPAIGN.MIN_TIME).from(CAMPAIGN)
-                .where(CAMPAIGN.CID.eq(campaignID))
-                .fetchOne().value1();
-
-        int minPages = query.select(CAMPAIGN.MIN_PAGES).from(CAMPAIGN)
-                .where(CAMPAIGN.CID.eq(campaignID))
-                .fetchOne().value1();
+        boolean isMinTimeEnabled = q.value1();
+        boolean isMinPagesEnabled = q.value2();
+        double minTime = q.value3();
+        int minPages = q.value4();
 
         return query.selectCount()
                 .from(INTERACTION)
                 .where(INTERACTION.CID.eq(campaignID))
                 .and(isMinTimeEnabled ? INTERACTION.EXIT_DATE.isNotNull() : DSL.trueCondition())
                 .and(isMinTimeEnabled ? DSL.localDateTimeDiff(INTERACTION.EXIT_DATE, INTERACTION.ENTRY_DATE)
-                        .ge(DayToSecond.valueOf(Duration.ofSeconds((long) (minTime * 60)))) : DSL.trueCondition())
+                        .ge(DayToSecond.valueOf(minTime * 60 * 1000)) : DSL.trueCondition())
                 .and(isMinPagesEnabled ? INTERACTION.VIEWS.ge(minPages) : DSL.trueCondition())
                 .fetchOne().value1();
     }
