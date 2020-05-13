@@ -73,7 +73,7 @@ public class BounceDefinitionController {
             }
 
             int clicks = query.selectCount().from(CLICK).where(CLICK.CID.eq(campaignID)).fetchOneInto(int.class);
-            int bounces = clicks - getSuccessfulInteractions(campaignID, query);
+            int bounces = clicks - getSuccessfulInteractions(campaignID);
 
             query.update(CAMPAIGN).set(CAMPAIGN.BOUNCES, bounces).where(CAMPAIGN.CID.eq(campaignID)).execute();
             query.update(CAMPAIGN).set(CAMPAIGN.BOUNCE_RATE, (double) bounces / clicks).where(CAMPAIGN.CID.eq(campaignID)).execute();

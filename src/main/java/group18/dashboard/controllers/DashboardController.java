@@ -16,6 +16,7 @@ import javafx.collections.ObservableList;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
@@ -32,6 +33,8 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.jooq.Result;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -43,17 +46,21 @@ import static group18.dashboard.database.tables.Campaign.CAMPAIGN;
 public class DashboardController {
 
     public BorderPane chartPane;
-    public TabPane tabs;
-    public FlowPane dashboardArea;
+    public TabPane campaignTabs;
+    public FlowPane currentDashboardArea;
     public ScrollPane scrollPane;
     public BorderPane appView;
     public Slider uiScalingSlider;
+    public TabPane chartAreaTabs;
+    public Tab addTab;
+    public Tab firstTab;
+    public FlowPane firstDashboardArea;
     ObservableList<String> campaignNames;
 
     @FXML
     public void initialize() {
         scrollPane.getContent().setOnMousePressed(Event::consume);
-        dashboardArea.prefWrapLengthProperty().bind(dashboardArea.widthProperty());
+        firstDashboardArea.prefWrapLengthProperty().bind(firstDashboardArea.widthProperty());
 
         chartPane.styleProperty().bind(Bindings.format("-fx-font-size: %.2fpx;", uiScalingSlider.valueProperty()));
 
@@ -63,10 +70,16 @@ public class DashboardController {
         loadTabs(campaigns);
         campaignNames = FXCollections.observableArrayList(campaigns.getValues(CAMPAIGN.NAME));
 
-        setupFirstCampaignButton();
+        currentDashboardArea = firstDashboardArea;
+        setupFirstCampaignButton(currentDashboardArea);
+        firstTab.setOnSelectionChanged(e -> {
+            if (((Tab) e.getSource()).isSelected()) {
+                currentDashboardArea = firstDashboardArea;
+            }
+        });
     }
 
-    void setupFirstCampaignButton() {
+    void setupFirstCampaignButton(FlowPane dashboardArea) {
         final JFXButton initChartButton = new JFXButton(" You can insert more charts from \"New\"");
         initChartButton.setStyle("-fx-font-size:26");
         ImageView image = new ImageView(App.class.getResource("icons/baseline_add_black.png").toString());
@@ -95,7 +108,7 @@ public class DashboardController {
 
     //generates a tab and its contents and adds it to the TabPane
     public void loadTab(CampaignRecord campaignRecord) {
-        Tab tab = tabs.getTabs().parallelStream()
+        Tab tab = campaignTabs.getTabs().parallelStream()
                 .filter(x -> x.getText().equals(campaignRecord.getName()))
                 .findAny()
                 .orElseGet(() -> new Tab(campaignRecord.getName()));
@@ -166,7 +179,7 @@ public class DashboardController {
 
         tab.setClosable(false);
         tab.setContent(content);
-        tabs.getTabs().add(tab);
+        campaignTabs.getTabs().add(tab);
     }
 
     @FXML
@@ -220,7 +233,7 @@ public class DashboardController {
             Parent chartForm = fxmlLoader.load();
             ChartFactory chartController = fxmlLoader.getController();
 
-            chartController.setChartPane(dashboardArea);
+            chartController.setChartPane(currentDashboardArea);
             chartController.setCampaigns(campaignNames);
 
             Stage stage = new Stage();
@@ -237,7 +250,7 @@ public class DashboardController {
     }
 
     public String getCampaignName() {
-        return tabs.getSelectionModel().getSelectedItem().getText();
+        return campaignTabs.getSelectionModel().getSelectedItem().getText();
     }
 
     public void addCampaign(String name) {
@@ -292,6 +305,37 @@ public class DashboardController {
             stage.show();
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    public void addButtonSelection(Event event) {
+        if (((Tab) event.getSource()).isSelected()) { // True when we select the add tab
+            final String prevTabText = chartAreaTabs.getTabs().get(chartAreaTabs.getTabs().size() - 2).getText();
+            Tab tab = new Tab("Graphs " + (Integer.parseInt(Character.toString(prevTabText.charAt(prevTabText.length() - 1))) + 1));
+
+            ScrollPane scrollPane = new ScrollPane();
+            scrollPane.setFitToHeight(true);
+            scrollPane.setFitToWidth(true);
+
+            FlowPane flowPane = new FlowPane();
+            flowPane.setAlignment(Pos.CENTER);
+            flowPane.setColumnHalignment(HPos.CENTER);
+            flowPane.setHgap(5);
+            flowPane.setVgap(5);
+            scrollPane.setContent(flowPane);
+            tab.setContent(flowPane);
+
+            tab.setOnSelectionChanged(e -> {
+                if (((Tab) e.getSource()).isSelected()) {
+                    currentDashboardArea = flowPane;
+                }
+            });
+
+            setupFirstCampaignButton(flowPane);
+
+            chartAreaTabs.getTabs().add(chartAreaTabs.getTabs().size() - 1, tab);
+            chartAreaTabs.getSelectionModel().selectPrevious();
+
         }
     }
 }

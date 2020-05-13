@@ -323,7 +323,7 @@ public class ImportController {
 
         int impressions = query.selectCount().from(IMPRESSION).where(IMPRESSION.CID.eq(campaignID)).fetchOneInto(int.class);
 
-        int bounces = clicks - getSuccessfulInteractions(campaignID, query);
+        int bounces = clicks - getSuccessfulInteractions(campaignID);
 
         int uniques = query.select(DSL.countDistinct(CLICK.USER)).from(CLICK).where(CLICK.CID.eq(campaignID)).fetchOneInto(int.class);
 
@@ -358,7 +358,7 @@ public class ImportController {
         }
     }
 
-    public static int getSuccessfulInteractions(int campaignID, DSLContext query) {
+    public static int getSuccessfulInteractions(int campaignID) {
         Record4<Boolean, Boolean, Double, Integer> q = query.select(
                 CAMPAIGN.MIN_TIME_ENABLED,
                 CAMPAIGN.MIN_PAGES_ENABLED,
@@ -371,12 +371,10 @@ public class ImportController {
         double minTime = q.value3();
         int minPages = q.value4();
 
-        return query.selectCount()
-                .from(INTERACTION)
+        return query.selectCount().from(INTERACTION)
                 .where(INTERACTION.CID.eq(campaignID))
                 .and(isMinTimeEnabled ? INTERACTION.EXIT_DATE.isNotNull() : DSL.trueCondition())
-                .and(isMinTimeEnabled ? DSL.localDateTimeDiff(INTERACTION.EXIT_DATE, INTERACTION.ENTRY_DATE)
-                        .ge(DayToSecond.valueOf(minTime * 60 * 1000)) : DSL.trueCondition())
+                .and(isMinTimeEnabled ? DSL.condition("datediff('ms', ENTRY_DATE, EXIT_DATE) >= " + (minTime * 60 * 1000)) : DSL.trueCondition())
                 .and(isMinPagesEnabled ? INTERACTION.VIEWS.ge(minPages) : DSL.trueCondition())
                 .fetchOne().value1();
     }
