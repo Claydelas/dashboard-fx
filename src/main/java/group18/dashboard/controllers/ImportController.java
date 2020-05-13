@@ -2,6 +2,7 @@ package group18.dashboard.controllers;
 
 import com.jfoenix.controls.JFXComboBox;
 import group18.dashboard.App;
+import group18.dashboard.database.tables.Campaign;
 import group18.dashboard.database.tables.Interaction;
 import group18.dashboard.database.tables.records.CampaignRecord;
 import group18.dashboard.util.DB;
@@ -30,6 +31,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.SQLException;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -365,30 +367,30 @@ public class ImportController {
     }
 
     public int getBounces(int campaignID) {
-        boolean isMinTimeEnabled = query.select(CAMPAIGN.MIN_TIME_ENABLED)
+        boolean isMinTimeEnabled = query.select(CAMPAIGN.MIN_TIME_ENABLED).from(CAMPAIGN)
                 .where(CAMPAIGN.CID.eq(campaignID))
                 .fetchOne().value1();
 
-        boolean isMinPagesEnabled = query.select(CAMPAIGN.MIN_PAGES_ENABLED)
+        boolean isMinPagesEnabled = query.select(CAMPAIGN.MIN_PAGES_ENABLED).from(CAMPAIGN)
                 .where(CAMPAIGN.CID.eq(campaignID))
                 .fetchOne().value1();
 
-        double minTime = query.select(CAMPAIGN.MIN_TIME)
+        double minTime = query.select(CAMPAIGN.MIN_TIME).from(CAMPAIGN)
                 .where(CAMPAIGN.CID.eq(campaignID))
                 .fetchOne().value1();
 
-        int minPages = query.select(CAMPAIGN.MIN_PAGES)
+        int minPages = query.select(CAMPAIGN.MIN_PAGES).from(CAMPAIGN)
                 .where(CAMPAIGN.CID.eq(campaignID))
                 .fetchOne().value1();
 
         return query.selectCount()
                 .from(INTERACTION)
                 .where(INTERACTION.CID.eq(campaignID))
-                .and(INTERACTION.EXIT_DATE.isNotNull())
+                .and(isMinTimeEnabled ? INTERACTION.EXIT_DATE.isNotNull() : DSL.trueCondition())
                 .and(isMinTimeEnabled ? DSL.localDateTimeDiff(INTERACTION.EXIT_DATE, INTERACTION.ENTRY_DATE)
-                        .ge(DayToSecond.valueOf(minTime * 1000 * 60)) : DSL.trueCondition())
+                        .ge(DayToSecond.valueOf(Duration.ofSeconds((long) (minTime * 60)))) : DSL.trueCondition())
                 .and(isMinPagesEnabled ? INTERACTION.VIEWS.ge(minPages) : DSL.trueCondition())
-                .execute();
+                .fetchOne().value1();
     }
 
     public void setParentController(DashboardController dashboardController) {
