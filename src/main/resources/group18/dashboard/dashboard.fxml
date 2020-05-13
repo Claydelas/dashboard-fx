@@ -13,6 +13,10 @@
                 <MenuItem fx:id="importCampaignButton" mnemonicParsing="false"
                           onAction="#importCampaignButtonAction" text="Campaign"/>
             </Menu>
+            <Menu mnemonicParsing="false" text="Manage">
+                <MenuItem fx:id="manageCampaignsMenu" mnemonicParsing="false" onAction="#manageCampaigns"
+                          text="Campaigns"/>
+            </Menu>
             <Menu mnemonicParsing="false" text="Accessibility">
                 <Menu mnemonicParsing="false" text="Font Size">
                     <CustomMenuItem fx:id="uiScalingMenu" mnemonicParsing="false" hideOnClick="false">
@@ -22,8 +26,6 @@
                         </content>
                     </CustomMenuItem>
                 </Menu>
-                <MenuItem fx:id="themeButton" mnemonicParsing="false" onAction="#themeButtonAction"
-                          text="Colour Palette"/>
             </Menu>
         </MenuBar>
     </top>

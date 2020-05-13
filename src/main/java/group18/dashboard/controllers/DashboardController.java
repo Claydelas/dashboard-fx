@@ -1,21 +1,27 @@
 package group18.dashboard.controllers;
 
 import com.jfoenix.controls.JFXButton;
+import com.jfoenix.controls.JFXListView;
 import group18.dashboard.App;
 import group18.dashboard.database.tables.records.CampaignRecord;
+import group18.dashboard.util.DB;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.CheckBoxListCell;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
@@ -25,6 +31,9 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.jooq.Result;
+
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static group18.dashboard.App.query;
 import static group18.dashboard.database.tables.Campaign.CAMPAIGN;
@@ -114,7 +123,7 @@ public class DashboardController {
                 , new Label(String.format("\u00A3%.3f", campaignRecord.getCpc() / 100))
                 , new Label(String.format("\u00A3%.3f", campaignRecord.getCpm() / 100))
                 , new Label(String.format("%.2f%%", campaignRecord.getBounceRate() * 100)));
-        content.setTop(campaignInfo);
+        content.setCenter(campaignInfo);
 
         VBox bounceInfo = new VBox();
         bounceInfo.setPadding(new Insets(7, 7, 7, 7));
@@ -201,11 +210,53 @@ public class DashboardController {
     }
 
     @FXML
-    public void themeButtonAction() {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("oops..");
-        alert.setHeaderText(null);
-        alert.setContentText("This feature has not been implemented yet!");
-        alert.showAndWait();
+    public void manageCampaigns() {
+        try {
+            Stage stage = new Stage();
+
+            ObservableList<String> removedCampaigns = FXCollections.observableArrayList();
+
+            JFXListView<String> campaigns = new JFXListView<>();
+            campaigns.setCellFactory(CheckBoxListCell.forListView(item -> {
+                BooleanProperty observable = new SimpleBooleanProperty();
+                observable.addListener((obs, wasSelected, isNowSelected) -> {
+                    if (isNowSelected) removedCampaigns.add(item);
+                    else removedCampaigns.remove(item);
+                });
+                return observable;
+            }));
+
+            campaigns.setItems(campaignNames);
+            campaigns.setPrefHeight(185);
+
+            Button confirm = new Button("Remove Selected");
+            confirm.setOnAction(actionEvent -> {
+                ExecutorService exService = Executors.newSingleThreadExecutor();
+                removedCampaigns.forEach(c -> {
+                    campaignNames.remove(c);
+                    tabs.getTabs().removeIf(tab -> (tab.getText().equals(c)));
+                    exService.execute(() -> {
+                        query.deleteFrom(CAMPAIGN).where(CAMPAIGN.NAME.equalIgnoreCase(c)).execute();
+                        DB.commit();
+                    });
+                });
+                exService.shutdown();
+                stage.close();
+            });
+
+            VBox controls = new VBox(campaigns, confirm);
+            controls.setSpacing(5);
+            controls.setPadding(new Insets(10, 10, 10, 10));
+            controls.setAlignment(Pos.CENTER_RIGHT);
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setScene(new Scene(controls));
+            stage.getIcons().add(new Image(App.class.getResourceAsStream("icons/app.png")));
+            stage.setTitle("Manage Campaigns");
+            stage.sizeToScene();
+            stage.setResizable(false);
+            stage.show();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

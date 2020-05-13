@@ -2,8 +2,6 @@ package group18.dashboard.controllers;
 
 import com.jfoenix.controls.JFXComboBox;
 import group18.dashboard.App;
-import group18.dashboard.database.tables.Campaign;
-import group18.dashboard.database.tables.Interaction;
 import group18.dashboard.database.tables.records.CampaignRecord;
 import group18.dashboard.util.DB;
 import javafx.application.Platform;
@@ -19,10 +17,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import org.jooq.Condition;
-import org.jooq.Record;
 import org.jooq.SQLDialect;
-import org.jooq.TableField;
 import org.jooq.impl.DSL;
 import org.jooq.types.DayToSecond;
 
@@ -32,10 +27,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.time.Duration;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -46,7 +38,6 @@ import static group18.dashboard.database.tables.Campaign.CAMPAIGN;
 import static group18.dashboard.database.tables.Click.CLICK;
 import static group18.dashboard.database.tables.Impression.IMPRESSION;
 import static group18.dashboard.database.tables.Interaction.INTERACTION;
-import static org.jooq.impl.DSL.select;
 
 public class ImportController {
 
@@ -86,7 +77,7 @@ public class ImportController {
     // returns the text of the name textfield or generates a name (Campaign ID) if the textfield is empty
     public String generateCampaignName() {
         String name = campaignNameField.getText();
-        return name.isBlank() ? "Campaign " + (query.selectCount().from(CAMPAIGN).fetchOneInto(int.class) + 1) : name;
+        return name.isBlank() || nameTaken(name) ? "Campaign " + (query.selectCount().from(CAMPAIGN).fetchOneInto(int.class) + 1) : name;
     }
 
     // inserts a new entry to the Campaign table
