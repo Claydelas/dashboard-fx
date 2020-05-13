@@ -1,45 +1,54 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<BorderPane fx:id="appView" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="group18.dashboard.controllers.DashboardController">
+<?import javafx.scene.control.CustomMenuItem?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Slider?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.FlowPane?>
+
+<BorderPane fx:id="appView" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="group18.dashboard.controllers.DashboardController">
     <top>
-        <MenuBar BorderPane.alignment="CENTER" stylesheets="@css/menu.css">
+        <MenuBar stylesheets="@css/menu.css" BorderPane.alignment="CENTER">
             <Menu mnemonicParsing="false" text="New">
-                <MenuItem fx:id="newChartButton" mnemonicParsing="false" onAction="#newChartButtonAction"
-                          text="Chart"/>
-                <MenuItem fx:id="importCampaignButton" mnemonicParsing="false"
-                          onAction="#importCampaignButtonAction" text="Campaign"/>
+                <MenuItem fx:id="newChartButton" mnemonicParsing="false" onAction="#newChartButtonAction" text="Chart" />
+                <MenuItem fx:id="importCampaignButton" mnemonicParsing="false" onAction="#importCampaignButtonAction" text="Campaign" />
             </Menu>
             <Menu mnemonicParsing="false" text="Accessibility">
                 <Menu mnemonicParsing="false" text="Font Size">
-                    <CustomMenuItem fx:id="uiScalingMenu" mnemonicParsing="false" hideOnClick="false">
+                    <CustomMenuItem fx:id="uiScalingMenu" hideOnClick="false" mnemonicParsing="false">
                         <content>
-                            <Slider fx:id="uiScalingSlider" blockIncrement="1.0" majorTickUnit="2.0" max="22.0"
-                                    min="12.0" minorTickCount="1" showTickLabels="true" snapToTicks="true" value="14.0"/>
+                            <Slider fx:id="uiScalingSlider" blockIncrement="1.0" majorTickUnit="2.0" max="22.0" min="12.0" minorTickCount="1" showTickLabels="true" snapToTicks="true" value="14.0" />
                         </content>
                     </CustomMenuItem>
                 </Menu>
-                <MenuItem fx:id="themeButton" mnemonicParsing="false" onAction="#themeButtonAction"
-                          text="Colour Palette"/>
+                <MenuItem fx:id="themeButton" mnemonicParsing="false" onAction="#themeButtonAction" text="Colour Palette" />
             </Menu>
         </MenuBar>
     </top>
     <center>
         <BorderPane fx:id="chartPane">
             <left>
-                <TabPane fx:id="tabs" side="LEFT" stylesheets="@css/tabs.css"/>
+                <TabPane fx:id="campaignTabs" side="LEFT" stylesheets="@css/tabs.css" />
             </left>
-            <center>
-                <ScrollPane fx:id="scrollPane" fitToHeight="true" fitToWidth="true">
-                    <BorderPane.margin>
-                        <Insets/>
-                    </BorderPane.margin>
-                    <FlowPane fx:id="dashboardArea" alignment="CENTER" columnHalignment="CENTER" hgap="5.0" vgap="5.0"/>
-                </ScrollPane>
-            </center>
+         <center>
+            <TabPane fx:id="chartAreaTabs" BorderPane.alignment="CENTER">
+                <tabs>
+                  <Tab fx:id="firstTab" text="Graphs 1">
+                     <content>
+
+                            <ScrollPane fx:id="scrollPane" fitToHeight="true" fitToWidth="true">
+                                <FlowPane fx:id="firstDashboardArea" alignment="CENTER" columnHalignment="CENTER" hgap="5.0" vgap="5.0" />
+                            </ScrollPane>
+                     </content>
+                  </Tab>
+                    <Tab fx:id="addTab" closable="false" onSelectionChanged="#addButtonSelection" text="+"/>
+               </tabs></TabPane>
+         </center>
         </BorderPane>
     </center>
 </BorderPane>
