@@ -19,8 +19,8 @@
                 <MenuItem fx:id="importCampaignButton" mnemonicParsing="false" onAction="#importCampaignButtonAction" text="Campaign" />
             </Menu>
             <Menu mnemonicParsing="false" text="Manage">
-                <MenuItem fx:id="manageCampaignsMenu" mnemonicParsing="false" onAction="#manageCampaigns"
-                          text="Campaigns"/>
+                <MenuItem fx:id="manageCampaignsMenu" mnemonicParsing="false" onAction="#manageCampaigns" text="Campaigns"/>
+                <MenuItem fx:id="manageBounceDefMenu" mnemonicParsing="false" onAction="#updateBounceDefinitionButtonAction" text="Bounce Definition"/>
             </Menu>
             <Menu mnemonicParsing="false" text="Accessibility">
                 <Menu mnemonicParsing="false" text="Font Size">
@@ -39,7 +39,7 @@
                 <TabPane fx:id="campaignTabs" side="LEFT" stylesheets="@css/tabs.css" />
             </left>
          <center>
-            <TabPane fx:id="chartAreaTabs" BorderPane.alignment="CENTER">
+            <TabPane fx:id="chartAreaTabs" BorderPane.alignment="CENTER" stylesheets="@css/tabs.css">
                 <tabs>
                   <Tab fx:id="firstTab" text="Graphs 1">
                      <content>

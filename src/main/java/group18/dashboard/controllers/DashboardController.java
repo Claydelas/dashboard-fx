@@ -33,12 +33,8 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.jooq.Result;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
-import java.util.Optional;
 
 import static group18.dashboard.App.query;
 import static group18.dashboard.database.tables.Campaign.CAMPAIGN;
@@ -113,7 +109,6 @@ public class DashboardController {
                 .findAny()
                 .orElseGet(() -> new Tab(campaignRecord.getName()));
 
-        BorderPane content = new BorderPane();
         GridPane campaignInfo = new GridPane();
         campaignInfo.setPadding(new Insets(10, 10, 10, 10));
         campaignInfo.setVgap(10);
@@ -142,43 +137,31 @@ public class DashboardController {
                 , new Label(String.format("\u00A3%.3f", campaignRecord.getCpc() / 100))
                 , new Label(String.format("\u00A3%.3f", campaignRecord.getCpm() / 100))
                 , new Label(String.format("%.2f%%", campaignRecord.getBounceRate() * 100)));
-        content.setCenter(campaignInfo);
 
-        VBox bounceInfo = new VBox();
-        bounceInfo.setPadding(new Insets(7, 7, 7, 7));
-
-        bounceInfo.getChildren().add(new Label("Current bounce definition:"));
+        Label bdef = new Label("Current bounce definition:");
+        GridPane.setColumnSpan(bdef, 2);
+        bdef.setStyle("-fx-font-weight: bold");
 
         final Label pagesLabel = new Label(
-                "- If less than " + campaignRecord.getMinPages() +
-                        " website pages were visited");
-        pagesLabel.setPadding(new Insets(2, 0, 2, 9));
-
+                "< " + campaignRecord.getMinPages() +
+                        " website pages visited");
+        GridPane.setColumnSpan(pagesLabel, 2);
         final Label timeLabel = new Label(
-                "- If less than " + campaignRecord.getMinTime() +
-                        " minutes were spent on the website");
-        timeLabel.setPadding(new Insets(2, 0, 2, 9));
+                "< " + campaignRecord.getMinTime() +
+                        " minutes spent on website");
+        GridPane.setColumnSpan(timeLabel, 2);
 
+        final Label noDef = new Label("No bounce definition currently set.");
+        GridPane.setColumnSpan(noDef, 2);
 
-        if (campaignRecord.getMinPagesEnabled()) {
-            bounceInfo.getChildren().add(pagesLabel);
-        }
-        if (campaignRecord.getMinTimeEnabled()) {
-            bounceInfo.getChildren().add(timeLabel);
-        }
-
-        if (!campaignRecord.getMinTimeEnabled() && !campaignRecord.getMinPagesEnabled()) {
-            bounceInfo.getChildren().add(new Label("No bounce definition currently set."));
-        }
-
-        Button changeBounce = new Button("Update bounce definition");
-        changeBounce.setOnAction(e -> updateBounceDefinitionButtonAction());
-        bounceInfo.getChildren().add(changeBounce);
-
-        content.setBottom(bounceInfo);
+        campaignInfo.addColumn(0, bdef);
+        if (campaignRecord.getMinPagesEnabled()) campaignInfo.addColumn(0, pagesLabel);
+        if (campaignRecord.getMinTimeEnabled()) campaignInfo.addColumn(0, timeLabel);
+        if (!campaignRecord.getMinTimeEnabled() && !campaignRecord.getMinPagesEnabled())
+            campaignInfo.addColumn(0, noDef);
 
         tab.setClosable(false);
-        tab.setContent(content);
+        tab.setContent(campaignInfo);
         campaignTabs.getTabs().add(tab);
     }
 
