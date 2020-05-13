@@ -282,7 +282,7 @@ public class DashboardController {
                 ExecutorService exService = Executors.newSingleThreadExecutor();
                 removedCampaigns.forEach(c -> {
                     campaignNames.remove(c);
-                    tabs.getTabs().removeIf(tab -> (tab.getText().equals(c)));
+                    campaignTabs.getTabs().removeIf(tab -> (tab.getText().equals(c)));
                     exService.execute(() -> {
                         query.deleteFrom(CAMPAIGN).where(CAMPAIGN.NAME.equalIgnoreCase(c)).execute();
                         DB.commit();
