@@ -25,6 +25,7 @@ public class BounceDefinitionController {
     public VBox bounceForm;
     public DashboardController parentController; // TODO probably dont need
     public String campaignName;
+    int campaignID;
 
     public void setParentController(DashboardController dashboardController) {
         this.parentController = dashboardController;
@@ -53,7 +54,7 @@ public class BounceDefinitionController {
     }
 
     public void changeBounce() {
-        final int campaignID = query.select(CAMPAIGN.CID).from(CAMPAIGN)
+         campaignID = query.select(CAMPAIGN.CID).from(CAMPAIGN)
                 .where(CAMPAIGN.NAME.eq(campaignName)).fetchAny().value1();
         try {
             if (minPagesEnabledBox.isSelected()) {
@@ -87,7 +88,7 @@ public class BounceDefinitionController {
     }
 
     private void exit() {
-        parentController.loadTab(query.fetch(CAMPAIGN, CAMPAIGN.UID.eq(LoginController.getLoggedUserID()).and(CAMPAIGN.PARSED)).get(0));
+        parentController.loadTab(query.fetch(CAMPAIGN, CAMPAIGN.CID.eq(campaignID).and(CAMPAIGN.PARSED)).get(0));
         Stage stage = (Stage) bounceForm.getScene().getWindow();
         stage.close();
     }
