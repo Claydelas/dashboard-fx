@@ -293,8 +293,13 @@ public class DashboardController {
 
     public void addButtonSelection(Event event) {
         if (((Tab) event.getSource()).isSelected()) { // True when we select the add tab
-            final String prevTabText = chartAreaTabs.getTabs().get(chartAreaTabs.getTabs().size() - 2).getText();
-            Tab tab = new Tab("Graphs " + (Integer.parseInt(Character.toString(prevTabText.charAt(prevTabText.length() - 1))) + 1));
+            Tab tab;
+            if (chartAreaTabs.getTabs().size() < 2) {
+                tab = new Tab("Graphs 1");
+            } else {
+                final String prevTabText = chartAreaTabs.getTabs().get(chartAreaTabs.getTabs().size() - 2).getText();
+                tab = new Tab("Graphs " + (Integer.parseInt(Character.toString(prevTabText.charAt(prevTabText.length() - 1))) + 1));
+            }
 
             ScrollPane scrollPane = new ScrollPane();
             scrollPane.setFitToHeight(true);
