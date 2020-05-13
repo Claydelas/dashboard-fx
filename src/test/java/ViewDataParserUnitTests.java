@@ -86,7 +86,7 @@ public class ViewDataParserUnitTests {
         clicks.add(new ClickRecord(LocalDateTime.parse("2015-01-01 12:01:21", f), 8895519749317550080L, 11.794442, 1, 2));
         clicks.add(new ClickRecord(LocalDateTime.parse("2015-01-01 12:01:21", f), 8895519749317550081L, 11.794442, 1, 3));
 
-        double cost = (0.001713 * 3) + (11.794442 * 3);
+        double cost = ((0.001713 * 3) + (11.794442 * 3))/100;
         assertEquals(cost, getTotalCost(impressions, clicks));
     }
 }
