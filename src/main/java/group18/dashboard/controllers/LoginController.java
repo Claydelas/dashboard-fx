@@ -70,7 +70,7 @@ public class LoginController {
             stage.sizeToScene();
             stage.setResizable(false);
         } else {
-            stage.setScene(new Scene(new FXMLLoader(App.class.getResource("dashboard.fxml")).load(), 1024, 600));
+            stage.setScene(new Scene(new FXMLLoader(App.class.getResource("dashboard.fxml")).load(), 1024, 650));
             stage.setMinHeight(500);
             stage.setMinWidth(810);
         }
