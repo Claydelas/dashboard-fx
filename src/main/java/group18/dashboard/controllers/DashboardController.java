@@ -138,7 +138,7 @@ public class DashboardController {
                 , new Label(String.format("\u00A3%.3f", campaignRecord.getCpm() / 100))
                 , new Label(String.format("%.2f%%", campaignRecord.getBounceRate() * 100)));
 
-        Label bdef = new Label("Current bounce definition:");
+        Label bdef = new Label("Current bounce criteria:");
         GridPane.setColumnSpan(bdef, 2);
         bdef.setStyle("-fx-font-weight: bold");
 
@@ -151,7 +151,7 @@ public class DashboardController {
                         " minutes spent on website");
         GridPane.setColumnSpan(timeLabel, 2);
 
-        final Label noDef = new Label("No bounce definition currently set.");
+        final Label noDef = new Label("No bounce criteria currently set.");
         GridPane.setColumnSpan(noDef, 2);
 
         campaignInfo.addColumn(0, bdef);
@@ -196,12 +196,11 @@ public class DashboardController {
             bounceDefinitionController.setParentController(this);
             bounceDefinitionController.setCurrentBounceValues();
 
-
             Stage stage = new Stage();
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.setScene(new Scene(bounceDefinitionForm));
             stage.getIcons().add(new Image(App.class.getResourceAsStream("icons/app.png")));
-            stage.setTitle("Update bounce definition");
+            stage.setTitle("Update bounce criteria");
             stage.sizeToScene();
             stage.setResizable(false);
             stage.show();

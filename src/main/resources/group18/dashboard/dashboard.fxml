@@ -20,7 +20,7 @@
             </Menu>
             <Menu mnemonicParsing="false" text="Manage">
                 <MenuItem fx:id="manageCampaignsMenu" mnemonicParsing="false" onAction="#manageCampaigns" text="Campaigns"/>
-                <MenuItem fx:id="manageBounceDefMenu" mnemonicParsing="false" onAction="#updateBounceDefinitionButtonAction" text="Bounce Definition"/>
+                <MenuItem fx:id="manageBounceDefMenu" mnemonicParsing="false" onAction="#updateBounceDefinitionButtonAction" text="Bounce Criteria"/>
             </Menu>
             <Menu mnemonicParsing="false" text="Accessibility">
                 <Menu mnemonicParsing="false" text="Font Size">
