@@ -19,6 +19,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
+import javafx.print.PrinterJob;
 import javafx.scene.Node;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.chart.*;
@@ -349,14 +350,20 @@ public class ChartFactory {
             image1.setFitHeight(20);
             image1.setPreserveRatio(true);
             png.setGraphic(image1);
-            final JFXButton close = new JFXButton();
-            ImageView image2 = new ImageView(App.class.getResource("icons/baseline_cancel_black_18dp.png").toString());
+            final JFXButton print = new JFXButton();
+            ImageView image2 = new ImageView(App.class.getResource("icons/print-512.png").toString());
             image2.setFitWidth(20);
             image2.setFitHeight(20);
             image2.setPreserveRatio(true);
-            close.setGraphic(image2);
+            print.setGraphic(image2);
+            final JFXButton close = new JFXButton();
+            ImageView image3 = new ImageView(App.class.getResource("icons/baseline_cancel_black_18dp.png").toString());
+            image3.setFitWidth(20);
+            image3.setFitHeight(20);
+            image3.setPreserveRatio(true);
+            close.setGraphic(image3);
 
-            final VBox buttons = new VBox(close, png);
+            final VBox buttons = new VBox(close, png, print);
 
             Platform.runLater(() -> {
                 pane.setCenter(chart);
@@ -367,6 +374,20 @@ public class ChartFactory {
                 saveAsPng(chart);
                 dashboardArea.requestFocus();
             });
+
+            print.setOnMouseClicked(e -> {
+                PrinterJob job = PrinterJob.createPrinterJob();
+
+                boolean proceed = job.showPrintDialog(dashboardArea.getScene().getWindow());
+
+                if (proceed) {
+                    boolean printed = job.printPage(chart);
+                    if (printed) {
+                        job.endJob();
+                    }
+                }
+            });
+
             close.setOnMouseClicked(e -> dashboardArea.getChildren().remove(pane));
 
             makeDraggable(pane);
